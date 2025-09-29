@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Standalone Usage Example - Changebot Widgets</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #333;
+      margin-top: 0;
+    }
+    .description {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+    .example-box {
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+    .example-box h3 {
+      margin-top: 0;
+      color: #2d3748;
+    }
+    .controls {
+      margin-top: 20px;
+      padding: 20px;
+      background: #f7fafc;
+      border-radius: 4px;
+    }
+    .control-group {
+      margin-bottom: 15px;
+    }
+    .control-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #4a5568;
+    }
+    button {
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background: #5568d3;
+    }
+    button.secondary {
+      background: #718096;
+    }
+    button.secondary:hover {
+      background: #4a5568;
+    }
+    input[type="number"] {
+      padding: 8px;
+      border: 1px solid #cbd5e0;
+      border-radius: 4px;
+      width: 100px;
+    }
+    .code-block {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 15px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+    }
+  </style>
+
+  <!-- Load Changebot Widgets -->
+  <script type="module" src="../dist/widgets/widgets.esm.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>⚡ Standalone Usage Example</h1>
+
+    <div class="description">
+      <p>Components can work without a provider for simple use cases. Use props and methods to control them directly:</p>
+    </div>
+
+    <!-- Standalone Badge Example -->
+    <div class="example-box">
+      <h3>1. Standalone Badge</h3>
+      <p>Use the <code>count</code> prop to control the badge directly without a provider:</p>
+
+      <div class="code-block">
+&lt;changebot-badge count="5" show-count="true" theme="light"&gt;&lt;/changebot-badge&gt;
+      </div>
+
+      <p>Live Example:</p>
+      <changebot-badge id="standalone-badge" count="0" show-count="true"></changebot-badge>
+
+      <div class="controls">
+        <div class="control-group">
+          <label>Update Count:</label>
+          <input type="number" id="badge-count" value="0" min="0" max="99">
+          <button onclick="updateBadgeCount()">Update</button>
+        </div>
+        <div class="control-group">
+          <label>Actions:</label>
+          <button onclick="setBadgeCount(0)">Clear</button>
+          <button onclick="setBadgeCount(5)">Set to 5</button>
+          <button onclick="setBadgeCount(15)">Set to 15</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Standalone Drawer Example -->
+    <div class="example-box">
+      <h3>2. Standalone Drawer</h3>
+      <p>Control the drawer using public methods (<code>open()</code>, <code>close()</code>, <code>setUpdates()</code>):</p>
+
+      <div class="code-block">
+// Get reference to drawer
+const drawer = document.querySelector('changebot-drawer');
+
+// Control it programmatically
+await drawer.open();
+await drawer.close();
+await drawer.setUpdates([...]);
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <label>Drawer Controls:</label>
+          <button onclick="openStandaloneDrawer()">Open Drawer</button>
+          <button class="secondary" onclick="closeStandaloneDrawer()">Close Drawer</button>
+        </div>
+        <div class="control-group">
+          <label>Display Mode:</label>
+          <button onclick="changeDrawerMode('drawer-left')">Left</button>
+          <button onclick="changeDrawerMode('drawer-right')">Right</button>
+          <button onclick="changeDrawerMode('modal')">Modal</button>
+        </div>
+        <div class="control-group">
+          <label>Data:</label>
+          <button onclick="loadSampleData()">Load Sample Updates</button>
+          <button class="secondary" onclick="clearUpdates()">Clear Updates</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Standalone drawer component -->
+    <changebot-drawer
+      id="standalone-drawer"
+      display-mode="drawer-right">
+    </changebot-drawer>
+  </div>
+
+  <script>
+    // Badge controls
+    function updateBadgeCount() {
+      const input = document.getElementById('badge-count');
+      const badge = document.getElementById('standalone-badge');
+      badge.count = parseInt(input.value);
+    }
+
+    function setBadgeCount(count) {
+      const badge = document.getElementById('standalone-badge');
+      const input = document.getElementById('badge-count');
+      badge.count = count;
+      input.value = count;
+    }
+
+    // Drawer controls
+    async function openStandaloneDrawer() {
+      const drawer = document.getElementById('standalone-drawer');
+      await drawer.open();
+    }
+
+    async function closeStandaloneDrawer() {
+      const drawer = document.getElementById('standalone-drawer');
+      await drawer.close();
+    }
+
+    async function changeDrawerMode(mode) {
+      const drawer = document.getElementById('standalone-drawer');
+      drawer.displayMode = mode;
+    }
+
+    async function loadSampleData() {
+      const drawer = document.getElementById('standalone-drawer');
+      const updates = [
+        {
+          id: '1',
+          title: 'Version 2.0 Released',
+          description: 'We\'re excited to announce the release of version 2.0 with many new features and improvements.',
+          date: new Date().toISOString(),
+          timestamp: Date.now(),
+          tags: [
+            { text: 'Release', color: '#667eea' },
+            { text: 'Major', color: '#48bb78' }
+          ],
+          details: '<ul><li>New dashboard design</li><li>Performance improvements</li><li>Bug fixes</li></ul>'
+        },
+        {
+          id: '2',
+          title: 'New Integration: Slack',
+          description: 'Connect your account with Slack for real-time notifications.',
+          date: new Date(Date.now() - 86400000).toISOString(),
+          timestamp: Date.now() - 86400000,
+          tags: [
+            { text: 'Integration', color: '#f6ad55' }
+          ]
+        },
+        {
+          id: '3',
+          title: 'Security Update',
+          description: 'Important security patches have been applied.',
+          date: new Date(Date.now() - 172800000).toISOString(),
+          timestamp: Date.now() - 172800000,
+          tags: [
+            { text: 'Security', color: '#f56565' }
+          ]
+        }
+      ];
+
+      await drawer.setUpdates(updates);
+      await drawer.open();
+    }
+
+    async function clearUpdates() {
+      const drawer = document.getElementById('standalone-drawer');
+      await drawer.setUpdates([]);
+    }
+  </script>
+</body>
+</html>

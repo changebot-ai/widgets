@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Display Modes Example - Changebot Widgets</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    .description {
+      color: #666;
+      line-height: 1.6;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 40px;
+    }
+    .mode-section {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    .mode-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .mode-header h2 {
+      margin: 0;
+      color: #333;
+    }
+    .mode-description {
+      color: #666;
+      margin-bottom: 15px;
+    }
+    .demo-button {
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+    .demo-button:hover {
+      background: #5568d3;
+    }
+    code {
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+    }
+  </style>
+
+  <!-- Load Changebot Widgets -->
+  <script type="module" src="../dist/widgets/widgets.esm.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>🎭 Display Modes Example</h1>
+
+    <div class="description">
+      <p>Changebot Widgets supports three display modes:</p>
+      <ul style="text-align: left; max-width: 600px; margin: 20px auto;">
+        <li><strong>drawer-right</strong>: Slides in from the right side</li>
+        <li><strong>drawer-left</strong>: Slides in from the left side</li>
+        <li><strong>modal</strong>: Displays as a centered modal with backdrop</li>
+      </ul>
+    </div>
+
+    <!-- Drawer Right Mode -->
+    <changebot-provider scope="drawer-right">
+      <div class="mode-section">
+        <div class="mode-header">
+          <div>
+            <h2>📱 Drawer Right Mode</h2>
+            <p class="mode-description">
+              Displays as a drawer that slides in from the right side of the screen.
+              <br><code>display-mode="drawer-right"</code>
+            </p>
+          </div>
+          <changebot-badge scope="drawer-right"></changebot-badge>
+        </div>
+        <button class="demo-button" onclick="openDrawer('drawer-right')">
+          Open Drawer Right
+        </button>
+      </div>
+
+      <changebot-drawer
+        scope="drawer-right"
+        display-mode="drawer-right">
+      </changebot-drawer>
+    </changebot-provider>
+
+    <!-- Drawer Left Mode -->
+    <changebot-provider scope="drawer-left">
+      <div class="mode-section">
+        <div class="mode-header">
+          <div>
+            <h2>📱 Drawer Left Mode</h2>
+            <p class="mode-description">
+              Displays as a drawer that slides in from the left side of the screen.
+              <br><code>display-mode="drawer-left"</code>
+            </p>
+          </div>
+          <changebot-badge scope="drawer-left"></changebot-badge>
+        </div>
+        <button class="demo-button" onclick="openDrawer('drawer-left')">
+          Open Drawer Left
+        </button>
+      </div>
+
+      <changebot-drawer
+        scope="drawer-left"
+        display-mode="drawer-left">
+      </changebot-drawer>
+    </changebot-provider>
+
+    <!-- Modal Mode -->
+    <changebot-provider scope="modal">
+      <div class="mode-section">
+        <div class="mode-header">
+          <div>
+            <h2>🪟 Modal Mode</h2>
+            <p class="mode-description">
+              Displays as a centered modal dialog with a backdrop overlay.
+              <br><code>display-mode="modal"</code>
+            </p>
+          </div>
+          <changebot-badge scope="modal"></changebot-badge>
+        </div>
+        <button class="demo-button" onclick="openDrawer('modal')">
+          Open Modal
+        </button>
+      </div>
+
+      <changebot-drawer
+        scope="modal"
+        display-mode="modal">
+      </changebot-drawer>
+    </changebot-provider>
+  </div>
+
+  <script>
+    // Helper function to open drawers programmatically
+    function openDrawer(scope) {
+      const event = new CustomEvent('changebot:action', {
+        detail: {
+          type: 'openDisplay',
+          scope: scope
+        },
+        bubbles: true,
+        composed: true
+      });
+      document.dispatchEvent(event);
+    }
+
+    // Simulate updates for all modes
+    const sampleUpdates = [
+      {
+        id: '1',
+        title: 'New Feature: Dark Mode',
+        description: 'We\'ve added a beautiful dark mode to improve your viewing experience.',
+        date: new Date().toISOString(),
+        timestamp: Date.now(),
+        tags: [{ text: 'Feature', color: '#667eea' }]
+      },
+      {
+        id: '2',
+        title: 'Bug Fix: Login Issue',
+        description: 'Fixed an issue where some users couldn\'t log in.',
+        date: new Date(Date.now() - 86400000).toISOString(),
+        timestamp: Date.now() - 86400000,
+        tags: [{ text: 'Bug Fix', color: '#f56565' }]
+      },
+      {
+        id: '3',
+        title: 'Performance Improvements',
+        description: 'The app now loads 50% faster!',
+        date: new Date(Date.now() - 172800000).toISOString(),
+        timestamp: Date.now() - 172800000,
+        tags: [{ text: 'Performance', color: '#48bb78' }]
+      }
+    ];
+
+    // Apply updates to all providers
+    setTimeout(() => {
+      const providers = document.querySelectorAll('changebot-provider');
+      providers.forEach(provider => {
+        if (provider.services) {
+          provider.services.store.state = {
+            ...provider.services.store.state,
+            updates: sampleUpdates
+          };
+        }
+      });
+    }, 1000);
+  </script>
+</body>
+</html>

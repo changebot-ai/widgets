@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multiple Scopes Example - Changebot Widgets</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    .description {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 30px;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 40px;
+    }
+    .app-section {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      color: white;
+    }
+    .app-1 .app-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .app-2 .app-header {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    .code-block {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 20px;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 20px auto 40px;
+      max-width: 800px;
+    }
+    code {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+    }
+  </style>
+
+  <!-- Load Changebot Widgets -->
+  <script type="module" src="../dist/widgets/widgets.esm.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 Multiple Scopes Example</h1>
+
+    <div class="description">
+      <p>This example shows how multiple independent widget systems can coexist on the same page using different scopes.</p>
+      <p>Each scope has its own provider, badge, and drawer that work independently.</p>
+    </div>
+
+    <div class="code-block">
+      <code>&lt;!-- App 1 --&gt;
+&lt;changebot-provider scope="app1"&gt;
+  &lt;changebot-badge scope="app1"&gt;&lt;/changebot-badge&gt;
+  &lt;changebot-drawer scope="app1"&gt;&lt;/changebot-drawer&gt;
+&lt;/changebot-provider&gt;
+
+&lt;!-- App 2 --&gt;
+&lt;changebot-provider scope="app2"&gt;
+  &lt;changebot-badge scope="app2"&gt;&lt;/changebot-badge&gt;
+  &lt;changebot-drawer scope="app2"&gt;&lt;/changebot-drawer&gt;
+&lt;/changebot-provider&gt;</code>
+    </div>
+
+    <!-- First Application Scope -->
+    <changebot-provider scope="app1">
+      <div class="app-section app-1">
+        <div class="app-header">
+          <h2>📱 Application 1 - Main Product</h2>
+          <changebot-badge scope="app1"></changebot-badge>
+        </div>
+        <p>This is Application 1 with its own set of updates.</p>
+        <p>Click the badge to see updates specific to this application.</p>
+      </div>
+
+      <changebot-drawer
+        scope="app1"
+        display-mode="drawer-right">
+      </changebot-drawer>
+    </changebot-provider>
+
+    <!-- Second Application Scope -->
+    <changebot-provider scope="app2">
+      <div class="app-section app-2">
+        <div class="app-header">
+          <h2>🚀 Application 2 - Admin Dashboard</h2>
+          <changebot-badge scope="app2"></changebot-badge>
+        </div>
+        <p>This is Application 2 with completely independent updates.</p>
+        <p>Notice how the badge and updates are separate from Application 1.</p>
+      </div>
+
+      <changebot-drawer
+        scope="app2"
+        display-mode="drawer-left">
+      </changebot-drawer>
+    </changebot-provider>
+  </div>
+
+  <script>
+    // Simulate updates for App 1
+    setTimeout(() => {
+      const provider1 = document.querySelectorAll('changebot-provider')[0];
+      if (provider1 && provider1.services) {
+        provider1.services.store.state = {
+          ...provider1.services.store.state,
+          updates: [
+            {
+              id: 'app1-1',
+              title: 'Main App: New Dashboard',
+              description: 'We\'ve redesigned the main dashboard with better analytics.',
+              date: new Date().toISOString(),
+              timestamp: Date.now(),
+              tags: [{ text: 'Feature', color: '#667eea' }]
+            },
+            {
+              id: 'app1-2',
+              title: 'Main App: Export Feature',
+              description: 'You can now export your data to CSV and PDF.',
+              date: new Date(Date.now() - 86400000).toISOString(),
+              timestamp: Date.now() - 86400000,
+              tags: [{ text: 'Feature', color: '#667eea' }]
+            }
+          ]
+        };
+      }
+    }, 1000);
+
+    // Simulate updates for App 2
+    setTimeout(() => {
+      const provider2 = document.querySelectorAll('changebot-provider')[1];
+      if (provider2 && provider2.services) {
+        provider2.services.store.state = {
+          ...provider2.services.store.state,
+          updates: [
+            {
+              id: 'app2-1',
+              title: 'Admin: User Management Update',
+              description: 'Enhanced user management with bulk actions.',
+              date: new Date().toISOString(),
+              timestamp: Date.now(),
+              tags: [{ text: 'Admin', color: '#f5576c' }]
+            },
+            {
+              id: 'app2-2',
+              title: 'Admin: Security Patch',
+              description: 'Applied latest security updates to admin panel.',
+              date: new Date(Date.now() - 43200000).toISOString(),
+              timestamp: Date.now() - 43200000,
+              tags: [{ text: 'Security', color: '#f56565' }]
+            },
+            {
+              id: 'app2-3',
+              title: 'Admin: Audit Logs',
+              description: 'New audit log viewer for tracking admin actions.',
+              date: new Date(Date.now() - 172800000).toISOString(),
+              timestamp: Date.now() - 172800000,
+              tags: [{ text: 'Feature', color: '#f5576c' }]
+            }
+          ]
+        };
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
