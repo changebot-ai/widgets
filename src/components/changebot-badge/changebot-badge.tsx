@@ -48,7 +48,7 @@ export class ChangebotBadge {
         this.services = services;
         this.subscribeToStore();
       },
-      scope: this.scope
+      scope: this.scope || 'default'  // Ensure we always have a scope
     };
 
     this.el.dispatchEvent(
