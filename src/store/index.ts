@@ -160,34 +160,117 @@ const defaultStore = createStore<StoreState>({
 export const updatesStore = defaultStore;
 
 // Create and export default actions
-export const actions: StoreActions & { loadUpdates: (slug?: string, endpoint?: string) => Promise<void>, markViewed: (timestamp?: string) => void } = {
-  async loadUpdates(slug?: string, endpoint?: string) {
+export const actions: StoreActions & { loadUpdates: (slug?: string, url?: string) => Promise<void>, markViewed: (timestamp?: string) => void } = {
+  async loadUpdates(slug?: string, url?: string) {
     updatesStore.state.isLoading = true;
     updatesStore.state.error = null;
 
     try {
-      let url: string;
-      if (endpoint) {
-        url = endpoint;
-        if (slug) {
-          // Add slug as query parameter to custom endpoint
-          const urlObj = new URL(endpoint);
-          urlObj.searchParams.set('slug', slug);
-          url = urlObj.toString();
-        }
-      } else if (slug) {
-        url = `https://app.changebot.ai/api/v1/updates?slug=${slug}`;
+      let apiUrl: string;
+      if (slug) {
+        // Slug takes precedence - always use the standard API format
+        apiUrl = `https://api.changebot.ai/v1/updates/${slug}`;
+      } else if (url) {
+        // Use url as-is without modification
+        apiUrl = url;
       } else {
-        throw new Error('Either slug or endpoint must be provided');
+        throw new Error('Either slug or url must be provided');
       }
 
-      const response = await fetch(url);
-      if (!response.ok) {
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+        mode: 'cors',
+      });
+
+      // Handle rate limiting
+      if (response.status === 429) {
+        const retryAfterHeader = response.headers.get('Retry-After');
+        const rateLimitHeaders = {
+          limit: response.headers.get('X-RateLimit-Limit'),
+          remaining: response.headers.get('X-RateLimit-Remaining'),
+          reset: response.headers.get('X-RateLimit-Reset'),
+          retryAfter: retryAfterHeader
+        };
+
+        // Use server's Retry-After if provided, otherwise use a sensible default
+        // Since we poll every 30 seconds, wait at least 60 seconds on rate limit
+        let waitTime = 60000; // Default 60 seconds
+
+        if (retryAfterHeader) {
+          // Retry-After can be seconds or an HTTP date
+          const retryAfterSeconds = parseInt(retryAfterHeader);
+          if (!isNaN(retryAfterSeconds)) {
+            waitTime = retryAfterSeconds * 1000;
+          }
+        } else if (rateLimitHeaders.reset) {
+          // Calculate wait time from reset timestamp
+          const resetTime = parseInt(rateLimitHeaders.reset) * 1000;
+          waitTime = Math.max(resetTime - Date.now(), 60000);
+        }
+
+        const errorMessage = `Rate limited. Will retry in ${Math.ceil(waitTime / 1000)} seconds.`;
+        updatesStore.state.error = errorMessage;
+        updatesStore.state.isLoading = false;
+
+        // Dispatch error event for UI to handle
+        document.dispatchEvent(new CustomEvent('changebot:error', {
+          detail: { error: errorMessage, type: 'rate-limit' },
+          bubbles: true
+        }));
+
+        // Detailed console logging
+        console.group('🚫 Rate Limit Detected (HTTP 429)');
+        console.log(`URL: ${apiUrl}`);
+        console.log(`Wait Time: ${Math.ceil(waitTime / 1000)} seconds`);
+
+        if (Object.values(rateLimitHeaders).some(h => h !== null)) {
+          console.log('Rate Limit Headers:', rateLimitHeaders);
+          if (rateLimitHeaders.reset) {
+            const resetDate = new Date(parseInt(rateLimitHeaders.reset) * 1000);
+            console.log(`Reset Time: ${resetDate.toLocaleTimeString()}`);
+          }
+        }
+
+        console.log(`Next Retry: ${new Date(Date.now() + waitTime).toLocaleTimeString()}`);
+        console.log('💡 Tip: Normal polling is paused until rate limit clears');
+        console.groupEnd();
+
+        // Don't retry automatically - let the normal polling handle it
+        // Just log that we're rate limited
+        return;
+      }
+
+      // Handle successful request
+      if (response.ok) {
+        // Success - continue processing
+      } else {
         throw new Error(`Failed to fetch updates: ${response.statusText}`);
       }
 
       const data = await response.json();
-      updatesStore.state.updates = Array.isArray(data) ? data : data.updates || [];
+
+      // Parse the API response format
+      let updates = [];
+      if (Array.isArray(data)) {
+        updates = data;
+      } else if (data.data && Array.isArray(data.data)) {
+        // Transform API response to our Update format
+        updates = data.data.map((item: any) => ({
+          id: item.id.toString(),
+          title: item.attributes?.title || 'Untitled',
+          description: item.attributes?.content?.body || '',
+          date: item.attributes?.published_at || new Date().toISOString(),
+          timestamp: new Date(item.attributes?.published_at || Date.now()).getTime(),
+          tags: []
+        }));
+      } else if (data.updates) {
+        updates = data.updates;
+      }
+
+      updatesStore.state.updates = updates;
       updatesStore.state.isLoading = false;
 
       // Calculate new updates count

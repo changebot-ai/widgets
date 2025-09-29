@@ -9,39 +9,36 @@ import { updatesStore, actions } from '../../store';
 export class ChangebotProvider {
   @Element() el: HTMLElement;
 
-  @Prop() endpoint?: string;
+  @Prop() url?: string;
   @Prop() slug?: string;
   @Prop() scope: string = 'default';
   @Prop() pollInterval?: number;
 
-  private services: {
-    store: typeof updatesStore;
-    actions: typeof actions;
-    config: {
-      endpoint?: string;
-      slug?: string;
-      scope: string;
-      pollInterval?: number;
-    };
-  };
-
   pollTimer?: NodeJS.Timeout;  // Made public for testing
 
+  // Initialize services immediately when component is created
+  private services = {
+    store: updatesStore,
+    actions: actions,
+    config: {
+      url: this.url,
+      slug: this.slug,
+      scope: this.scope || 'default',
+      pollInterval: this.pollInterval,
+    },
+  };
+
   componentWillLoad() {
-    // Setup services object
-    this.services = {
-      store: updatesStore,
-      actions: actions,
-      config: {
-        endpoint: this.endpoint,
-        slug: this.slug,
-        scope: this.scope,
-        pollInterval: this.pollInterval,
-      },
+    // Update services config with actual prop values
+    this.services.config = {
+      url: this.url,
+      slug: this.slug,
+      scope: this.scope,
+      pollInterval: this.pollInterval,
     };
 
-    // Load initial data if endpoint or slug provided
-    if (this.endpoint || this.slug) {
+    // Load initial data if url or slug provided
+    if (this.url || this.slug) {
       this.loadUpdates();
 
       // Setup polling if interval provided
@@ -104,7 +101,7 @@ export class ChangebotProvider {
 
   private async loadUpdates() {
     try {
-      await actions.loadUpdates(this.slug, this.endpoint);
+      await actions.loadUpdates(this.slug, this.url);
     } catch (error) {
       console.error('Failed to load updates:', error);
       // Store error is already handled in the action

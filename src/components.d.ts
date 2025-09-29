@@ -16,13 +16,13 @@ export namespace Components {
         "theme"?: 'light' | 'dark';
     }
     interface ChangebotProvider {
-        "endpoint"?: string;
         "pollInterval"?: number;
         /**
           * @default 'default'
          */
         "scope": string;
         "slug"?: string;
+        "url"?: string;
     }
     interface MyComponent {
         /**
@@ -75,13 +75,13 @@ declare namespace LocalJSX {
         "theme"?: 'light' | 'dark';
     }
     interface ChangebotProvider {
-        "endpoint"?: string;
         "pollInterval"?: number;
         /**
           * @default 'default'
          */
         "scope"?: string;
         "slug"?: string;
+        "url"?: string;
     }
     interface MyComponent {
         /**
