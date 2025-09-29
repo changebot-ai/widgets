@@ -128,7 +128,7 @@ export class ChangebotBadge {
     localStorage.setItem(key, Date.now().toString());
 
     // Dispatch open action
-    dispatchAction(this.el, 'openUpdates', undefined, this.scope);
+    dispatchAction(this.el, 'openDisplay', undefined, this.scope);
   };
 
   private handleKeyDown = (event: KeyboardEvent) => {

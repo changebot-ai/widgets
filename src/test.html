@@ -298,6 +298,42 @@
       </div>
     </section>
 
+    <!-- Drawer Component Testing -->
+    <section>
+      <h2>Drawer/Modal Component</h2>
+      <p>Test the updates display component in different modes:</p>
+
+      <div class="demo-grid">
+        <div class="demo-item">
+          <h3>Drawer Right (Default)</h3>
+          <changebot-drawer id="drawer-right"></changebot-drawer>
+          <button onclick="openDrawer('drawer-right')">Open Drawer</button>
+          <code>&lt;changebot-drawer display-mode="drawer-right"&gt;&lt;/changebot-drawer&gt;</code>
+        </div>
+
+        <div class="demo-item">
+          <h3>Drawer Left</h3>
+          <changebot-drawer id="drawer-left" display-mode="drawer-left"></changebot-drawer>
+          <button onclick="openDrawer('drawer-left')">Open Drawer</button>
+          <code>&lt;changebot-drawer display-mode="drawer-left"&gt;&lt;/changebot-drawer&gt;</code>
+        </div>
+
+        <div class="demo-item">
+          <h3>Modal</h3>
+          <changebot-drawer id="modal" display-mode="modal"></changebot-drawer>
+          <button onclick="openDrawer('modal')">Open Modal</button>
+          <code>&lt;changebot-drawer display-mode="modal"&gt;&lt;/changebot-drawer&gt;</code>
+        </div>
+      </div>
+
+      <div class="controls">
+        <h3>Drawer Controls</h3>
+        <button onclick="populateDrawers()">Populate with Mock Updates</button>
+        <button onclick="clearDrawers()">Clear Updates</button>
+        <button onclick="closeAllDrawers()">Close All</button>
+      </div>
+    </section>
+
     <!-- Testing Controls -->
     <section>
       <h2>Testing Controls</h2>
@@ -393,6 +429,34 @@
           <td>number</td>
           <td>-</td>
           <td>Manual count (bypasses provider)</td>
+        </tr>
+      </table>
+
+      <h3>changebot-drawer</h3>
+      <table>
+        <tr>
+          <th>Prop</th>
+          <th>Type</th>
+          <th>Default</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>scope</code></td>
+          <td>string</td>
+          <td>"default"</td>
+          <td>Connect to provider with matching scope</td>
+        </tr>
+        <tr>
+          <td><code>theme</code></td>
+          <td>"light" | "dark"</td>
+          <td>-</td>
+          <td>Drawer color theme</td>
+        </tr>
+        <tr>
+          <td><code>display-mode</code></td>
+          <td>"drawer-left" | "drawer-right" | "modal"</td>
+          <td>"drawer-right"</td>
+          <td>Display mode for the updates</td>
         </tr>
       </table>
     </section>
@@ -508,6 +572,94 @@
       setTimeout(() => {
         status.style.background = '#f8f9fa';
       }, 2000);
+    }
+
+    // Drawer control functions
+    async function openDrawer(id) {
+      const drawer = document.getElementById(id);
+      if (drawer) {
+        await drawer.open();
+        updateStatus(`Opened drawer: ${id}`);
+      }
+    }
+
+    async function closeAllDrawers() {
+      const promises = ['drawer-right', 'drawer-left', 'modal'].map(async id => {
+        const drawer = document.getElementById(id);
+        if (drawer) {
+          await drawer.close();
+        }
+      });
+      await Promise.all(promises);
+      updateStatus('Closed all drawers');
+    }
+
+    async function populateDrawers() {
+      const mockUpdates = [
+        {
+          id: '1',
+          title: 'New Feature: Dark Mode Support',
+          description: 'We\'ve added full dark mode support across all components with automatic theme detection.',
+          date: '2024-01-15',
+          timestamp: Date.now() - 86400000, // 1 day ago
+          tags: [
+            { text: 'Feature', color: '#3b82f6' },
+            { text: 'UI', color: '#8b5cf6' }
+          ]
+        },
+        {
+          id: '2',
+          title: 'Performance Improvements',
+          description: 'Significant performance improvements in rendering and state management.',
+          date: '2024-01-10',
+          timestamp: Date.now() - 86400000 * 5, // 5 days ago
+          tags: [
+            { text: 'Performance', color: '#10b981' }
+          ]
+        },
+        {
+          id: '3',
+          title: 'Bug Fix: ESC Key Handling',
+          description: 'Fixed an issue where ESC key wasn\'t properly closing the drawer in certain scenarios.',
+          date: '2024-01-08',
+          timestamp: Date.now() - 86400000 * 7, // 7 days ago
+          tags: [
+            { text: 'Bug Fix', color: '#ef4444' }
+          ]
+        },
+        {
+          id: '4',
+          title: 'New Component: Drawer',
+          description: 'Added a new drawer component with left, right, and modal display modes.',
+          date: '2024-01-05',
+          timestamp: Date.now() - 86400000 * 10, // 10 days ago
+          tags: [
+            { text: 'Feature', color: '#3b82f6' },
+            { text: 'Component', color: '#f59e0b' }
+          ]
+        }
+      ];
+
+      const promises = ['drawer-right', 'drawer-left', 'modal'].map(async id => {
+        const drawer = document.getElementById(id);
+        if (drawer) {
+          await drawer.setUpdates(mockUpdates);
+        }
+      });
+      await Promise.all(promises);
+
+      updateStatus('Populated all drawers with mock updates');
+    }
+
+    async function clearDrawers() {
+      const promises = ['drawer-right', 'drawer-left', 'modal'].map(async id => {
+        const drawer = document.getElementById(id);
+        if (drawer) {
+          await drawer.setUpdates([]);
+        }
+      });
+      await Promise.all(promises);
+      updateStatus('Cleared all drawer updates');
     }
 
     // Log when ready

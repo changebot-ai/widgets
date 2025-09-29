@@ -127,7 +127,7 @@ describe('changebot-badge', () => {
     expect(mockStore.onChange).toHaveBeenCalledWith('updates', expect.any(Function));
   });
 
-  it('dispatches openUpdates action on click', async () => {
+  it('dispatches openDisplay action on click', async () => {
     const dispatchEventSpy = jest.fn();
 
     const { root } = await newSpecPage({
@@ -148,7 +148,7 @@ describe('changebot-badge', () => {
         bubbles: true,
         composed: true,
         detail: expect.objectContaining({
-          type: 'openUpdates',
+          type: 'openDisplay',
           scope: 'default'
         })
       })
@@ -174,7 +174,7 @@ describe('changebot-badge', () => {
       expect.objectContaining({
         type: 'changebot:action',
         detail: expect.objectContaining({
-          type: 'openUpdates'
+          type: 'openDisplay'
         })
       })
     );
@@ -199,7 +199,7 @@ describe('changebot-badge', () => {
       expect.objectContaining({
         type: 'changebot:action',
         detail: expect.objectContaining({
-          type: 'openUpdates'
+          type: 'openDisplay'
         })
       })
     );

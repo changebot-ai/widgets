@@ -5,6 +5,8 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { Update } from "./types";
+export { Update } from "./types";
 export namespace Components {
     interface ChangebotBadge {
         "count"?: number;
@@ -13,6 +15,26 @@ export namespace Components {
           * @default true
          */
         "showCount": boolean;
+        "theme"?: 'light' | 'dark';
+    }
+    interface ChangebotDrawer {
+        /**
+          * Close the drawer/modal
+         */
+        "close": () => Promise<void>;
+        /**
+          * @default 'drawer-right'
+         */
+        "displayMode": 'drawer-left' | 'drawer-right' | 'modal';
+        /**
+          * Open the drawer/modal
+         */
+        "open": () => Promise<void>;
+        "scope"?: string;
+        /**
+          * Set the updates to display
+         */
+        "setUpdates": (updates: Update[]) => Promise<void>;
         "theme"?: 'light' | 'dark';
     }
     interface ChangebotProvider {
@@ -46,6 +68,12 @@ declare global {
         prototype: HTMLChangebotBadgeElement;
         new (): HTMLChangebotBadgeElement;
     };
+    interface HTMLChangebotDrawerElement extends Components.ChangebotDrawer, HTMLStencilElement {
+    }
+    var HTMLChangebotDrawerElement: {
+        prototype: HTMLChangebotDrawerElement;
+        new (): HTMLChangebotDrawerElement;
+    };
     interface HTMLChangebotProviderElement extends Components.ChangebotProvider, HTMLStencilElement {
     }
     var HTMLChangebotProviderElement: {
@@ -60,6 +88,7 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "changebot-badge": HTMLChangebotBadgeElement;
+        "changebot-drawer": HTMLChangebotDrawerElement;
         "changebot-provider": HTMLChangebotProviderElement;
         "my-component": HTMLMyComponentElement;
     }
@@ -72,6 +101,14 @@ declare namespace LocalJSX {
           * @default true
          */
         "showCount"?: boolean;
+        "theme"?: 'light' | 'dark';
+    }
+    interface ChangebotDrawer {
+        /**
+          * @default 'drawer-right'
+         */
+        "displayMode"?: 'drawer-left' | 'drawer-right' | 'modal';
+        "scope"?: string;
         "theme"?: 'light' | 'dark';
     }
     interface ChangebotProvider {
@@ -99,6 +136,7 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "changebot-badge": ChangebotBadge;
+        "changebot-drawer": ChangebotDrawer;
         "changebot-provider": ChangebotProvider;
         "my-component": MyComponent;
     }
@@ -108,6 +146,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "changebot-badge": LocalJSX.ChangebotBadge & JSXBase.HTMLAttributes<HTMLChangebotBadgeElement>;
+            "changebot-drawer": LocalJSX.ChangebotDrawer & JSXBase.HTMLAttributes<HTMLChangebotDrawerElement>;
             "changebot-provider": LocalJSX.ChangebotProvider & JSXBase.HTMLAttributes<HTMLChangebotProviderElement>;
             "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }

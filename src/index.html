@@ -1,283 +1,358 @@
-<!DOCTYPE html>
+<!doctype html>
 <html dir="ltr" lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
-  <title>Changebot Widget - Simple Example</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+    <title>Changebot Widget - Simple Example</title>
 
-  <script type="module" src="/build/widgets.esm.js"></script>
-  <script nomodule src="/build/widgets.js"></script>
+    <script type="module" src="/build/widgets.esm.js"></script>
+    <script nomodule src="/build/widgets.js"></script>
 
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      margin: 0;
-      padding: 40px;
-      background: #f5f5f5;
-    }
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        margin: 0;
+        padding: 40px;
+        background: #f5f5f5;
+      }
 
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      background: white;
-      padding: 40px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
 
-    h1 {
-      margin-top: 0;
-      color: #333;
-    }
+      h1 {
+        margin-top: 0;
+        color: #333;
+      }
 
-    .example-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px;
-      background: #f9f9f9;
-      border-radius: 4px;
-      margin: 20px 0;
-    }
+      .example-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 4px;
+        margin: 20px 0;
+      }
 
-    .example-header h2 {
-      margin: 0;
-      font-size: 18px;
-    }
+      .example-header h2 {
+        margin: 0;
+        font-size: 18px;
+      }
 
-    code {
-      display: block;
-      background: #1e1e1e;
-      color: #d4d4d4;
-      padding: 20px;
-      border-radius: 4px;
-      overflow-x: auto;
-      font-family: 'Courier New', monospace;
-      margin: 20px 0;
-    }
+      code {
+        display: block;
+        background: #1e1e1e;
+        color: #d4d4d4;
+        padding: 20px;
+        border-radius: 4px;
+        overflow-x: auto;
+        font-family: 'Courier New', monospace;
+        margin: 20px 0;
+      }
 
-    a {
-      color: #007bff;
-      text-decoration: none;
-    }
+      a {
+        color: #007bff;
+        text-decoration: none;
+      }
 
-    a:hover {
-      text-decoration: underline;
-    }
+      a:hover {
+        text-decoration: underline;
+      }
 
-    button {
-      padding: 8px 16px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-right: 10px;
-    }
+      button {
+        padding: 8px 16px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-right: 10px;
+      }
 
-    button:hover {
-      background: #0056b3;
-    }
+      button:hover {
+        background: #0056b3;
+      }
 
-    .controls {
-      margin: 20px 0;
-      padding: 15px;
-      background: #f8f9fa;
-      border-radius: 4px;
-    }
+      .controls {
+        margin: 20px 0;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 4px;
+      }
 
-    .input-group {
-      margin: 15px 0;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
+      .controls h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 16px;
+        color: #333;
+      }
 
-    .input-group label {
-      font-size: 14px;
-      color: #666;
-      min-width: 150px;
-    }
+      .input-group {
+        margin: 15px 0;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
 
-    .input-group input {
-      padding: 6px 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 14px;
-      flex: 1;
-      max-width: 300px;
-    }
+      .input-group label {
+        font-size: 14px;
+        color: #666;
+        min-width: 150px;
+      }
 
-    .error-banner {
-      background: #fff3cd;
-      border: 1px solid #ffc107;
-      color: #856404;
-      padding: 10px;
-      border-radius: 4px;
-      margin: 10px 0;
-      display: none;
-    }
+      .input-group input,
+      .input-group select {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        flex: 1;
+        max-width: 300px;
+      }
 
-    .error-banner.visible {
-      display: block;
-    }
-  </style>
-</head>
-<body>
-  <!-- Provider Component - Required for state management -->
-  <changebot-provider slug="changebot" poll-interval="30"></changebot-provider>
+      .button-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin: 15px 0;
+      }
 
-  <div class="container">
-    <h1>Changebot Widget - Production Example</h1>
-    <p>This is a simple example showing the widget in action with real production data.</p>
+      .button-group button {
+        margin: 0;
+      }
 
-    <div class="example-header">
-      <h2>Your Application Header</h2>
-      <changebot-badge></changebot-badge>
-    </div>
+      .error-banner {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        color: #856404;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+        display: none;
+      }
 
-    <div id="error-banner" class="error-banner"></div>
+      .error-banner.visible {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Provider Component - Required for state management -->
+    <changebot-provider slug="changebot" poll-interval="30"></changebot-provider>
 
-    <p>The badge above shows the number of new updates from your Changebot feed. It will:</p>
-    <ul>
-      <li>Poll for updates every 30 seconds</li>
-      <li>Show the count of unread updates</li>
-      <li>Remember what you've already seen using localStorage</li>
-      <li>Hide automatically when there are no new updates</li>
-    </ul>
+    <!-- Updates Drawer - Will open when badge is clicked -->
+    <changebot-drawer display-mode="drawer-right"></changebot-drawer>
 
-    <div class="controls">
-      <div class="input-group">
-        <label for="timestamp-input">Set Last Viewed:</label>
-        <input type="datetime-local" id="timestamp-input" />
-        <button onclick="setLastViewed()">Set & Reload</button>
+    <div class="container">
+      <h1>Changebot Widget - Production Example</h1>
+      <p>This is a simple example showing the widget in action with real production data.</p>
+
+      <div class="example-header">
+        <h2>Your Application Header</h2>
+        <changebot-badge></changebot-badge>
       </div>
-      <button onclick="clearLastViewed()">Clear Last Viewed & Reload</button>
-      <button onclick="setToOneHourAgo()">Set to 1 Hour Ago</button>
-      <button onclick="setToYesterday()">Set to Yesterday</button>
-      <button onclick="logStore()">Log Store State</button>
-    </div>
 
-    <h2>Integration Code</h2>
-    <code>&lt;!-- Add once per page --&gt;
-&lt;changebot-provider slug="changebot" poll-interval="30"&gt;&lt;/changebot-provider&gt;
+      <div id="error-banner" class="error-banner"></div>
+
+      <p>The badge above shows the number of new updates from your Changebot feed. <strong>Click the badge</strong> to open the updates drawer!</p>
+
+      <p>Features:</p>
+      <ul>
+        <li>✨ <strong>Click the badge</strong> to open the updates drawer</li>
+        <li>🔄 Polls for updates every 30 seconds automatically</li>
+        <li>📊 Shows count of unread updates on the badge</li>
+        <li>💾 Remembers what you've already seen using localStorage</li>
+        <li>🎯 Badge hides automatically when there are no new updates</li>
+        <li>⌨️ Press <code style="display: inline; padding: 2px 6px; background: #e0e0e0; color: #333">ESC</code> to close the drawer</li>
+      </ul>
+
+      <div class="controls">
+        <h3>Drawer Display Mode</h3>
+        <div class="input-group">
+          <label for="display-mode-select">Display Mode:</label>
+          <select id="display-mode-select" onchange="changeDisplayMode()">
+            <option value="drawer-right" selected>Drawer Right</option>
+            <option value="drawer-left">Drawer Left</option>
+            <option value="modal">Modal (Center)</option>
+          </select>
+        </div>
+
+        <h3>Testing Controls</h3>
+        <div class="button-group">
+          <button onclick="openDrawer()">Open Drawer Manually</button>
+          <button onclick="logStore()">Log Store State</button>
+        </div>
+
+        <h3>Last Viewed Timestamp</h3>
+        <div class="input-group">
+          <label for="timestamp-input">Set Last Viewed:</label>
+          <input type="datetime-local" id="timestamp-input" />
+          <button onclick="setLastViewed()">Set & Reload</button>
+        </div>
+        <div class="button-group">
+          <button onclick="clearLastViewed()">Clear Last Viewed & Reload</button>
+          <button onclick="setToOneHourAgo()">Set to 1 Hour Ago</button>
+          <button onclick="setToYesterday()">Set to Yesterday</button>
+        </div>
+      </div>
+
+      <h2>Integration Code</h2>
+      <pre><code>&lt;!-- Add before the closing body tag --&gt;
+&lt;changebot-provider slug="changebot" poll-interval="30" /&gt;
+
+&lt;!-- Updates drawer (opens when badge is clicked) --&gt;
+&lt;changebot-drawer display-mode="drawer-right" /&gt;
 
 &lt;!-- Add badge wherever you want it to appear --&gt;
-&lt;changebot-badge&gt;&lt;/changebot-badge&gt;</code>
+&lt;changebot-badge /&gt;</code></pre>
 
-    <p>
-      <a href="/test.html">View comprehensive testing page →</a>
-    </p>
-  </div>
+      <p>
+        <a href="/test.html">View comprehensive testing page →</a>
+      </p>
+    </div>
 
-  <script>
-    // Log events for debugging (don't interfere with propagation)
-    document.addEventListener('changebot:context-request', (e) => {
-      console.log('Page: Context request event detected:', e.detail);
-    }, false); // Use bubble phase, not capture
+    <script>
+      // Log events for debugging (don't interfere with propagation)
+      document.addEventListener(
+        'changebot:context-request',
+        e => {
+          console.log('Page: Context request event detected:', e.detail);
+        },
+        false,
+      ); // Use bubble phase, not capture
 
-    document.addEventListener('changebot:action', (e) => {
-      console.log('Action dispatched:', e.detail);
-    });
+      document.addEventListener('changebot:action', e => {
+        console.log('Action dispatched:', e.detail);
+      });
 
-    // Clear localStorage and reload
-    function clearLastViewed() {
-      localStorage.removeItem('changebot:lastViewed:default');
-      console.log('Cleared last viewed timestamp. Reloading...');
-      setTimeout(() => location.reload(), 500);
-    }
-
-    // Set last viewed from input
-    function setLastViewed() {
-      const input = document.getElementById('timestamp-input');
-      if (input.value) {
-        const timestamp = new Date(input.value).getTime();
-        localStorage.setItem('changebot:lastViewed:default', timestamp.toString());
-        console.log('Set last viewed to:', new Date(timestamp));
+      // Clear localStorage and reload
+      function clearLastViewed() {
+        localStorage.removeItem('changebot:lastViewed:default');
+        console.log('Cleared last viewed timestamp. Reloading...');
         setTimeout(() => location.reload(), 500);
       }
-    }
 
-    // Set to 1 hour ago
-    function setToOneHourAgo() {
-      const timestamp = Date.now() - (60 * 60 * 1000);
-      localStorage.setItem('changebot:lastViewed:default', timestamp.toString());
-      console.log('Set last viewed to 1 hour ago:', new Date(timestamp));
-      setTimeout(() => location.reload(), 500);
-    }
-
-    // Set to yesterday
-    function setToYesterday() {
-      const timestamp = Date.now() - (24 * 60 * 60 * 1000);
-      localStorage.setItem('changebot:lastViewed:default', timestamp.toString());
-      console.log('Set last viewed to yesterday:', new Date(timestamp));
-      setTimeout(() => location.reload(), 500);
-    }
-
-    // Log store state for debugging
-    function logStore() {
-      const event = new CustomEvent('changebot:context-request', {
-        detail: {
-          callback: (services) => {
-            console.log('📊 Store State:', services.store.state);
-            console.log('📦 Updates:', services.store.state.updates);
-            console.log('🔢 New Updates Count:', services.store.state.newUpdatesCount);
-            console.log('⏰ Last Viewed:', new Date(services.store.state.lastViewed));
-
-            // Check for errors and display them
-            if (services.store.state.error) {
-              showError(services.store.state.error);
-            }
-          },
-          scope: 'default'
-        },
-        bubbles: true,
-        composed: true
-      });
-      document.dispatchEvent(event);
-    }
-
-    // Show error banner
-    function showError(message) {
-      const banner = document.getElementById('error-banner');
-      banner.textContent = message;
-      banner.classList.add('visible');
-    }
-
-    // Log when ready
-    window.addEventListener('load', () => {
-      console.log('✅ Changebot widget loaded');
-      console.log('💡 Click "Clear Last Viewed & Reload" to see all updates as new');
-
-      // Pre-populate timestamp input with current last viewed
-      const lastViewed = localStorage.getItem('changebot:lastViewed:default');
-      if (lastViewed) {
-        const date = new Date(parseInt(lastViewed));
+      // Set last viewed from input
+      function setLastViewed() {
         const input = document.getElementById('timestamp-input');
-        // Format for datetime-local input
-        const formatted = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-          .toISOString()
-          .slice(0, 16);
-        input.value = formatted;
-        console.log('Current last viewed:', date);
+        if (input.value) {
+          const timestamp = new Date(input.value).getTime();
+          localStorage.setItem('changebot:lastViewed:default', timestamp.toString());
+          console.log('Set last viewed to:', new Date(timestamp));
+          setTimeout(() => location.reload(), 500);
+        }
       }
 
-      // Listen for error events from the store
-      document.addEventListener('changebot:error', (e) => {
-        if (e.detail && e.detail.error) {
-          showError(e.detail.error);
+      // Set to 1 hour ago
+      function setToOneHourAgo() {
+        const timestamp = Date.now() - 60 * 60 * 1000;
+        localStorage.setItem('changebot:lastViewed:default', timestamp.toString());
+        console.log('Set last viewed to 1 hour ago:', new Date(timestamp));
+        setTimeout(() => location.reload(), 500);
+      }
 
-          // Auto-clear rate limit errors after the wait time
-          if (e.detail.type === 'rate-limit') {
-            const waitTime = parseInt(e.detail.error.match(/\d+/)?.[0] || '60') * 1000;
-            setTimeout(() => {
-              const banner = document.getElementById('error-banner');
-              banner.classList.remove('visible');
-            }, waitTime);
-          }
+      // Set to yesterday
+      function setToYesterday() {
+        const timestamp = Date.now() - 24 * 60 * 60 * 1000;
+        localStorage.setItem('changebot:lastViewed:default', timestamp.toString());
+        console.log('Set last viewed to yesterday:', new Date(timestamp));
+        setTimeout(() => location.reload(), 500);
+      }
+
+      // Log store state for debugging
+      function logStore() {
+        const event = new CustomEvent('changebot:context-request', {
+          detail: {
+            callback: services => {
+              console.log('📊 Store State:', services.store.state);
+              console.log('📦 Updates:', services.store.state.updates);
+              console.log('🔢 New Updates Count:', services.store.state.newUpdatesCount);
+              console.log('⏰ Last Viewed:', new Date(services.store.state.lastViewed));
+
+              // Check for errors and display them
+              if (services.store.state.error) {
+                showError(services.store.state.error);
+              }
+            },
+            scope: 'default',
+          },
+          bubbles: true,
+          composed: true,
+        });
+        document.dispatchEvent(event);
+      }
+
+      // Manually open the drawer
+      function openDrawer() {
+        const event = new CustomEvent('changebot:action', {
+          detail: {
+            type: 'openDisplay',
+            scope: 'default',
+          },
+          bubbles: true,
+          composed: true,
+        });
+        document.dispatchEvent(event);
+        console.log('📂 Dispatched openDisplay action');
+      }
+
+      // Change display mode dynamically
+      function changeDisplayMode() {
+        const select = document.getElementById('display-mode-select');
+        const drawer = document.querySelector('changebot-drawer');
+        if (drawer && select) {
+          drawer.setAttribute('display-mode', select.value);
+          console.log('🎨 Changed display mode to:', select.value);
         }
+      }
+
+      // Show error banner
+      function showError(message) {
+        const banner = document.getElementById('error-banner');
+        banner.textContent = message;
+        banner.classList.add('visible');
+      }
+
+      // Log when ready
+      window.addEventListener('load', () => {
+        console.log('✅ Changebot widget loaded');
+        console.log('💡 Click the badge to open the updates drawer');
+        console.log('💡 Press ESC to close the drawer');
+        console.log('💡 Click "Clear Last Viewed & Reload" to see all updates as new');
+
+        // Pre-populate timestamp input with current last viewed
+        const lastViewed = localStorage.getItem('changebot:lastViewed:default');
+        if (lastViewed) {
+          const date = new Date(parseInt(lastViewed));
+          const input = document.getElementById('timestamp-input');
+          // Format for datetime-local input
+          const formatted = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+          input.value = formatted;
+          console.log('Current last viewed:', date);
+        }
+
+        // Listen for error events from the store
+        document.addEventListener('changebot:error', e => {
+          if (e.detail && e.detail.error) {
+            showError(e.detail.error);
+
+            // Auto-clear rate limit errors after the wait time
+            if (e.detail.type === 'rate-limit') {
+              const waitTime = parseInt(e.detail.error.match(/\d+/)?.[0] || '60') * 1000;
+              setTimeout(() => {
+                const banner = document.getElementById('error-banner');
+                banner.classList.remove('visible');
+              }, waitTime);
+            }
+          }
+        });
       });
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>
