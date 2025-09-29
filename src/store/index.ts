@@ -140,3 +140,117 @@ export function createWidgetStore(config: StoreConfig) {
     get
   };
 }
+
+// Create a default global store instance
+const defaultStore = createStore<StoreState>({
+  updates: [],
+  lastViewed: getLastViewed(),
+  isDrawerOpen: false,
+  isModalOpen: false,
+  displayMode: 'drawer',
+  drawerPosition: 'right',
+  newUpdatesCount: 0,
+  isLoading: false,
+  error: null,
+  isOpen: false
+});
+
+// Export the default store state
+export const updatesStore = defaultStore;
+
+// Create and export default actions
+export const actions: StoreActions & { loadUpdates: (slug?: string, endpoint?: string) => Promise<void>, markViewed: (timestamp?: string) => void } = {
+  async loadUpdates(slug?: string, endpoint?: string) {
+    updatesStore.state.isLoading = true;
+    updatesStore.state.error = null;
+
+    try {
+      let url: string;
+      if (endpoint) {
+        url = endpoint;
+        if (slug) {
+          // Add slug as query parameter to custom endpoint
+          const urlObj = new URL(endpoint);
+          urlObj.searchParams.set('slug', slug);
+          url = urlObj.toString();
+        }
+      } else if (slug) {
+        url = `https://app.changebot.ai/api/v1/updates?slug=${slug}`;
+      } else {
+        throw new Error('Either slug or endpoint must be provided');
+      }
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch updates: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      updatesStore.state.updates = Array.isArray(data) ? data : data.updates || [];
+      updatesStore.state.isLoading = false;
+
+      // Calculate new updates count
+      updatesStore.state.newUpdatesCount = calculateNewUpdatesCount(updatesStore.state.updates, updatesStore.state.lastViewed);
+    } catch (error) {
+      updatesStore.state.error = error instanceof Error ? error.message : 'Failed to load updates';
+      updatesStore.state.isLoading = false;
+      console.error('Failed to load updates:', error);
+    }
+  },
+
+  markViewed(timestamp?: string) {
+    const now = timestamp ? new Date(timestamp).getTime() : Date.now();
+    updatesStore.state.lastViewed = now;
+    saveLastViewed(now);
+    updatesStore.state.newUpdatesCount = calculateNewUpdatesCount(updatesStore.state.updates, now);
+  },
+
+  markAllViewed() {
+    const now = Date.now();
+    updatesStore.state.lastViewed = now;
+    saveLastViewed(now);
+    updatesStore.state.newUpdatesCount = 0;
+  },
+
+  openDisplay() {
+    updatesStore.state.isOpen = true;
+    if (updatesStore.state.displayMode === 'drawer') {
+      updatesStore.state.isDrawerOpen = true;
+      updatesStore.state.isModalOpen = false;
+    } else {
+      updatesStore.state.isModalOpen = true;
+      updatesStore.state.isDrawerOpen = false;
+    }
+  },
+
+  closeDisplay() {
+    updatesStore.state.isOpen = false;
+    updatesStore.state.isDrawerOpen = false;
+    updatesStore.state.isModalOpen = false;
+  },
+
+  toggleDisplay() {
+    updatesStore.state.isOpen = !updatesStore.state.isOpen;
+    if (updatesStore.state.displayMode === 'drawer') {
+      updatesStore.state.isDrawerOpen = !updatesStore.state.isDrawerOpen;
+    } else {
+      updatesStore.state.isModalOpen = !updatesStore.state.isModalOpen;
+    }
+  },
+
+  setDisplayMode(mode: 'drawer' | 'modal') {
+    updatesStore.state.displayMode = mode;
+    // Close any open displays when switching modes
+    updatesStore.state.isOpen = false;
+    updatesStore.state.isDrawerOpen = false;
+    updatesStore.state.isModalOpen = false;
+  },
+
+  setDrawerPosition(position: 'left' | 'right') {
+    updatesStore.state.drawerPosition = position;
+  },
+
+  calculateNewCount() {
+    updatesStore.state.newUpdatesCount = calculateNewUpdatesCount(updatesStore.state.updates, updatesStore.state.lastViewed);
+  }
+};

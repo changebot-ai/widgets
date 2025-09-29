@@ -18,6 +18,7 @@ export interface StoreState {
   lastViewed: number | null;
   isDrawerOpen: boolean;
   isModalOpen: boolean;
+  isOpen: boolean;
   displayMode: 'drawer' | 'modal';
   drawerPosition: 'left' | 'right';
   newUpdatesCount: number;

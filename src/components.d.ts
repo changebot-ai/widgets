@@ -6,6 +6,15 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface ChangebotProvider {
+        "endpoint"?: string;
+        "pollInterval"?: number;
+        /**
+          * @default 'default'
+         */
+        "scope": string;
+        "slug"?: string;
+    }
     interface MyComponent {
         /**
           * The first name
@@ -22,6 +31,12 @@ export namespace Components {
     }
 }
 declare global {
+    interface HTMLChangebotProviderElement extends Components.ChangebotProvider, HTMLStencilElement {
+    }
+    var HTMLChangebotProviderElement: {
+        prototype: HTMLChangebotProviderElement;
+        new (): HTMLChangebotProviderElement;
+    };
     interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
     }
     var HTMLMyComponentElement: {
@@ -29,10 +44,20 @@ declare global {
         new (): HTMLMyComponentElement;
     };
     interface HTMLElementTagNameMap {
+        "changebot-provider": HTMLChangebotProviderElement;
         "my-component": HTMLMyComponentElement;
     }
 }
 declare namespace LocalJSX {
+    interface ChangebotProvider {
+        "endpoint"?: string;
+        "pollInterval"?: number;
+        /**
+          * @default 'default'
+         */
+        "scope"?: string;
+        "slug"?: string;
+    }
     interface MyComponent {
         /**
           * The first name
@@ -48,6 +73,7 @@ declare namespace LocalJSX {
         "middle"?: string;
     }
     interface IntrinsicElements {
+        "changebot-provider": ChangebotProvider;
         "my-component": MyComponent;
     }
 }
@@ -55,6 +81,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "changebot-provider": LocalJSX.ChangebotProvider & JSXBase.HTMLAttributes<HTMLChangebotProviderElement>;
             "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
     }
