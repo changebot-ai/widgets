@@ -1,7 +1,6 @@
 import { Component, Element, Prop, State, Watch, h } from '@stencil/core';
-import { requestContext, dispatchAction } from '../../utils/context';
+import { dispatchAction } from '../../utils/context';
 import { StoreState } from '../../types';
-import { createStore } from '@stencil/store';
 
 @Component({
   tag: 'changebot-badge',

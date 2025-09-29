@@ -52,13 +52,6 @@ describe('changebot-provider', () => {
       // Set up listener for the response
       const contextReceived = await page.evaluateHandle(() => {
         return new Promise((resolve) => {
-          const handler = (event: CustomEvent) => {
-            event.detail.callback({
-              receivedContext: true
-            });
-            resolve(true);
-          };
-
           // Dispatch context request
           const requestEvent = new CustomEvent('changebot:context-request', {
             detail: {

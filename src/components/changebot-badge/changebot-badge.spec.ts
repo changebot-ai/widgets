@@ -104,7 +104,6 @@ describe('changebot-badge', () => {
 
     // Mock the dispatchEvent method on the element
     const component = page.root as HTMLChangebotBadgeElement;
-    const originalDispatchEvent = component.dispatchEvent.bind(component);
     component.dispatchEvent = dispatchEventSpy;
 
     // Re-run component lifecycle
@@ -152,7 +151,7 @@ describe('changebot-badge', () => {
   it('dispatches openUpdates action on click', async () => {
     const dispatchEventSpy = jest.fn();
 
-    const { root, waitForChanges } = await newSpecPage({
+    const { root } = await newSpecPage({
       components: [ChangebotBadge],
       html: '<changebot-badge count="3"></changebot-badge>',
     });

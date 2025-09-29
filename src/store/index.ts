@@ -47,6 +47,7 @@ export function createWidgetStore(config: StoreConfig) {
     lastViewed: config.persistLastViewed ? getLastViewed() : null,
     isDrawerOpen: false,
     isModalOpen: false,
+    isOpen: false,
     displayMode: config.displayMode || 'drawer',
     drawerPosition: config.drawerPosition || 'right',
     newUpdatesCount: 0,
