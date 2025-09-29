@@ -6,6 +6,16 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface ChangebotBadge {
+        "count"?: number;
+        "position"?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+        "scope"?: string;
+        /**
+          * @default true
+         */
+        "showCount": boolean;
+        "theme"?: 'light' | 'dark';
+    }
     interface ChangebotProvider {
         "endpoint"?: string;
         "pollInterval"?: number;
@@ -31,6 +41,12 @@ export namespace Components {
     }
 }
 declare global {
+    interface HTMLChangebotBadgeElement extends Components.ChangebotBadge, HTMLStencilElement {
+    }
+    var HTMLChangebotBadgeElement: {
+        prototype: HTMLChangebotBadgeElement;
+        new (): HTMLChangebotBadgeElement;
+    };
     interface HTMLChangebotProviderElement extends Components.ChangebotProvider, HTMLStencilElement {
     }
     var HTMLChangebotProviderElement: {
@@ -44,11 +60,22 @@ declare global {
         new (): HTMLMyComponentElement;
     };
     interface HTMLElementTagNameMap {
+        "changebot-badge": HTMLChangebotBadgeElement;
         "changebot-provider": HTMLChangebotProviderElement;
         "my-component": HTMLMyComponentElement;
     }
 }
 declare namespace LocalJSX {
+    interface ChangebotBadge {
+        "count"?: number;
+        "position"?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+        "scope"?: string;
+        /**
+          * @default true
+         */
+        "showCount"?: boolean;
+        "theme"?: 'light' | 'dark';
+    }
     interface ChangebotProvider {
         "endpoint"?: string;
         "pollInterval"?: number;
@@ -73,6 +100,7 @@ declare namespace LocalJSX {
         "middle"?: string;
     }
     interface IntrinsicElements {
+        "changebot-badge": ChangebotBadge;
         "changebot-provider": ChangebotProvider;
         "my-component": MyComponent;
     }
@@ -81,6 +109,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "changebot-badge": LocalJSX.ChangebotBadge & JSXBase.HTMLAttributes<HTMLChangebotBadgeElement>;
             "changebot-provider": LocalJSX.ChangebotProvider & JSXBase.HTMLAttributes<HTMLChangebotProviderElement>;
             "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
