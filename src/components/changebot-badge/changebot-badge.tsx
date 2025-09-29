@@ -45,11 +45,18 @@ export class ChangebotBadge {
     // Request context from provider
     const detail = {
       callback: (services: any) => {
+        console.log('📛 Badge: Received services from provider', {
+          hasStore: !!services?.store,
+          hasActions: !!services?.actions,
+          storeState: services?.store?.state
+        });
         this.services = services;
         this.subscribeToStore();
       },
       scope: this.scope || 'default'  // Ensure we always have a scope
     };
+
+    console.log('📛 Badge: Requesting context with scope:', detail.scope);
 
     this.el.dispatchEvent(
       new CustomEvent('changebot:context-request', {
@@ -71,11 +78,14 @@ export class ChangebotBadge {
 
     const store = this.services.store;
 
+    console.log('📛 Badge: Subscribing to store, current state:', store.state);
+
     // Calculate initial count
     this.calculateNewUpdatesCount(store.state);
 
     // Subscribe to updates changes
     this.unsubscribe = store.onChange('updates', () => {
+      console.log('📛 Badge: Updates changed, recalculating...');
       this.calculateNewUpdatesCount(store.state);
     });
   }
@@ -83,6 +93,7 @@ export class ChangebotBadge {
   public calculateNewUpdatesCount(state: StoreState) {
     if (!state.updates) {
       this.newUpdatesCount = 0;
+      console.log('📛 Badge: No updates in state yet');
       return;
     }
 
@@ -95,6 +106,8 @@ export class ChangebotBadge {
 
     this.newUpdatesCount = newUpdates.length;
     this.isVisible = this.newUpdatesCount > 0;
+
+    console.log(`📛 Badge calculated: ${this.newUpdatesCount} new updates (lastViewed: ${lastViewed === 0 ? 'never' : new Date(lastViewed).toLocaleTimeString()}, total updates: ${state.updates.length})`);
   }
 
   // Public method to set count for testing

@@ -64,15 +64,21 @@ export class ChangebotProvider {
   handleContextRequest(event: CustomEvent<{ callback: Function; scope?: string }>) {
     const requestScope = event.detail.scope || 'default';
 
+    console.log(`🔌 Provider: Received context request for scope "${requestScope}", my scope is "${this.scope}"`);
+
     // Only respond if scope matches
     if (requestScope === this.scope) {
       // Stop propagation to prevent other providers from responding
       event.stopPropagation();
 
+      console.log('🔌 Provider: Responding with services', this.services);
+
       // Provide the services via callback
       if (event.detail.callback) {
         event.detail.callback(this.services);
       }
+    } else {
+      console.log(`🔌 Provider: Ignoring request (scope mismatch)`);
     }
   }
 
@@ -105,7 +111,7 @@ export class ChangebotProvider {
     try {
       await actions.loadUpdates(this.slug, this.url);
     } catch (error) {
-      console.error('Failed to load updates:', error);
+      console.error('🔌 Provider: Failed to load updates:', error);
       // Store error is already handled in the action
     }
   }
