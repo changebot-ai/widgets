@@ -8,7 +8,6 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface ChangebotBadge {
         "count"?: number;
-        "position"?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
         "scope"?: string;
         /**
           * @default true
@@ -68,7 +67,6 @@ declare global {
 declare namespace LocalJSX {
     interface ChangebotBadge {
         "count"?: number;
-        "position"?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
         "scope"?: string;
         /**
           * @default true

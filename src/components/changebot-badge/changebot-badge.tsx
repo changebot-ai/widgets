@@ -12,7 +12,6 @@ export class ChangebotBadge {
 
   @Prop() scope?: string;
   @Prop() theme?: 'light' | 'dark';
-  @Prop() position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
   @Prop() showCount: boolean = true;
   @Prop() count?: number; // For testing and external control
 
@@ -150,9 +149,8 @@ export class ChangebotBadge {
   render() {
     const classes = {
       'badge': true,
-      'badge--hidden': this.newUpdatesCount === 0,
-      [`badge--${this.theme}`]: !!this.theme,
-      [`badge--${this.position}`]: !!this.position
+      'badge--hidden': !this.isVisible || this.newUpdatesCount === 0,
+      [`badge--${this.theme}`]: !!this.theme
     };
 
     const countClasses = {
