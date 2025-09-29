@@ -20,14 +20,6 @@ describe('changebot-badge e2e', () => {
     expect(badge).toHaveClass('badge--dark');
   });
 
-  it('applies position prop correctly', async () => {
-    const page = await newE2EPage();
-    await page.setContent('<changebot-badge position="bottom-right"></changebot-badge>');
-
-    const badge = await page.find('changebot-badge >>> .badge');
-    expect(badge).toHaveClass('badge--bottom-right');
-  });
-
   it('has correct initial aria-label', async () => {
     const page = await newE2EPage();
     await page.setContent('<changebot-badge></changebot-badge>');

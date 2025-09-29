@@ -28,12 +28,12 @@ describe('changebot-provider', () => {
     expect(page.root.tagName.toLowerCase()).toBe('changebot-provider');
   });
 
-  it('accepts endpoint prop', async () => {
+  it('accepts url prop', async () => {
     const page = await newSpecPage({
       components: [ChangebotProvider],
-      html: `<changebot-provider endpoint="https://api.example.com/updates"></changebot-provider>`,
+      html: `<changebot-provider url="https://api.example.com/updates"></changebot-provider>`,
     });
-    expect(page.rootInstance.endpoint).toBe('https://api.example.com/updates');
+    expect(page.rootInstance.url).toBe('https://api.example.com/updates');
   });
 
   it('accepts slug prop', async () => {
@@ -92,7 +92,7 @@ describe('changebot-provider', () => {
         store: updatesStore,
         actions: actions,
         config: {
-          endpoint: undefined,
+          url: undefined,
           slug: undefined,
           scope: 'default',
           pollInterval: undefined
@@ -265,12 +265,12 @@ describe('changebot-provider', () => {
       expect(loadSpy).toHaveBeenCalledWith('test-team', undefined);
     });
 
-    it('loads updates on mount when endpoint is provided', async () => {
+    it('loads updates on mount when url is provided', async () => {
       const loadSpy = jest.spyOn(actions, 'loadUpdates').mockResolvedValue();
 
       const page = await newSpecPage({
         components: [ChangebotProvider],
-        html: `<changebot-provider endpoint="https://api.example.com/updates"></changebot-provider>`,
+        html: `<changebot-provider url="https://api.example.com/updates"></changebot-provider>`,
       });
 
       await page.waitForChanges();
@@ -278,7 +278,7 @@ describe('changebot-provider', () => {
       expect(loadSpy).toHaveBeenCalledWith(undefined, 'https://api.example.com/updates');
     });
 
-    it('does not load updates when neither slug nor endpoint provided', async () => {
+    it('does not load updates when neither slug nor url provided', async () => {
       const loadSpy = jest.spyOn(actions, 'loadUpdates').mockResolvedValue();
 
       const page = await newSpecPage({
@@ -341,7 +341,7 @@ describe('changebot-provider', () => {
 
       await page.waitForChanges();
 
-      expect(errorSpy).toHaveBeenCalledWith('Failed to load updates:', expect.any(Error));
+      expect(errorSpy).toHaveBeenCalledWith('🔌 Provider: Failed to load updates:', expect.any(Error));
       errorSpy.mockRestore();
     });
 
