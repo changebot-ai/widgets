@@ -41,11 +41,13 @@ export class ChangebotProvider {
     if (this.url || this.slug) {
       this.loadUpdates();
 
-      // Setup polling if interval provided
+      // Setup polling if interval provided (in seconds, minimum 1 second)
       if (this.pollInterval) {
+        const intervalMs = Math.max(this.pollInterval, 1) * 1000; // Convert to ms, minimum 1 second
+        console.log(`🔌 Provider: Setting up polling every ${Math.max(this.pollInterval, 1)} seconds`);
         this.pollTimer = setInterval(() => {
           this.loadUpdates();
-        }, this.pollInterval);
+        }, intervalMs);
       }
     }
   }
