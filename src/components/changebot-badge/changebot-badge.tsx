@@ -87,9 +87,11 @@ export class ChangebotBadge {
     }
 
     const lastViewed = this.getLastViewedTime();
-    const newUpdates = state.updates.filter(
-      update => update.timestamp > lastViewed
-    );
+
+    // If no lastViewed (returns 0), ALL updates are new
+    const newUpdates = lastViewed === 0
+      ? state.updates  // All updates are new
+      : state.updates.filter(update => update.timestamp > lastViewed);
 
     this.newUpdatesCount = newUpdates.length;
     this.isVisible = this.newUpdatesCount > 0;
