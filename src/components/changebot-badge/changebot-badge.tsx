@@ -126,8 +126,8 @@ export class ChangebotBadge {
   };
 
   private get displayCount(): string {
-    if (this.newUpdatesCount > 99) {
-      return '99+';
+    if (this.newUpdatesCount > 9) {
+      return '9+';
     }
     return this.newUpdatesCount.toString();
   }
@@ -138,9 +138,6 @@ export class ChangebotBadge {
     }
     if (this.newUpdatesCount === 1) {
       return '1 new update';
-    }
-    if (this.newUpdatesCount > 99) {
-      return 'More than 99 new updates';
     }
     if (!this.showCount) {
       return 'New updates available';
