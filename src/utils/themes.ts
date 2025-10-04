@@ -1,6 +1,6 @@
 /**
  * Color theme palettes
- * Supports: Catppuccin, Gruvbox, Dracula, Nord, Solarized, Everforest, Tokyo Night
+ * Supports: Catppuccin, Gruvbox, Dracula, Nord, Solarized, Everforest, Tokyo Night, Cyberpunk
  */
 
 // Generic theme palette interface
@@ -278,6 +278,25 @@ export const tokyoNight: ThemePalette = {
   backdrop: 'rgba(26, 27, 38, 0.7)'
 };
 
+// Cyberpunk
+export const cyberpunk: ThemePalette = {
+  bg: '#0a0014',          // deep purple-black
+  bgAlt: '#1a0033',       // purple
+  surface: '#1a0033',     // purple surface
+  text: '#00ffff',        // cyan text
+  textMuted: '#ff66ff',   // pink muted text
+  border: '#ff00ff',      // magenta border
+  hover: '#330066',       // purple hover
+  primary: '#ff6600',     // bright orange
+  link: '#00ff00',        // lime green links
+  focus: '#ffff00',       // yellow focus
+  accent: '#ff6600',      // bright orange - for titles
+  meta: '#00ffff',        // cyan - for dates/metadata
+  subtle: '#00ff00',      // lime green - for decorative elements
+  shadow: 'rgba(255, 0, 255, 0.5)',
+  backdrop: 'rgba(10, 0, 20, 0.9)'
+};
+
 // Theme registry
 export const themes = {
   // Catppuccin
@@ -297,7 +316,8 @@ export const themes = {
   'solarized-dark': solarizedDark,
   'everforest-dark': everforestDark,
   'everforest-light': everforestLight,
-  'tokyo-night': tokyoNight
+  'tokyo-night': tokyoNight,
+  'cyberpunk': cyberpunk
 } as const;
 
 export type Theme = keyof typeof themes;

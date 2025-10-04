@@ -581,6 +581,23 @@
   --cb-backdrop: rgba(26, 27, 38, 0.7);
 }
 
+/* Cyberpunk theme */
+.theme--cyberpunk {
+  --cb-drawer-bg: #0a0014;
+  --cb-drawer-surface: #1a0033;
+  --cb-drawer-border: #ff00ff;
+  --cb-drawer-text: #00ffff;
+  --cb-drawer-text-muted: #ff66ff;
+  --cb-drawer-hover: #330066;
+  --cb-drawer-link: #00ff00;
+  --cb-drawer-focus: #ffff00;
+  --cb-drawer-accent: #ff6600;
+  --cb-drawer-meta: #00ffff;
+  --cb-drawer-subtle: #00ff00;
+  --cb-drawer-shadow: rgba(255, 0, 255, 0.5);
+  --cb-backdrop: rgba(10, 0, 20, 0.9);
+}
+
 /* Responsive adjustments */
 @media (max-width: 640px) {
   .drawer--left,

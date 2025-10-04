@@ -270,6 +270,16 @@
   --cb-badge-ripple: rgba(26, 27, 38, 0.3);
 }
 
+/* Cyberpunk theme */
+.theme--cyberpunk {
+  --cb-badge-bg: #ff6600;
+  --cb-badge-text: #ffffff;
+  --cb-badge-shadow: rgba(255, 102, 0, 0.5);
+  --cb-badge-pulse: rgba(255, 102, 0, 0.8);
+  --cb-badge-hover-mix: #000000;
+  --cb-badge-ripple: rgba(255, 255, 255, 0.6);
+}
+
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .badge {
