@@ -276,9 +276,18 @@ export const actions: StoreActions & { loadUpdates: (slug?: string, url?: string
       // Calculate new updates count
       updatesStore.state.newUpdatesCount = calculateNewUpdatesCount(updatesStore.state.updates, updatesStore.state.lastViewed);
     } catch (error) {
-      updatesStore.state.error = error instanceof Error ? error.message : 'Failed to load updates';
+      // Handle errors gracefully - don't let API errors break the widget
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load updates';
+      updatesStore.state.error = errorMessage;
       updatesStore.state.isLoading = false;
-      console.error('Failed to load updates:', error);
+
+      // Log errors quietly - don't spam console with expected CORS/404 errors
+      // This prevents blocking the customer's app if the widget has issues
+      console.warn('⚠️ Changebot widget: Could not load updates. Widget functionality will continue to work.', {
+        error: errorMessage,
+        slug,
+        url
+      });
     }
   },
 

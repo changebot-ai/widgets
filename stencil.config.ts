@@ -18,12 +18,10 @@ export const config: Config = {
     {
       type: 'www',
       serviceWorker: null, // disable service workers
-      copy: [
-        { src: 'test.html' }
-      ]
+      copy: [{ src: 'test.html' }, { src: 'custom-theme.html' }],
     },
   ],
   testing: {
-    browserHeadless: "shell",
+    browserHeadless: 'shell',
   },
 };

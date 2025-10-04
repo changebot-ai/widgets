@@ -45,29 +45,39 @@ export class ChangebotDrawer {
       this.el.setAttribute('data-scope', this.scope);
     }
 
-    // Request context from provider
-    const detail = {
-      callback: (services: any) => {
-        console.log('📂 Drawer: Received services from provider', {
-          hasStore: !!services?.store,
-          hasActions: !!services?.actions,
-          storeState: services?.store?.state
-        });
-        this.services = services;
-        this.subscribeToStore();
-      },
-      scope: this.scope || 'default'
-    };
+    // Request context from provider with error handling
+    try {
+      const detail = {
+        callback: (services: any) => {
+          try {
+            console.log('📂 Drawer: Received services from provider', {
+              hasStore: !!services?.store,
+              hasActions: !!services?.actions,
+              storeState: services?.store?.state
+            });
+            this.services = services;
+            this.subscribeToStore();
+          } catch (error) {
+            // If provider setup fails, drawer will still work in standalone mode
+            console.warn('Drawer: Failed to setup provider connection, using standalone mode:', error);
+          }
+        },
+        scope: this.scope || 'default'
+      };
 
-    console.log('📂 Drawer: Requesting context with scope:', detail.scope);
+      console.log('📂 Drawer: Requesting context with scope:', detail.scope);
 
-    this.el.dispatchEvent(
-      new CustomEvent('changebot:context-request', {
-        bubbles: true,
-        composed: true,
-        detail
-      })
-    );
+      this.el.dispatchEvent(
+        new CustomEvent('changebot:context-request', {
+          bubbles: true,
+          composed: true,
+          detail
+        })
+      );
+    } catch (error) {
+      // If provider request fails, continue in standalone mode
+      console.warn('Drawer: Failed to request provider context, using standalone mode:', error);
+    }
 
     // Listen for ESC key globally
     document.addEventListener('keydown', this.handleKeyDown);
@@ -140,30 +150,42 @@ export class ChangebotDrawer {
   public subscribeToStore() {
     if (!this.services?.store) return;
 
-    const store = this.services.store;
+    try {
+      const store = this.services.store;
 
-    console.log('📂 Drawer: Subscribing to store, current state:', store.state);
+      console.log('📂 Drawer: Subscribing to store, current state:', store.state);
 
-    // Subscribe to isOpen changes
-    this.unsubscribeIsOpen = store.onChange('isOpen', () => {
-      console.log('📂 Drawer: isOpen changed to', store.state.isOpen);
-      this.isOpen = store.state.isOpen;
+      // Subscribe to isOpen changes
+      this.unsubscribeIsOpen = store.onChange('isOpen', () => {
+        try {
+          console.log('📂 Drawer: isOpen changed to', store.state.isOpen);
+          this.isOpen = store.state.isOpen;
 
-      if (this.isOpen) {
-        // Focus first element when opening
-        setTimeout(() => this.focusFirstElement(), 100);
-      }
-    });
+          if (this.isOpen) {
+            // Focus first element when opening
+            setTimeout(() => this.focusFirstElement(), 100);
+          }
+        } catch (error) {
+          console.warn('Drawer: Error in isOpen change handler:', error);
+        }
+      });
 
-    // Subscribe to updates changes
-    this.unsubscribeUpdates = store.onChange('updates', () => {
-      console.log('📂 Drawer: Updates changed, count:', store.state.updates?.length);
+      // Subscribe to updates changes
+      this.unsubscribeUpdates = store.onChange('updates', () => {
+        try {
+          console.log('📂 Drawer: Updates changed, count:', store.state.updates?.length);
+          this.updates = store.state.updates || [];
+        } catch (error) {
+          console.warn('Drawer: Error in updates change handler:', error);
+        }
+      });
+
+      // Initialize state safely
+      this.isOpen = store.state.isOpen || false;
       this.updates = store.state.updates || [];
-    });
-
-    // Initialize state
-    this.isOpen = store.state.isOpen || false;
-    this.updates = store.state.updates || [];
+    } catch (error) {
+      console.warn('Drawer: Failed to subscribe to store:', error);
+    }
   }
 
   /**
@@ -217,11 +239,16 @@ export class ChangebotDrawer {
 
     if (event.key === 'Escape') {
       event.preventDefault();
-      // If connected to provider, dispatch action
-      if (this.services) {
-        dispatchAction(this.el, 'closeDisplay', undefined, this.scope);
-      } else {
-        // If standalone (no provider), close directly
+      try {
+        // If connected to provider, dispatch action
+        if (this.services) {
+          dispatchAction(this.el, 'closeDisplay', undefined, this.scope);
+        }
+      } catch (error) {
+        // If dispatch fails for any reason, close directly
+        console.warn('Failed to dispatch close action from ESC key, closing directly:', error);
+      } finally {
+        // Always close the drawer, regardless of provider state
         this.isOpen = false;
       }
     }
@@ -239,11 +266,17 @@ export class ChangebotDrawer {
   };
 
   private handleClose = () => {
-    // If connected to provider, dispatch action
-    if (this.services) {
-      dispatchAction(this.el, 'closeDisplay', undefined, this.scope);
-    } else {
-      // If standalone (no provider), close directly
+    try {
+      // If connected to provider, dispatch action
+      if (this.services) {
+        dispatchAction(this.el, 'closeDisplay', undefined, this.scope);
+      }
+    } catch (error) {
+      // If dispatch fails for any reason, close directly
+      console.warn('Failed to dispatch close action, closing directly:', error);
+    } finally {
+      // Always close the drawer, regardless of provider state
+      // This ensures errors don't prevent users from closing the drawer
       this.isOpen = false;
     }
   };
@@ -251,11 +284,16 @@ export class ChangebotDrawer {
   private handleBackdropClick = (event: MouseEvent) => {
     // Close on backdrop click for all display modes
     if ((event.target as HTMLElement).classList.contains('backdrop')) {
-      // If connected to provider, dispatch action
-      if (this.services) {
-        dispatchAction(this.el, 'closeDisplay', undefined, this.scope);
-      } else {
-        // If standalone (no provider), close directly
+      try {
+        // If connected to provider, dispatch action
+        if (this.services) {
+          dispatchAction(this.el, 'closeDisplay', undefined, this.scope);
+        }
+      } catch (error) {
+        // If dispatch fails for any reason, close directly
+        console.warn('Failed to dispatch close action from backdrop, closing directly:', error);
+      } finally {
+        // Always close the drawer, regardless of provider state
         this.isOpen = false;
       }
     }
