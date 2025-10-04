@@ -1,162 +1,268 @@
 /**
- * Catppuccin color palettes
- * @see https://catppuccin.com/palette
+ * Color theme palettes
+ * Supports: Catppuccin, Gruvbox, Dracula, Nord, Solarized, Everforest, Tokyo Night
  */
 
-export interface CatppuccinPalette {
-  rosewater: string;
-  flamingo: string;
-  pink: string;
-  mauve: string;
-  red: string;
-  maroon: string;
-  peach: string;
-  yellow: string;
-  green: string;
-  teal: string;
-  sky: string;
-  sapphire: string;
-  blue: string;
-  lavender: string;
+// Generic theme palette interface
+export interface ThemePalette {
+  // Background layers
+  bg: string;
+  bgAlt: string;
+  surface: string;
+
+  // Text colors
   text: string;
-  subtext1: string;
-  subtext0: string;
-  overlay2: string;
-  overlay1: string;
-  overlay0: string;
-  surface2: string;
-  surface1: string;
-  surface0: string;
-  base: string;
-  mantle: string;
-  crust: string;
+  textMuted: string;
+
+  // UI elements
+  border: string;
+  hover: string;
+
+  // Accent colors
+  primary: string;
+  link: string;
+  focus: string;
+
+  // Shadows and overlays
+  shadow: string;
+  backdrop: string;
 }
 
-export const catppuccinLatte: CatppuccinPalette = {
-  rosewater: '#dc8a78',
-  flamingo: '#dd7878',
-  pink: '#ea76cb',
-  mauve: '#8839ef',
-  red: '#d20f39',
-  maroon: '#e64553',
-  peach: '#fe640b',
-  yellow: '#df8e1d',
-  green: '#40a02b',
-  teal: '#179299',
-  sky: '#04a5e5',
-  sapphire: '#209fb5',
-  blue: '#1e66f5',
-  lavender: '#7287fd',
+// Catppuccin Latte (Light)
+export const catppuccinLatte: ThemePalette = {
+  bg: '#eff1f5',
+  bgAlt: '#e6e9ef',
+  surface: '#dce0e8',
   text: '#4c4f69',
-  subtext1: '#5c5f77',
-  subtext0: '#6c6f85',
-  overlay2: '#7c7f93',
-  overlay1: '#8c8fa1',
-  overlay0: '#9ca0b0',
-  surface2: '#acb0be',
-  surface1: '#bcc0cc',
-  surface0: '#ccd0da',
-  base: '#eff1f5',
-  mantle: '#e6e9ef',
-  crust: '#dce0e8'
+  textMuted: '#6c6f85',
+  border: '#ccd0da',
+  hover: '#dce0e8',
+  primary: '#1e66f5',
+  link: '#1e66f5',
+  focus: '#1e66f5',
+  shadow: 'rgba(76, 79, 105, 0.1)',
+  backdrop: 'rgba(76, 79, 105, 0.5)'
 };
 
-export const catppuccinFrappe: CatppuccinPalette = {
-  rosewater: '#f2d5cf',
-  flamingo: '#eebebe',
-  pink: '#f4b8e4',
-  mauve: '#ca9ee6',
-  red: '#e78284',
-  maroon: '#ea999c',
-  peach: '#ef9f76',
-  yellow: '#e5c890',
-  green: '#a6d189',
-  teal: '#81c8be',
-  sky: '#99d1db',
-  sapphire: '#85c1dc',
-  blue: '#8caaee',
-  lavender: '#babbf1',
+// Catppuccin Frappé (Dark)
+export const catppuccinFrappe: ThemePalette = {
+  bg: '#303446',
+  bgAlt: '#292c3c',
+  surface: '#232634',
   text: '#c6d0f5',
-  subtext1: '#b5bfe2',
-  subtext0: '#a5adce',
-  overlay2: '#949cbb',
-  overlay1: '#838ba7',
-  overlay0: '#737994',
-  surface2: '#626880',
-  surface1: '#51576d',
-  surface0: '#414559',
-  base: '#303446',
-  mantle: '#292c3c',
-  crust: '#232634'
+  textMuted: '#a5adce',
+  border: '#414559',
+  hover: '#414559',
+  primary: '#8caaee',
+  link: '#8caaee',
+  focus: '#8caaee',
+  shadow: 'rgba(0, 0, 0, 0.3)',
+  backdrop: 'rgba(0, 0, 0, 0.5)'
 };
 
-export const catppuccinMacchiato: CatppuccinPalette = {
-  rosewater: '#f4dbd6',
-  flamingo: '#f0c6c6',
-  pink: '#f5bde6',
-  mauve: '#c6a0f6',
-  red: '#ed8796',
-  maroon: '#ee99a0',
-  peach: '#f5a97f',
-  yellow: '#eed49f',
-  green: '#a6da95',
-  teal: '#8bd5ca',
-  sky: '#91d7e3',
-  sapphire: '#7dc4e4',
-  blue: '#8aadf4',
-  lavender: '#b7bdf8',
+// Catppuccin Macchiato (Dark)
+export const catppuccinMacchiato: ThemePalette = {
+  bg: '#24273a',
+  bgAlt: '#1e2030',
+  surface: '#181926',
   text: '#cad3f5',
-  subtext1: '#b8c0e0',
-  subtext0: '#a5adcb',
-  overlay2: '#939ab7',
-  overlay1: '#8087a2',
-  overlay0: '#6e738d',
-  surface2: '#5b6078',
-  surface1: '#494d64',
-  surface0: '#363a4f',
-  base: '#24273a',
-  mantle: '#1e2030',
-  crust: '#181926'
+  textMuted: '#a5adcb',
+  border: '#363a4f',
+  hover: '#363a4f',
+  primary: '#8aadf4',
+  link: '#8aadf4',
+  focus: '#8aadf4',
+  shadow: 'rgba(0, 0, 0, 0.3)',
+  backdrop: 'rgba(0, 0, 0, 0.5)'
 };
 
-export const catppuccinMocha: CatppuccinPalette = {
-  rosewater: '#f5e0dc',
-  flamingo: '#f2cdcd',
-  pink: '#f5c2e7',
-  mauve: '#cba6f7',
-  red: '#f38ba8',
-  maroon: '#eba0ac',
-  peach: '#fab387',
-  yellow: '#f9e2af',
-  green: '#a6e3a1',
-  teal: '#94e2d5',
-  sky: '#89dceb',
-  sapphire: '#74c7ec',
-  blue: '#89b4fa',
-  lavender: '#b4befe',
+// Catppuccin Mocha (Dark)
+export const catppuccinMocha: ThemePalette = {
+  bg: '#1e1e2e',
+  bgAlt: '#181825',
+  surface: '#11111b',
   text: '#cdd6f4',
-  subtext1: '#bac2de',
-  subtext0: '#a6adc8',
-  overlay2: '#9399b2',
-  overlay1: '#7f849c',
-  overlay0: '#6c7086',
-  surface2: '#585b70',
-  surface1: '#45475a',
-  surface0: '#313244',
-  base: '#1e1e2e',
-  mantle: '#181825',
-  crust: '#11111b'
+  textMuted: '#a6adc8',
+  border: '#313244',
+  hover: '#313244',
+  primary: '#89b4fa',
+  link: '#89b4fa',
+  focus: '#89b4fa',
+  shadow: 'rgba(0, 0, 0, 0.3)',
+  backdrop: 'rgba(0, 0, 0, 0.5)'
 };
 
-export const catppuccinThemes = {
+// Gruvbox Dark
+export const gruvboxDark: ThemePalette = {
+  bg: '#282828',
+  bgAlt: '#3c3836',
+  surface: '#504945',
+  text: '#ebdbb2',
+  textMuted: '#a89984',
+  border: '#665c54',
+  hover: '#504945',
+  primary: '#458588',
+  link: '#458588',
+  focus: '#83a598',
+  shadow: 'rgba(0, 0, 0, 0.3)',
+  backdrop: 'rgba(0, 0, 0, 0.5)'
+};
+
+// Gruvbox Light
+export const gruvboxLight: ThemePalette = {
+  bg: '#fbf1c7',
+  bgAlt: '#ebdbb2',
+  surface: '#d5c4a1',
+  text: '#3c3836',
+  textMuted: '#665c54',
+  border: '#bdae93',
+  hover: '#ebdbb2',
+  primary: '#076678',
+  link: '#076678',
+  focus: '#427b58',
+  shadow: 'rgba(60, 56, 54, 0.1)',
+  backdrop: 'rgba(60, 56, 54, 0.5)'
+};
+
+// Dracula
+export const dracula: ThemePalette = {
+  bg: '#282a36',
+  bgAlt: '#21222c',
+  surface: '#383a59',
+  text: '#f8f8f2',
+  textMuted: '#6272a4',
+  border: '#44475a',
+  hover: '#44475a',
+  primary: '#bd93f9',
+  link: '#8be9fd',
+  focus: '#bd93f9',
+  shadow: 'rgba(0, 0, 0, 0.4)',
+  backdrop: 'rgba(0, 0, 0, 0.6)'
+};
+
+// Nord
+export const nord: ThemePalette = {
+  bg: '#2e3440',
+  bgAlt: '#3b4252',
+  surface: '#434c5e',
+  text: '#eceff4',
+  textMuted: '#d8dee9',
+  border: '#4c566a',
+  hover: '#434c5e',
+  primary: '#88c0d0',
+  link: '#88c0d0',
+  focus: '#5e81ac',
+  shadow: 'rgba(0, 0, 0, 0.3)',
+  backdrop: 'rgba(46, 52, 64, 0.6)'
+};
+
+// Solarized Light
+export const solarizedLight: ThemePalette = {
+  bg: '#fdf6e3',
+  bgAlt: '#eee8d5',
+  surface: '#93a1a1',
+  text: '#657b83',
+  textMuted: '#839496',
+  border: '#93a1a1',
+  hover: '#eee8d5',
+  primary: '#268bd2',
+  link: '#268bd2',
+  focus: '#2aa198',
+  shadow: 'rgba(101, 123, 131, 0.1)',
+  backdrop: 'rgba(101, 123, 131, 0.5)'
+};
+
+// Solarized Dark
+export const solarizedDark: ThemePalette = {
+  bg: '#002b36',
+  bgAlt: '#073642',
+  surface: '#586e75',
+  text: '#839496',
+  textMuted: '#657b83',
+  border: '#586e75',
+  hover: '#073642',
+  primary: '#268bd2',
+  link: '#268bd2',
+  focus: '#2aa198',
+  shadow: 'rgba(0, 0, 0, 0.4)',
+  backdrop: 'rgba(0, 43, 54, 0.6)'
+};
+
+// Everforest Dark
+export const everforestDark: ThemePalette = {
+  bg: '#272e33',
+  bgAlt: '#2e383c',
+  surface: '#374145',
+  text: '#d3c6aa',
+  textMuted: '#859289',
+  border: '#414b50',
+  hover: '#374145',
+  primary: '#7fbbb3',
+  link: '#7fbbb3',
+  focus: '#a7c080',
+  shadow: 'rgba(0, 0, 0, 0.3)',
+  backdrop: 'rgba(30, 35, 38, 0.6)'
+};
+
+// Everforest Light
+export const everforestLight: ThemePalette = {
+  bg: '#fffbef',
+  bgAlt: '#f8f5e4',
+  surface: '#edeada',
+  text: '#5c6a72',
+  textMuted: '#829181',
+  border: '#e8e5d5',
+  hover: '#f2efdf',
+  primary: '#3a94c5',
+  link: '#3a94c5',
+  focus: '#8da101',
+  shadow: 'rgba(92, 106, 114, 0.1)',
+  backdrop: 'rgba(92, 106, 114, 0.5)'
+};
+
+// Tokyo Night
+export const tokyoNight: ThemePalette = {
+  bg: '#1a1b26',
+  bgAlt: '#16161e',
+  surface: '#24283b',
+  text: '#a9b1d6',
+  textMuted: '#565f89',
+  border: '#292e42',
+  hover: '#24283b',
+  primary: '#7aa2f7',
+  link: '#7aa2f7',
+  focus: '#bb9af7',
+  shadow: 'rgba(0, 0, 0, 0.4)',
+  backdrop: 'rgba(26, 27, 38, 0.7)'
+};
+
+// Theme registry
+export const themes = {
+  // Catppuccin
   'catppuccin-latte': catppuccinLatte,
   'catppuccin-frappe': catppuccinFrappe,
   'catppuccin-macchiato': catppuccinMacchiato,
-  'catppuccin-mocha': catppuccinMocha
+  'catppuccin-mocha': catppuccinMocha,
+
+  // Gruvbox
+  'gruvbox-dark': gruvboxDark,
+  'gruvbox-light': gruvboxLight,
+
+  // Other themes
+  'dracula': dracula,
+  'nord': nord,
+  'solarized-light': solarizedLight,
+  'solarized-dark': solarizedDark,
+  'everforest-dark': everforestDark,
+  'everforest-light': everforestLight,
+  'tokyo-night': tokyoNight
 } as const;
 
-export type CatppuccinTheme = keyof typeof catppuccinThemes;
+export type Theme = keyof typeof themes;
 
-export function getCatppuccinPalette(theme: CatppuccinTheme): CatppuccinPalette {
-  return catppuccinThemes[theme];
+// Legacy type alias for backward compatibility
+export type CatppuccinTheme = Theme;
+
+export function getThemePalette(theme: Theme): ThemePalette {
+  return themes[theme];
 }

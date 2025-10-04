@@ -173,15 +173,30 @@
       </ul>
 
       <div class="controls">
-        <h3>Catppuccin Themes</h3>
+        <h3>Color Themes</h3>
         <div class="input-group">
           <label for="theme-select">Theme:</label>
           <select id="theme-select" onchange="changeTheme()">
-            <option value="">System Auto (Light/Dark)</option>
-            <option value="catppuccin-latte">Latte (Light)</option>
-            <option value="catppuccin-frappe">Frappé (Dark)</option>
-            <option value="catppuccin-macchiato">Macchiato (Dark)</option>
-            <option value="catppuccin-mocha">Mocha (Dark)</option>
+            <option value="">System Auto (Latte/Mocha)</option>
+            <optgroup label="Catppuccin">
+              <option value="catppuccin-latte">Latte (Light)</option>
+              <option value="catppuccin-frappe">Frappé (Dark)</option>
+              <option value="catppuccin-macchiato">Macchiato (Dark)</option>
+              <option value="catppuccin-mocha">Mocha (Dark)</option>
+            </optgroup>
+            <optgroup label="Gruvbox">
+              <option value="gruvbox-light">Gruvbox Light</option>
+              <option value="gruvbox-dark">Gruvbox Dark</option>
+            </optgroup>
+            <optgroup label="Other Themes">
+              <option value="dracula">Dracula</option>
+              <option value="nord">Nord</option>
+              <option value="solarized-light">Solarized Light</option>
+              <option value="solarized-dark">Solarized Dark</option>
+              <option value="everforest-light">Everforest Light</option>
+              <option value="everforest-dark">Everforest Dark</option>
+              <option value="tokyo-night">Tokyo Night</option>
+            </optgroup>
           </select>
         </div>
 

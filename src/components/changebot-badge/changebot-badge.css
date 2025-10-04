@@ -183,6 +183,93 @@
   --cb-badge-ripple: rgba(30, 30, 46, 0.3);
 }
 
+/* Gruvbox theme variations */
+.theme--gruvbox-dark {
+  --cb-badge-bg: #458588;
+  --cb-badge-text: #ebdbb2;
+  --cb-badge-shadow: rgba(0, 0, 0, 0.3);
+  --cb-badge-pulse: rgba(69, 133, 136, 0.5);
+  --cb-badge-hover-mix: black;
+  --cb-badge-ripple: rgba(235, 219, 178, 0.3);
+}
+
+.theme--gruvbox-light {
+  --cb-badge-bg: #076678;
+  --cb-badge-text: #fbf1c7;
+  --cb-badge-shadow: rgba(60, 56, 54, 0.15);
+  --cb-badge-pulse: rgba(7, 102, 120, 0.5);
+  --cb-badge-hover-mix: #3c3836;
+  --cb-badge-ripple: rgba(251, 241, 199, 0.3);
+}
+
+/* Dracula theme */
+.theme--dracula {
+  --cb-badge-bg: #bd93f9;
+  --cb-badge-text: #282a36;
+  --cb-badge-shadow: rgba(0, 0, 0, 0.4);
+  --cb-badge-pulse: rgba(189, 147, 249, 0.5);
+  --cb-badge-hover-mix: black;
+  --cb-badge-ripple: rgba(40, 42, 54, 0.3);
+}
+
+/* Nord theme */
+.theme--nord {
+  --cb-badge-bg: #88c0d0;
+  --cb-badge-text: #2e3440;
+  --cb-badge-shadow: rgba(0, 0, 0, 0.3);
+  --cb-badge-pulse: rgba(136, 192, 208, 0.5);
+  --cb-badge-hover-mix: black;
+  --cb-badge-ripple: rgba(46, 52, 64, 0.3);
+}
+
+/* Solarized theme variations */
+.theme--solarized-light {
+  --cb-badge-bg: #268bd2;
+  --cb-badge-text: #fdf6e3;
+  --cb-badge-shadow: rgba(101, 123, 131, 0.15);
+  --cb-badge-pulse: rgba(38, 139, 210, 0.5);
+  --cb-badge-hover-mix: #657b83;
+  --cb-badge-ripple: rgba(253, 246, 227, 0.3);
+}
+
+.theme--solarized-dark {
+  --cb-badge-bg: #268bd2;
+  --cb-badge-text: #002b36;
+  --cb-badge-shadow: rgba(0, 0, 0, 0.4);
+  --cb-badge-pulse: rgba(38, 139, 210, 0.5);
+  --cb-badge-hover-mix: black;
+  --cb-badge-ripple: rgba(0, 43, 54, 0.3);
+}
+
+/* Everforest theme variations */
+.theme--everforest-dark {
+  --cb-badge-bg: #7fbbb3;
+  --cb-badge-text: #272e33;
+  --cb-badge-shadow: rgba(0, 0, 0, 0.3);
+  --cb-badge-pulse: rgba(127, 187, 179, 0.5);
+  --cb-badge-hover-mix: black;
+  --cb-badge-ripple: rgba(39, 46, 51, 0.3);
+}
+
+.theme--everforest-light {
+  --cb-badge-bg: #3a94c5;
+  --cb-badge-text: #fffbef;
+  --cb-badge-shadow: rgba(92, 106, 114, 0.15);
+  --cb-badge-pulse: rgba(58, 148, 197, 0.5);
+  --cb-badge-hover-mix: #5c6a72;
+  --cb-badge-ripple: rgba(255, 251, 239, 0.3);
+}
+
+/* Tokyo Night theme */
+.theme--tokyo-night {
+  --cb-badge-bg: #7aa2f7;
+  --cb-badge-text: #1a1b26;
+  --cb-badge-shadow: rgba(0, 0, 0, 0.4);
+  --cb-badge-pulse: rgba(122, 162, 247, 0.5);
+  --cb-badge-hover-mix: black;
+  --cb-badge-ripple: rgba(26, 27, 38, 0.3);
+}
+
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .badge {

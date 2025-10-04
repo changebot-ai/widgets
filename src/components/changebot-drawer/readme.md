@@ -7,13 +7,13 @@
 
 ## Properties
 
-| Property      | Attribute      | Description | Type                                                                                        | Default          |
-| ------------- | -------------- | ----------- | ------------------------------------------------------------------------------------------- | ---------------- |
-| `dark`        | `dark`         |             | `"catppuccin-frappe" \| "catppuccin-latte" \| "catppuccin-macchiato" \| "catppuccin-mocha"` | `undefined`      |
-| `displayMode` | `display-mode` |             | `"drawer-left" \| "drawer-right" \| "modal"`                                                | `'drawer-right'` |
-| `light`       | `light`        |             | `"catppuccin-frappe" \| "catppuccin-latte" \| "catppuccin-macchiato" \| "catppuccin-mocha"` | `undefined`      |
-| `scope`       | `scope`        |             | `string`                                                                                    | `undefined`      |
-| `theme`       | `theme`        |             | `"catppuccin-frappe" \| "catppuccin-latte" \| "catppuccin-macchiato" \| "catppuccin-mocha"` | `undefined`      |
+| Property      | Attribute      | Description | Type                                                                                                                                                                                                                                                         | Default          |
+| ------------- | -------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------- |
+| `dark`        | `dark`         |             | `"catppuccin-frappe" \| "catppuccin-latte" \| "catppuccin-macchiato" \| "catppuccin-mocha" \| "dracula" \| "everforest-dark" \| "everforest-light" \| "gruvbox-dark" \| "gruvbox-light" \| "nord" \| "solarized-dark" \| "solarized-light" \| "tokyo-night"` | `undefined`      |
+| `displayMode` | `display-mode` |             | `"drawer-left" \| "drawer-right" \| "modal"`                                                                                                                                                                                                                 | `'drawer-right'` |
+| `light`       | `light`        |             | `"catppuccin-frappe" \| "catppuccin-latte" \| "catppuccin-macchiato" \| "catppuccin-mocha" \| "dracula" \| "everforest-dark" \| "everforest-light" \| "gruvbox-dark" \| "gruvbox-light" \| "nord" \| "solarized-dark" \| "solarized-light" \| "tokyo-night"` | `undefined`      |
+| `scope`       | `scope`        |             | `string`                                                                                                                                                                                                                                                     | `undefined`      |
+| `theme`       | `theme`        |             | `"catppuccin-frappe" \| "catppuccin-latte" \| "catppuccin-macchiato" \| "catppuccin-mocha" \| "dracula" \| "everforest-dark" \| "everforest-light" \| "gruvbox-dark" \| "gruvbox-light" \| "nord" \| "solarized-dark" \| "solarized-light" \| "tokyo-night"` | `undefined`      |
 
 
 ## Methods
