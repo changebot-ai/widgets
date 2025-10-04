@@ -52,6 +52,25 @@ export namespace Components {
         "slug"?: string;
         "url"?: string;
     }
+    interface ChangebotToast {
+        "autoDismiss"?: number;
+        "dark"?: CatppuccinTheme;
+        /**
+          * Dismiss the toast
+         */
+        "dismiss": () => Promise<void>;
+        "light"?: CatppuccinTheme;
+        /**
+          * @default 'bottom-right'
+         */
+        "position": 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+        "scope"?: string;
+        /**
+          * Show the toast with a specific update
+         */
+        "show": (update: Update) => Promise<void>;
+        "theme"?: CatppuccinTheme;
+    }
     interface MyComponent {
         /**
           * The first name
@@ -86,6 +105,12 @@ declare global {
         prototype: HTMLChangebotProviderElement;
         new (): HTMLChangebotProviderElement;
     };
+    interface HTMLChangebotToastElement extends Components.ChangebotToast, HTMLStencilElement {
+    }
+    var HTMLChangebotToastElement: {
+        prototype: HTMLChangebotToastElement;
+        new (): HTMLChangebotToastElement;
+    };
     interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
     }
     var HTMLMyComponentElement: {
@@ -96,6 +121,7 @@ declare global {
         "changebot-badge": HTMLChangebotBadgeElement;
         "changebot-drawer": HTMLChangebotDrawerElement;
         "changebot-provider": HTMLChangebotProviderElement;
+        "changebot-toast": HTMLChangebotToastElement;
         "my-component": HTMLMyComponentElement;
     }
 }
@@ -130,6 +156,17 @@ declare namespace LocalJSX {
         "slug"?: string;
         "url"?: string;
     }
+    interface ChangebotToast {
+        "autoDismiss"?: number;
+        "dark"?: CatppuccinTheme;
+        "light"?: CatppuccinTheme;
+        /**
+          * @default 'bottom-right'
+         */
+        "position"?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+        "scope"?: string;
+        "theme"?: CatppuccinTheme;
+    }
     interface MyComponent {
         /**
           * The first name
@@ -148,6 +185,7 @@ declare namespace LocalJSX {
         "changebot-badge": ChangebotBadge;
         "changebot-drawer": ChangebotDrawer;
         "changebot-provider": ChangebotProvider;
+        "changebot-toast": ChangebotToast;
         "my-component": MyComponent;
     }
 }
@@ -158,6 +196,7 @@ declare module "@stencil/core" {
             "changebot-badge": LocalJSX.ChangebotBadge & JSXBase.HTMLAttributes<HTMLChangebotBadgeElement>;
             "changebot-drawer": LocalJSX.ChangebotDrawer & JSXBase.HTMLAttributes<HTMLChangebotDrawerElement>;
             "changebot-provider": LocalJSX.ChangebotProvider & JSXBase.HTMLAttributes<HTMLChangebotProviderElement>;
+            "changebot-toast": LocalJSX.ChangebotToast & JSXBase.HTMLAttributes<HTMLChangebotToastElement>;
             "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
     }

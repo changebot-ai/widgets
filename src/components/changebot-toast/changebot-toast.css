@@ -1,0 +1,358 @@
+:host {
+  /* CSS variables - defaults */
+  --cb-toast-bg: #ffffff;
+  --cb-toast-text: #1a1a1a;
+  --cb-toast-border: #e0e0e0;
+  --cb-toast-shadow: rgba(0, 0, 0, 0.1);
+  --cb-toast-title: #1a1a1a;
+  --cb-toast-date: #666666;
+  --cb-toast-close-hover: #f0f0f0;
+  --cb-toast-content-text: #333333;
+
+  /* Sizing variables */
+  --toast-max-width: 400px;
+  --toast-padding: 16px;
+  --toast-border-radius: 8px;
+  --toast-animation-duration: 0.3s;
+  --toast-spacing: 16px;
+
+  display: block;
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.toast {
+  background-color: var(--cb-toast-bg);
+  color: var(--cb-toast-text);
+  border: 1px solid var(--cb-toast-border);
+  border-radius: var(--toast-border-radius);
+  box-shadow: 0 4px 12px var(--cb-toast-shadow);
+  max-width: var(--toast-max-width);
+  padding: var(--toast-padding);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  pointer-events: auto;
+  animation: toast-slide-in var(--toast-animation-duration) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Positioning */
+.toast--top-left {
+  position: fixed;
+  top: var(--toast-spacing);
+  left: var(--toast-spacing);
+}
+
+.toast--top-right {
+  position: fixed;
+  top: var(--toast-spacing);
+  right: var(--toast-spacing);
+}
+
+.toast--bottom-left {
+  position: fixed;
+  bottom: var(--toast-spacing);
+  left: var(--toast-spacing);
+}
+
+.toast--bottom-right {
+  position: fixed;
+  bottom: var(--toast-spacing);
+  right: var(--toast-spacing);
+}
+
+/* Animations */
+@keyframes toast-slide-in {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.toast--top-left,
+.toast--top-right {
+  animation-name: toast-slide-in-top;
+}
+
+@keyframes toast-slide-in-top {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Toast Header */
+.toast-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.toast-title {
+  flex: 1;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--cb-toast-title);
+  line-height: 1.4;
+}
+
+.toast-close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: var(--cb-toast-text);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.toast-close:hover {
+  background-color: var(--cb-toast-close-hover);
+}
+
+.toast-close:focus {
+  outline: 2px solid var(--cb-toast-border);
+  outline-offset: 2px;
+}
+
+.toast-close:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Toast Content */
+.toast-content {
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--cb-toast-content-text);
+  word-wrap: break-word;
+}
+
+.toast-content p {
+  margin: 0 0 8px 0;
+}
+
+.toast-content p:last-child {
+  margin-bottom: 0;
+}
+
+.toast-content a {
+  color: var(--cb-toast-title);
+  text-decoration: underline;
+}
+
+/* Toast Date */
+.toast-date {
+  display: block;
+  font-size: 12px;
+  color: var(--cb-toast-date);
+  margin-top: 8px;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  :host {
+    --toast-max-width: calc(100vw - 32px);
+  }
+
+  .toast--top-left,
+  .toast--top-right,
+  .toast--bottom-left,
+  .toast--bottom-right {
+    left: var(--toast-spacing);
+    right: var(--toast-spacing);
+    max-width: none;
+  }
+}
+
+/* Catppuccin theme variations */
+.theme--catppuccin-latte {
+  --cb-toast-bg: #eff1f5;
+  --cb-toast-text: #4c4f69;
+  --cb-toast-border: #dce0e8;
+  --cb-toast-shadow: rgba(76, 79, 105, 0.1);
+  --cb-toast-title: #1e66f5;
+  --cb-toast-date: #6c6f85;
+  --cb-toast-close-hover: #e6e9ef;
+  --cb-toast-content-text: #5c5f77;
+}
+
+.theme--catppuccin-frappe {
+  --cb-toast-bg: #303446;
+  --cb-toast-text: #c6d0f5;
+  --cb-toast-border: #414559;
+  --cb-toast-shadow: rgba(0, 0, 0, 0.3);
+  --cb-toast-title: #8caaee;
+  --cb-toast-date: #a5adce;
+  --cb-toast-close-hover: #414559;
+  --cb-toast-content-text: #c6d0f5;
+}
+
+.theme--catppuccin-macchiato {
+  --cb-toast-bg: #24273a;
+  --cb-toast-text: #cad3f5;
+  --cb-toast-border: #363a4f;
+  --cb-toast-shadow: rgba(0, 0, 0, 0.3);
+  --cb-toast-title: #8aadf4;
+  --cb-toast-date: #a5adcb;
+  --cb-toast-close-hover: #363a4f;
+  --cb-toast-content-text: #cad3f5;
+}
+
+.theme--catppuccin-mocha {
+  --cb-toast-bg: #1e1e2e;
+  --cb-toast-text: #cdd6f4;
+  --cb-toast-border: #313244;
+  --cb-toast-shadow: rgba(0, 0, 0, 0.3);
+  --cb-toast-title: #89b4fa;
+  --cb-toast-date: #a6adc8;
+  --cb-toast-close-hover: #313244;
+  --cb-toast-content-text: #cdd6f4;
+}
+
+/* Gruvbox theme variations */
+.theme--gruvbox-dark {
+  --cb-toast-bg: #282828;
+  --cb-toast-text: #ebdbb2;
+  --cb-toast-border: #3c3836;
+  --cb-toast-shadow: rgba(0, 0, 0, 0.4);
+  --cb-toast-title: #83a598;
+  --cb-toast-date: #a89984;
+  --cb-toast-close-hover: #3c3836;
+  --cb-toast-content-text: #d5c4a1;
+}
+
+.theme--gruvbox-light {
+  --cb-toast-bg: #fbf1c7;
+  --cb-toast-text: #3c3836;
+  --cb-toast-border: #ebdbb2;
+  --cb-toast-shadow: rgba(60, 56, 54, 0.1);
+  --cb-toast-title: #076678;
+  --cb-toast-date: #665c54;
+  --cb-toast-close-hover: #ebdbb2;
+  --cb-toast-content-text: #504945;
+}
+
+/* Dracula theme */
+.theme--dracula {
+  --cb-toast-bg: #282a36;
+  --cb-toast-text: #f8f8f2;
+  --cb-toast-border: #44475a;
+  --cb-toast-shadow: rgba(0, 0, 0, 0.5);
+  --cb-toast-title: #bd93f9;
+  --cb-toast-date: #6272a4;
+  --cb-toast-close-hover: #44475a;
+  --cb-toast-content-text: #f8f8f2;
+}
+
+/* Nord theme */
+.theme--nord {
+  --cb-toast-bg: #2e3440;
+  --cb-toast-text: #eceff4;
+  --cb-toast-border: #3b4252;
+  --cb-toast-shadow: rgba(0, 0, 0, 0.3);
+  --cb-toast-title: #88c0d0;
+  --cb-toast-date: #d8dee9;
+  --cb-toast-close-hover: #3b4252;
+  --cb-toast-content-text: #e5e9f0;
+}
+
+/* Solarized theme variations */
+.theme--solarized-light {
+  --cb-toast-bg: #fdf6e3;
+  --cb-toast-text: #657b83;
+  --cb-toast-border: #eee8d5;
+  --cb-toast-shadow: rgba(101, 123, 131, 0.1);
+  --cb-toast-title: #268bd2;
+  --cb-toast-date: #93a1a1;
+  --cb-toast-close-hover: #eee8d5;
+  --cb-toast-content-text: #586e75;
+}
+
+.theme--solarized-dark {
+  --cb-toast-bg: #002b36;
+  --cb-toast-text: #93a1a1;
+  --cb-toast-border: #073642;
+  --cb-toast-shadow: rgba(0, 0, 0, 0.5);
+  --cb-toast-title: #268bd2;
+  --cb-toast-date: #586e75;
+  --cb-toast-close-hover: #073642;
+  --cb-toast-content-text: #839496;
+}
+
+/* Everforest theme variations */
+.theme--everforest-dark {
+  --cb-toast-bg: #272e33;
+  --cb-toast-text: #d3c6aa;
+  --cb-toast-border: #323c41;
+  --cb-toast-shadow: rgba(0, 0, 0, 0.3);
+  --cb-toast-title: #7fbbb3;
+  --cb-toast-date: #859289;
+  --cb-toast-close-hover: #323c41;
+  --cb-toast-content-text: #d3c6aa;
+}
+
+.theme--everforest-light {
+  --cb-toast-bg: #fffbef;
+  --cb-toast-text: #5c6a72;
+  --cb-toast-border: #f4f0d9;
+  --cb-toast-shadow: rgba(92, 106, 114, 0.1);
+  --cb-toast-title: #3a94c5;
+  --cb-toast-date: #939f91;
+  --cb-toast-close-hover: #f4f0d9;
+  --cb-toast-content-text: #5c6a72;
+}
+
+/* Tokyo Night theme */
+.theme--tokyo-night {
+  --cb-toast-bg: #1a1b26;
+  --cb-toast-text: #c0caf5;
+  --cb-toast-border: #24283b;
+  --cb-toast-shadow: rgba(0, 0, 0, 0.5);
+  --cb-toast-title: #7aa2f7;
+  --cb-toast-date: #565f89;
+  --cb-toast-close-hover: #24283b;
+  --cb-toast-content-text: #a9b1d6;
+}
+
+/* Cyberpunk theme */
+.theme--cyberpunk {
+  --cb-toast-bg: #000000;
+  --cb-toast-text: #00ff00;
+  --cb-toast-border: #ff6600;
+  --cb-toast-shadow: rgba(255, 102, 0, 0.5);
+  --cb-toast-title: #ff6600;
+  --cb-toast-date: #00ccff;
+  --cb-toast-close-hover: #1a1a1a;
+  --cb-toast-content-text: #ffffff;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .toast {
+    border-width: 2px;
+  }
+}
