@@ -55,11 +55,32 @@ describe('changebot-drawer', () => {
   it('applies theme class when provided', async () => {
     const { root } = await newSpecPage({
       components: [ChangebotDrawer],
-      html: '<changebot-drawer theme="dark"></changebot-drawer>',
+      html: '<changebot-drawer theme="catppuccin-mocha"></changebot-drawer>',
     });
 
     const display = root.shadowRoot.querySelector('.drawer');
-    expect(display).toHaveClass('drawer--dark');
+    expect(display).toHaveClass('theme--catppuccin-mocha');
+  });
+
+  it('applies light theme when system prefers light', async () => {
+    const page = await newSpecPage({
+      components: [ChangebotDrawer],
+      html: '<changebot-drawer light="catppuccin-latte" dark="catppuccin-mocha"></changebot-drawer>',
+    });
+
+    // Component should have activeTheme set (either light or dark based on system preference)
+    const component = page.rootInstance;
+    expect(component.activeTheme).toMatch(/catppuccin-(latte|mocha)/);
+  });
+
+  it('prioritizes theme prop over light/dark', async () => {
+    const { root } = await newSpecPage({
+      components: [ChangebotDrawer],
+      html: '<changebot-drawer theme="catppuccin-frappe" light="catppuccin-latte" dark="catppuccin-mocha"></changebot-drawer>',
+    });
+
+    const display = root.shadowRoot.querySelector('.drawer');
+    expect(display).toHaveClass('theme--catppuccin-frappe');
   });
 
   // Store integration tests

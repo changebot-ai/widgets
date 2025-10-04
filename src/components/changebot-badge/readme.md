@@ -7,12 +7,14 @@
 
 ## Properties
 
-| Property    | Attribute    | Description | Type                | Default     |
-| ----------- | ------------ | ----------- | ------------------- | ----------- |
-| `count`     | `count`      |             | `number`            | `undefined` |
-| `scope`     | `scope`      |             | `string`            | `undefined` |
-| `showCount` | `show-count` |             | `boolean`           | `true`      |
-| `theme`     | `theme`      |             | `"dark" \| "light"` | `undefined` |
+| Property    | Attribute    | Description | Type                                                                                        | Default     |
+| ----------- | ------------ | ----------- | ------------------------------------------------------------------------------------------- | ----------- |
+| `count`     | `count`      |             | `number`                                                                                    | `undefined` |
+| `dark`      | `dark`       |             | `"catppuccin-frappe" \| "catppuccin-latte" \| "catppuccin-macchiato" \| "catppuccin-mocha"` | `undefined` |
+| `light`     | `light`      |             | `"catppuccin-frappe" \| "catppuccin-latte" \| "catppuccin-macchiato" \| "catppuccin-mocha"` | `undefined` |
+| `scope`     | `scope`      |             | `string`                                                                                    | `undefined` |
+| `showCount` | `show-count` |             | `boolean`                                                                                   | `true`      |
+| `theme`     | `theme`      |             | `"catppuccin-frappe" \| "catppuccin-latte" \| "catppuccin-macchiato" \| "catppuccin-mocha"` | `undefined` |
 
 
 ----------------------------------------------

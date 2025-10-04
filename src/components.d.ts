@@ -5,27 +5,33 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { CatppuccinTheme } from "./utils/themes";
 import { Update } from "./types";
+export { CatppuccinTheme } from "./utils/themes";
 export { Update } from "./types";
 export namespace Components {
     interface ChangebotBadge {
         "count"?: number;
+        "dark"?: CatppuccinTheme;
+        "light"?: CatppuccinTheme;
         "scope"?: string;
         /**
           * @default true
          */
         "showCount": boolean;
-        "theme"?: 'light' | 'dark';
+        "theme"?: CatppuccinTheme;
     }
     interface ChangebotDrawer {
         /**
           * Close the drawer/modal
          */
         "close": () => Promise<void>;
+        "dark"?: CatppuccinTheme;
         /**
           * @default 'drawer-right'
          */
         "displayMode": 'drawer-left' | 'drawer-right' | 'modal';
+        "light"?: CatppuccinTheme;
         /**
           * Open the drawer/modal
          */
@@ -35,7 +41,7 @@ export namespace Components {
           * Set the updates to display
          */
         "setUpdates": (updates: Update[]) => Promise<void>;
-        "theme"?: 'light' | 'dark';
+        "theme"?: CatppuccinTheme;
     }
     interface ChangebotProvider {
         "pollInterval"?: number;
@@ -96,20 +102,24 @@ declare global {
 declare namespace LocalJSX {
     interface ChangebotBadge {
         "count"?: number;
+        "dark"?: CatppuccinTheme;
+        "light"?: CatppuccinTheme;
         "scope"?: string;
         /**
           * @default true
          */
         "showCount"?: boolean;
-        "theme"?: 'light' | 'dark';
+        "theme"?: CatppuccinTheme;
     }
     interface ChangebotDrawer {
+        "dark"?: CatppuccinTheme;
         /**
           * @default 'drawer-right'
          */
         "displayMode"?: 'drawer-left' | 'drawer-right' | 'modal';
+        "light"?: CatppuccinTheme;
         "scope"?: string;
-        "theme"?: 'light' | 'dark';
+        "theme"?: CatppuccinTheme;
     }
     interface ChangebotProvider {
         "pollInterval"?: number;

@@ -7,11 +7,13 @@
 
 ## Properties
 
-| Property      | Attribute      | Description | Type                                         | Default          |
-| ------------- | -------------- | ----------- | -------------------------------------------- | ---------------- |
-| `displayMode` | `display-mode` |             | `"drawer-left" \| "drawer-right" \| "modal"` | `'drawer-right'` |
-| `scope`       | `scope`        |             | `string`                                     | `undefined`      |
-| `theme`       | `theme`        |             | `"dark" \| "light"`                          | `undefined`      |
+| Property      | Attribute      | Description | Type                                                                                        | Default          |
+| ------------- | -------------- | ----------- | ------------------------------------------------------------------------------------------- | ---------------- |
+| `dark`        | `dark`         |             | `"catppuccin-frappe" \| "catppuccin-latte" \| "catppuccin-macchiato" \| "catppuccin-mocha"` | `undefined`      |
+| `displayMode` | `display-mode` |             | `"drawer-left" \| "drawer-right" \| "modal"`                                                | `'drawer-right'` |
+| `light`       | `light`        |             | `"catppuccin-frappe" \| "catppuccin-latte" \| "catppuccin-macchiato" \| "catppuccin-mocha"` | `undefined`      |
+| `scope`       | `scope`        |             | `string`                                                                                    | `undefined`      |
+| `theme`       | `theme`        |             | `"catppuccin-frappe" \| "catppuccin-latte" \| "catppuccin-macchiato" \| "catppuccin-mocha"` | `undefined`      |
 
 
 ## Methods

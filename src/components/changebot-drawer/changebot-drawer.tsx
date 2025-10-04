@@ -1,6 +1,7 @@
-import { Component, Element, Prop, State, Method, h, Host } from '@stencil/core';
+import { Component, Element, Prop, State, Method, Watch, h, Host } from '@stencil/core';
 import { dispatchAction } from '../../utils/context';
 import { Update } from '../../types';
+import { CatppuccinTheme } from '../../utils/themes';
 
 @Component({
   tag: 'changebot-drawer',
@@ -11,11 +12,14 @@ export class ChangebotDrawer {
   @Element() el: HTMLChangebotDrawerElement;
 
   @Prop() scope?: string;
-  @Prop() theme?: 'light' | 'dark';
+  @Prop() theme?: CatppuccinTheme;
+  @Prop() light?: CatppuccinTheme;
+  @Prop() dark?: CatppuccinTheme;
   @Prop() displayMode: 'drawer-left' | 'drawer-right' | 'modal' = 'drawer-right';
 
   @State() isOpen: boolean = false;
   @State() updates: Update[] = [];
+  @State() activeTheme?: CatppuccinTheme;
 
   private services: any;
   private unsubscribeIsOpen?: () => void;
@@ -23,8 +27,19 @@ export class ChangebotDrawer {
   private drawerElement?: HTMLDivElement;
   private firstFocusableElement?: HTMLElement;
   private lastFocusableElement?: HTMLElement;
+  private mediaQuery?: MediaQueryList;
+  private mediaQueryListener?: (e: MediaQueryListEvent) => void;
+
+  @Watch('theme')
+  @Watch('light')
+  @Watch('dark')
+  onThemeChange() {
+    this.updateActiveTheme();
+  }
 
   async componentWillLoad() {
+    this.setupTheme();
+
     // Set data-scope attribute if scope is provided
     if (this.scope) {
       this.el.setAttribute('data-scope', this.scope);
@@ -74,6 +89,52 @@ export class ChangebotDrawer {
 
     // Remove event listener
     document.removeEventListener('keydown', this.handleKeyDown);
+
+    // Cleanup media query listener
+    if (this.mediaQuery && this.mediaQueryListener) {
+      this.mediaQuery.removeEventListener('change', this.mediaQueryListener);
+    }
+  }
+
+  private setupTheme() {
+    // If theme is explicitly set, use it
+    if (this.theme) {
+      this.activeTheme = this.theme;
+      return;
+    }
+
+    // If light and dark are provided, listen to system preference
+    if (this.light || this.dark) {
+      this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      this.updateActiveTheme();
+
+      // Listen for changes in system preference
+      this.mediaQueryListener = () => {
+        this.updateActiveTheme();
+      };
+      this.mediaQuery.addEventListener('change', this.mediaQueryListener);
+    }
+  }
+
+  private updateActiveTheme() {
+    // If theme is explicitly set, use it
+    if (this.theme) {
+      this.activeTheme = this.theme;
+      return;
+    }
+
+    // Use system preference to choose between light and dark
+    const prefersDark = this.mediaQuery?.matches || window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (prefersDark && this.dark) {
+      this.activeTheme = this.dark;
+    } else if (!prefersDark && this.light) {
+      this.activeTheme = this.light;
+    } else if (this.light) {
+      this.activeTheme = this.light;
+    } else if (this.dark) {
+      this.activeTheme = this.dark;
+    }
   }
 
   public subscribeToStore() {
@@ -342,7 +403,7 @@ export class ChangebotDrawer {
       'drawer': true,
       'drawer--closed': !this.isOpen,
       'drawer--open': this.isOpen,
-      [`drawer--${this.theme}`]: !!this.theme,
+      [`theme--${this.activeTheme}`]: !!this.activeTheme,
       [this.getDisplayModeClass()]: true
     };
 
@@ -412,7 +473,9 @@ export class ChangebotDrawer {
 declare global {
   interface HTMLChangebotDrawerElement extends HTMLElement {
     scope?: string;
-    theme?: 'light' | 'dark';
+    theme?: CatppuccinTheme;
+    light?: CatppuccinTheme;
+    dark?: CatppuccinTheme;
     displayMode: 'drawer-left' | 'drawer-right' | 'modal';
     isOpen: boolean;
     updates: Update[];

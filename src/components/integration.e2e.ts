@@ -553,32 +553,32 @@ describe('Integration Tests - Full System', () => {
   });
 
   describe('Theme Support', () => {
-    it('should apply dark theme to badge', async () => {
+    it('should apply catppuccin theme to badge', async () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-badge theme="dark" count="1"></changebot-badge>
+        <changebot-badge theme="catppuccin-mocha" count="1"></changebot-badge>
       `);
 
       await page.waitForChanges();
 
       const badge = await page.find('changebot-badge >>> .badge');
       const className = await badge.getProperty('className');
-      expect(className).toContain('badge--dark');
+      expect(className).toContain('theme--catppuccin-mocha');
     });
 
-    it('should apply dark theme to drawer', async () => {
+    it('should apply catppuccin theme to drawer', async () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-drawer theme="dark"></changebot-drawer>
+        <changebot-drawer theme="catppuccin-mocha"></changebot-drawer>
       `);
 
       await page.waitForChanges();
 
       const drawer = await page.find('changebot-drawer >>> .drawer');
       const className = await drawer.getProperty('className');
-      expect(className).toContain('drawer--dark');
+      expect(className).toContain('theme--catppuccin-mocha');
     });
   });
 });

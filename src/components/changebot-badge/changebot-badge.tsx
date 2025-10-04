@@ -1,6 +1,7 @@
 import { Component, Element, Prop, State, Watch, h } from '@stencil/core';
 import { dispatchAction } from '../../utils/context';
 import { StoreState } from '../../types';
+import { CatppuccinTheme } from '../../utils/themes';
 
 @Component({
   tag: 'changebot-badge',
@@ -11,15 +12,20 @@ export class ChangebotBadge {
   @Element() el: HTMLChangebotBadgeElement;
 
   @Prop() scope?: string;
-  @Prop() theme?: 'light' | 'dark';
+  @Prop() theme?: CatppuccinTheme;
+  @Prop() light?: CatppuccinTheme;
+  @Prop() dark?: CatppuccinTheme;
   @Prop() showCount: boolean = true;
   @Prop() count?: number; // For testing and external control
 
   @State() newUpdatesCount: number = 0;
   @State() isVisible: boolean = false;
+  @State() activeTheme?: CatppuccinTheme;
 
   private services: any;
   private unsubscribe?: () => void;
+  private mediaQuery?: MediaQueryList;
+  private mediaQueryListener?: (e: MediaQueryListEvent) => void;
 
   @Watch('count')
   onCountChange(newCount: number) {
@@ -29,7 +35,15 @@ export class ChangebotBadge {
     }
   }
 
+  @Watch('theme')
+  @Watch('light')
+  @Watch('dark')
+  onThemeChange() {
+    this.updateActiveTheme();
+  }
+
   async componentWillLoad() {
+    this.setupTheme();
     // Set data-scope attribute if scope is provided
     if (this.scope) {
       this.el.setAttribute('data-scope', this.scope);
@@ -70,6 +84,50 @@ export class ChangebotBadge {
   disconnectedCallback() {
     if (this.unsubscribe) {
       this.unsubscribe();
+    }
+    if (this.mediaQuery && this.mediaQueryListener) {
+      this.mediaQuery.removeEventListener('change', this.mediaQueryListener);
+    }
+  }
+
+  private setupTheme() {
+    // If theme is explicitly set, use it
+    if (this.theme) {
+      this.activeTheme = this.theme;
+      return;
+    }
+
+    // If light and dark are provided, listen to system preference
+    if (this.light || this.dark) {
+      this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      this.updateActiveTheme();
+
+      // Listen for changes in system preference
+      this.mediaQueryListener = () => {
+        this.updateActiveTheme();
+      };
+      this.mediaQuery.addEventListener('change', this.mediaQueryListener);
+    }
+  }
+
+  private updateActiveTheme() {
+    // If theme is explicitly set, use it
+    if (this.theme) {
+      this.activeTheme = this.theme;
+      return;
+    }
+
+    // Use system preference to choose between light and dark
+    const prefersDark = this.mediaQuery?.matches || window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (prefersDark && this.dark) {
+      this.activeTheme = this.dark;
+    } else if (!prefersDark && this.light) {
+      this.activeTheme = this.light;
+    } else if (this.light) {
+      this.activeTheme = this.light;
+    } else if (this.dark) {
+      this.activeTheme = this.dark;
     }
   }
 
@@ -166,7 +224,7 @@ export class ChangebotBadge {
     const classes = {
       'badge': true,
       'badge--hidden': !this.isVisible || this.newUpdatesCount === 0,
-      [`badge--${this.theme}`]: !!this.theme
+      [`theme--${this.activeTheme}`]: !!this.activeTheme
     };
 
     const countClasses = {
@@ -195,7 +253,9 @@ export class ChangebotBadge {
 declare global {
   interface HTMLChangebotBadgeElement extends HTMLElement {
     scope?: string;
-    theme?: 'light' | 'dark';
+    theme?: CatppuccinTheme;
+    light?: CatppuccinTheme;
+    dark?: CatppuccinTheme;
     position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
     showCount: boolean;
     newUpdatesCount: number;

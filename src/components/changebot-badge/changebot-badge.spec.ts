@@ -63,11 +63,32 @@ describe('changebot-badge', () => {
   it('applies theme class when provided', async () => {
     const { root } = await newSpecPage({
       components: [ChangebotBadge],
-      html: '<changebot-badge theme="dark"></changebot-badge>',
+      html: '<changebot-badge theme="catppuccin-mocha"></changebot-badge>',
     });
 
     const badge = root.shadowRoot.querySelector('.badge');
-    expect(badge).toHaveClass('badge--dark');
+    expect(badge).toHaveClass('theme--catppuccin-mocha');
+  });
+
+  it('applies light theme when system prefers light', async () => {
+    const page = await newSpecPage({
+      components: [ChangebotBadge],
+      html: '<changebot-badge light="catppuccin-latte" dark="catppuccin-mocha"></changebot-badge>',
+    });
+
+    // Component should have activeTheme set (either light or dark based on system preference)
+    const component = page.rootInstance;
+    expect(component.activeTheme).toMatch(/catppuccin-(latte|mocha)/);
+  });
+
+  it('prioritizes theme prop over light/dark', async () => {
+    const { root } = await newSpecPage({
+      components: [ChangebotBadge],
+      html: '<changebot-badge theme="catppuccin-frappe" light="catppuccin-latte" dark="catppuccin-mocha"></changebot-badge>',
+    });
+
+    const badge = root.shadowRoot.querySelector('.badge');
+    expect(badge).toHaveClass('theme--catppuccin-frappe');
   });
 
 

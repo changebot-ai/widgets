@@ -147,7 +147,7 @@
     <changebot-provider slug="changebot" poll-interval="30"></changebot-provider>
 
     <!-- Updates Drawer - Will open when badge is clicked -->
-    <changebot-drawer display-mode="drawer-right"></changebot-drawer>
+    <changebot-drawer display-mode="drawer-right" id="main-drawer"></changebot-drawer>
 
     <div class="container">
       <h1>Changebot Widget - Production Example</h1>
@@ -155,7 +155,7 @@
 
       <div class="example-header">
         <h2>Your Application Header</h2>
-        <changebot-badge></changebot-badge>
+        <changebot-badge id="main-badge"></changebot-badge>
       </div>
 
       <div id="error-banner" class="error-banner"></div>
@@ -173,6 +173,18 @@
       </ul>
 
       <div class="controls">
+        <h3>Catppuccin Themes</h3>
+        <div class="input-group">
+          <label for="theme-select">Theme:</label>
+          <select id="theme-select" onchange="changeTheme()">
+            <option value="">System Auto (Light/Dark)</option>
+            <option value="catppuccin-latte">Latte (Light)</option>
+            <option value="catppuccin-frappe">Frappé (Dark)</option>
+            <option value="catppuccin-macchiato">Macchiato (Dark)</option>
+            <option value="catppuccin-mocha">Mocha (Dark)</option>
+          </select>
+        </div>
+
         <h3>Drawer Display Mode</h3>
         <div class="input-group">
           <label for="display-mode-select">Display Mode:</label>
@@ -207,10 +219,25 @@
 &lt;changebot-provider slug="changebot" poll-interval="30" /&gt;
 
 &lt;!-- Updates drawer (opens when badge is clicked) --&gt;
-&lt;changebot-drawer display-mode="drawer-right" /&gt;
+&lt;!-- Option 1: Auto theme based on system preference --&gt;
+&lt;changebot-drawer
+  display-mode="drawer-right"
+  light="catppuccin-latte"
+  dark="catppuccin-mocha" /&gt;
+
+&lt;!-- Option 2: Fixed theme --&gt;
+&lt;changebot-drawer
+  display-mode="drawer-right"
+  theme="catppuccin-mocha" /&gt;
 
 &lt;!-- Add badge wherever you want it to appear --&gt;
-&lt;changebot-badge /&gt;</code></pre>
+&lt;!-- Auto theme --&gt;
+&lt;changebot-badge
+  light="catppuccin-latte"
+  dark="catppuccin-mocha" /&gt;
+
+&lt;!-- Or fixed theme --&gt;
+&lt;changebot-badge theme="catppuccin-mocha" /&gt;</code></pre>
 
       <p>
         <a href="/test.html">View comprehensive testing page →</a>
@@ -312,6 +339,41 @@
         }
       }
 
+      // Change theme dynamically
+      function changeTheme() {
+        const select = document.getElementById('theme-select');
+        const badge = document.getElementById('main-badge');
+        const drawer = document.getElementById('main-drawer');
+
+        if (!badge || !drawer || !select) return;
+
+        const theme = select.value;
+
+        if (theme === '') {
+          // System auto mode - use light and dark props
+          badge.removeAttribute('theme');
+          badge.setAttribute('light', 'catppuccin-latte');
+          badge.setAttribute('dark', 'catppuccin-mocha');
+
+          drawer.removeAttribute('theme');
+          drawer.setAttribute('light', 'catppuccin-latte');
+          drawer.setAttribute('dark', 'catppuccin-mocha');
+
+          console.log('🎨 Changed to system auto theme (Latte/Mocha)');
+        } else {
+          // Explicit theme - remove light/dark and set theme
+          badge.removeAttribute('light');
+          badge.removeAttribute('dark');
+          badge.setAttribute('theme', theme);
+
+          drawer.removeAttribute('light');
+          drawer.removeAttribute('dark');
+          drawer.setAttribute('theme', theme);
+
+          console.log('🎨 Changed to explicit theme:', theme);
+        }
+      }
+
       // Show error banner
       function showError(message) {
         const banner = document.getElementById('error-banner');
@@ -325,6 +387,17 @@
         console.log('💡 Click the badge to open the updates drawer');
         console.log('💡 Press ESC to close the drawer');
         console.log('💡 Click "Clear Last Viewed & Reload" to see all updates as new');
+
+        // Initialize with system auto theme (Latte/Mocha)
+        const badge = document.getElementById('main-badge');
+        const drawer = document.getElementById('main-drawer');
+        if (badge && drawer) {
+          badge.setAttribute('light', 'catppuccin-latte');
+          badge.setAttribute('dark', 'catppuccin-mocha');
+          drawer.setAttribute('light', 'catppuccin-latte');
+          drawer.setAttribute('dark', 'catppuccin-mocha');
+          console.log('🎨 Initialized with system auto theme (Latte for light, Mocha for dark)');
+        }
 
         // Pre-populate timestamp input with current last viewed
         const lastViewed = localStorage.getItem('changebot:lastViewed:default');

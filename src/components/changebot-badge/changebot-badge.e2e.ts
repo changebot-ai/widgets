@@ -14,10 +14,10 @@ describe('changebot-badge e2e', () => {
 
   it('applies theme prop correctly', async () => {
     const page = await newE2EPage();
-    await page.setContent('<changebot-badge theme="dark"></changebot-badge>');
+    await page.setContent('<changebot-badge theme="catppuccin-mocha"></changebot-badge>');
 
     const badge = await page.find('changebot-badge >>> .badge');
-    expect(badge).toHaveClass('badge--dark');
+    expect(badge).toHaveClass('theme--catppuccin-mocha');
   });
 
   it('has correct initial aria-label', async () => {
