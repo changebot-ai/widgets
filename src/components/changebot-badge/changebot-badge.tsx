@@ -127,6 +127,10 @@ export class ChangebotBadge {
     const key = `changebot:lastViewed:${this.scope || 'default'}`;
     localStorage.setItem(key, Date.now().toString());
 
+    // Clear badge immediately
+    this.newUpdatesCount = 0;
+    this.isVisible = false;
+
     // Dispatch open action
     dispatchAction(this.el, 'openDisplay', undefined, this.scope);
   };
