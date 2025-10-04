@@ -209,6 +209,73 @@ export class ChangebotDrawer {
     });
   }
 
+  private transformHtmlUrls(html: string): string {
+    if (!html) return html;
+
+    // Create a temporary div to parse and transform the HTML
+    const div = document.createElement('div');
+    div.innerHTML = html;
+
+    // Convert Rails ActionText attachments to standard img tags
+    const actionTextAttachments = div.querySelectorAll('action-text-attachment');
+    actionTextAttachments.forEach((attachment: Element) => {
+      const contentType = attachment.getAttribute('content-type');
+
+      // Only process image attachments
+      if (contentType && contentType.startsWith('image/')) {
+        const url = attachment.getAttribute('url') || attachment.getAttribute('href');
+        const filename = attachment.getAttribute('filename') || 'Image';
+        const presentation = attachment.getAttribute('presentation');
+
+        if (url) {
+          // Create a figure element for better semantic HTML
+          const figure = document.createElement('figure');
+          figure.className = 'attachment-figure';
+
+          const img = document.createElement('img');
+          img.src = url;
+          img.alt = filename;
+
+          // Add loading lazy for performance
+          img.loading = 'lazy';
+
+          figure.appendChild(img);
+
+          // Add caption if filename is meaningful
+          if (filename && filename !== 'Image' && presentation !== 'gallery') {
+            const figcaption = document.createElement('figcaption');
+            figcaption.textContent = filename;
+            figure.appendChild(figcaption);
+          }
+
+          // Replace the action-text-attachment with the figure
+          attachment.parentNode?.replaceChild(figure, attachment);
+        }
+      }
+    });
+
+    // Find all images with relative URLs and make them absolute
+    const images = div.querySelectorAll('img[src^="/"], img[src^="rails/"]');
+    images.forEach((img: HTMLImageElement) => {
+      const src = img.getAttribute('src');
+      if (src && (src.startsWith('/') || src.startsWith('rails/'))) {
+        // Transform relative URLs to absolute URLs pointing to Changebot domain
+        img.setAttribute('src', `https://app.changebot.ai${src.startsWith('/') ? src : '/' + src}`);
+      }
+    });
+
+    // Also handle any links in the HTML
+    const links = div.querySelectorAll('a[href^="/"], a[href^="rails/"]');
+    links.forEach((link: HTMLAnchorElement) => {
+      const href = link.getAttribute('href');
+      if (href && (href.startsWith('/') || href.startsWith('rails/'))) {
+        link.setAttribute('href', `https://app.changebot.ai${href.startsWith('/') ? href : '/' + href}`);
+      }
+    });
+
+    return div.innerHTML;
+  }
+
   private getDisplayModeClass(): string {
     switch (this.displayMode) {
       case 'drawer-left':
@@ -232,7 +299,7 @@ export class ChangebotDrawer {
           </time>
         </div>
         {update.description && (
-          <div class="update-description" innerHTML={update.description}></div>
+          <div class="update-description" innerHTML={this.transformHtmlUrls(update.description)}></div>
         )}
         {update.tags && update.tags.length > 0 && (
           <div class="update-tags">
@@ -248,7 +315,7 @@ export class ChangebotDrawer {
           </div>
         )}
         {update.details && (
-          <div class="update-details" innerHTML={update.details}></div>
+          <div class="update-details" innerHTML={this.transformHtmlUrls(update.details)}></div>
         )}
       </div>
     );
