@@ -157,13 +157,11 @@
   background-color: var(--cb-drawer-surface);
   border-radius: 8px;
   border: 1px solid var(--cb-drawer-border);
-  border-left: 3px solid var(--cb-drawer-subtle);
-  transition: box-shadow 0.2s ease, border-left-color 0.2s ease;
+  transition: box-shadow 0.2s ease;
 }
 
 .update-item:hover {
   box-shadow: 0 4px 6px -1px var(--cb-drawer-shadow);
-  border-left-color: var(--cb-drawer-accent);
 }
 
 .update-header {
