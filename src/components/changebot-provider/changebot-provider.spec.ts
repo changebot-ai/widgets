@@ -3,6 +3,8 @@ import { ChangebotProvider } from './changebot-provider';
 import { updatesStore, actions } from '../../store';
 
 describe('changebot-provider', () => {
+  let fetchMock: jest.SpyInstance;
+
   beforeEach(() => {
     // Reset store state before each test
     updatesStore.state.updates = [];
@@ -11,12 +13,21 @@ describe('changebot-provider', () => {
     updatesStore.state.isOpen = false;
     updatesStore.state.newUpdatesCount = 0;
     updatesStore.state.lastViewed = null;
+
+    // Mock fetch to prevent real network requests
+    fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ updates: [] }),
+    } as Response);
   });
 
   afterEach(() => {
     // Clean up any listeners
     document.removeEventListener('changebot:context-request', () => {});
     document.removeEventListener('changebot:action', () => {});
+    // Restore fetch mock
+    fetchMock.mockRestore();
   });
 
   it('renders', async () => {
@@ -253,7 +264,12 @@ describe('changebot-provider', () => {
     });
 
     it('loads updates on mount when slug is provided', async () => {
-      const loadSpy = jest.spyOn(actions, 'loadUpdates').mockResolvedValue();
+      let loadResolve;
+      const loadPromise = new Promise(resolve => { loadResolve = resolve; });
+      const loadSpy = jest.spyOn(actions, 'loadUpdates').mockImplementation(() => {
+        loadResolve();
+        return Promise.resolve();
+      });
 
       const page = await newSpecPage({
         components: [ChangebotProvider],
@@ -261,12 +277,18 @@ describe('changebot-provider', () => {
       });
 
       await page.waitForChanges();
+      await loadPromise;
 
       expect(loadSpy).toHaveBeenCalledWith('test-team', undefined);
     });
 
     it('loads updates on mount when url is provided', async () => {
-      const loadSpy = jest.spyOn(actions, 'loadUpdates').mockResolvedValue();
+      let loadResolve;
+      const loadPromise = new Promise(resolve => { loadResolve = resolve; });
+      const loadSpy = jest.spyOn(actions, 'loadUpdates').mockImplementation(() => {
+        loadResolve();
+        return Promise.resolve();
+      });
 
       const page = await newSpecPage({
         components: [ChangebotProvider],
@@ -274,6 +296,7 @@ describe('changebot-provider', () => {
       });
 
       await page.waitForChanges();
+      await loadPromise;
 
       expect(loadSpy).toHaveBeenCalledWith(undefined, 'https://api.example.com/updates');
     });
@@ -331,8 +354,13 @@ describe('changebot-provider', () => {
 
   describe('error handling', () => {
     it('handles load errors gracefully', async () => {
-      const errorSpy = jest.spyOn(console, 'error').mockImplementation();
-      jest.spyOn(actions, 'loadUpdates').mockRejectedValue(new Error('Network error'));
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+      let errorResolve;
+      const errorPromise = new Promise(resolve => { errorResolve = resolve; });
+      fetchMock.mockImplementation(() => {
+        errorResolve();
+        return Promise.reject(new Error('Network error'));
+      });
 
       const page = await newSpecPage({
         components: [ChangebotProvider],
@@ -340,9 +368,17 @@ describe('changebot-provider', () => {
       });
 
       await page.waitForChanges();
+      await errorPromise;
 
-      expect(errorSpy).toHaveBeenCalledWith('🔌 Provider: Failed to load updates:', expect.any(Error));
-      errorSpy.mockRestore();
+      // Error is logged by the store's loadUpdates
+      expect(warnSpy).toHaveBeenCalledWith(
+        '⚠️ Changebot widget: Could not load updates. Widget functionality will continue to work.',
+        expect.objectContaining({
+          error: 'Network error',
+          slug: 'test-team'
+        })
+      );
+      warnSpy.mockRestore();
     });
 
     it('handles invalid action types gracefully', async () => {
