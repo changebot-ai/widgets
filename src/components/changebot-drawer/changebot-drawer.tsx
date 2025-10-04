@@ -188,8 +188,8 @@ export class ChangebotDrawer {
   };
 
   private handleBackdropClick = (event: MouseEvent) => {
-    // Only close on backdrop click in modal mode
-    if (this.displayMode === 'modal' && (event.target as HTMLElement).classList.contains('backdrop')) {
+    // Close on backdrop click for all display modes
+    if ((event.target as HTMLElement).classList.contains('backdrop')) {
       // If connected to provider, dispatch action
       if (this.services) {
         dispatchAction(this.el, 'closeDisplay', undefined, this.scope);
@@ -350,8 +350,8 @@ export class ChangebotDrawer {
 
     return (
       <Host>
-        {/* Backdrop for modal mode */}
-        {isModal && this.isOpen && (
+        {/* Backdrop */}
+        {this.isOpen && (
           <div
             class="backdrop"
             onClick={this.handleBackdropClick}
