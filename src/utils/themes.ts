@@ -322,9 +322,6 @@ export const themes = {
 
 export type Theme = keyof typeof themes;
 
-// Legacy type alias for backward compatibility
-export type CatppuccinTheme = Theme;
-
 export function getThemePalette(theme: Theme): ThemePalette {
   return themes[theme];
 }

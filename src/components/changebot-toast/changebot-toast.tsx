@@ -1,6 +1,6 @@
 import { Component, Element, Prop, State, Watch, Method, h, Host } from '@stencil/core';
 import { Update } from '../../types';
-import { CatppuccinTheme } from '../../utils/themes';
+import { Theme } from '../../utils/themes';
 
 @Component({
   tag: 'changebot-toast',
@@ -11,15 +11,15 @@ export class ChangebotToast {
   @Element() el: HTMLChangebotToastElement;
 
   @Prop() scope?: string;
-  @Prop() theme?: CatppuccinTheme;
-  @Prop() light?: CatppuccinTheme;
-  @Prop() dark?: CatppuccinTheme;
+  @Prop() theme?: Theme;
+  @Prop() light?: Theme;
+  @Prop() dark?: Theme;
   @Prop() position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' = 'bottom-right';
   @Prop() autoDismiss?: number; // Auto-dismiss after N seconds (optional)
 
   @State() isVisible: boolean = false;
   @State() currentUpdate?: Update;
-  @State() activeTheme?: CatppuccinTheme;
+  @State() activeTheme?: Theme;
 
   private services: any;
   private unsubscribeUpdates?: () => void;
@@ -311,9 +311,9 @@ export class ChangebotToast {
 declare global {
   interface HTMLChangebotToastElement extends HTMLElement {
     scope?: string;
-    theme?: CatppuccinTheme;
-    light?: CatppuccinTheme;
-    dark?: CatppuccinTheme;
+    theme?: Theme;
+    light?: Theme;
+    dark?: Theme;
     position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
     autoDismiss?: number;
   }

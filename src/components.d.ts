@@ -5,33 +5,33 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { CatppuccinTheme } from "./utils/themes";
+import { Theme } from "./utils/themes";
 import { Update } from "./types";
-export { CatppuccinTheme } from "./utils/themes";
+export { Theme } from "./utils/themes";
 export { Update } from "./types";
 export namespace Components {
     interface ChangebotBadge {
         "count"?: number;
-        "dark"?: CatppuccinTheme;
-        "light"?: CatppuccinTheme;
+        "dark"?: Theme;
+        "light"?: Theme;
         "scope"?: string;
         /**
           * @default true
          */
         "showCount": boolean;
-        "theme"?: CatppuccinTheme;
+        "theme"?: Theme;
     }
     interface ChangebotDrawer {
         /**
           * Close the drawer/modal
          */
         "close": () => Promise<void>;
-        "dark"?: CatppuccinTheme;
+        "dark"?: Theme;
         /**
           * @default 'drawer-right'
          */
         "displayMode": 'drawer-left' | 'drawer-right' | 'modal';
-        "light"?: CatppuccinTheme;
+        "light"?: Theme;
         /**
           * Open the drawer/modal
          */
@@ -41,7 +41,7 @@ export namespace Components {
           * Set the updates to display
          */
         "setUpdates": (updates: Update[]) => Promise<void>;
-        "theme"?: CatppuccinTheme;
+        "theme"?: Theme;
     }
     interface ChangebotProvider {
         "pollInterval"?: number;
@@ -54,12 +54,12 @@ export namespace Components {
     }
     interface ChangebotToast {
         "autoDismiss"?: number;
-        "dark"?: CatppuccinTheme;
+        "dark"?: Theme;
         /**
           * Dismiss the toast
          */
         "dismiss": () => Promise<void>;
-        "light"?: CatppuccinTheme;
+        "light"?: Theme;
         /**
           * @default 'bottom-right'
          */
@@ -69,7 +69,7 @@ export namespace Components {
           * Show the toast with a specific update
          */
         "show": (update: Update) => Promise<void>;
-        "theme"?: CatppuccinTheme;
+        "theme"?: Theme;
     }
     interface MyComponent {
         /**
@@ -128,24 +128,24 @@ declare global {
 declare namespace LocalJSX {
     interface ChangebotBadge {
         "count"?: number;
-        "dark"?: CatppuccinTheme;
-        "light"?: CatppuccinTheme;
+        "dark"?: Theme;
+        "light"?: Theme;
         "scope"?: string;
         /**
           * @default true
          */
         "showCount"?: boolean;
-        "theme"?: CatppuccinTheme;
+        "theme"?: Theme;
     }
     interface ChangebotDrawer {
-        "dark"?: CatppuccinTheme;
+        "dark"?: Theme;
         /**
           * @default 'drawer-right'
          */
         "displayMode"?: 'drawer-left' | 'drawer-right' | 'modal';
-        "light"?: CatppuccinTheme;
+        "light"?: Theme;
         "scope"?: string;
-        "theme"?: CatppuccinTheme;
+        "theme"?: Theme;
     }
     interface ChangebotProvider {
         "pollInterval"?: number;
@@ -158,14 +158,14 @@ declare namespace LocalJSX {
     }
     interface ChangebotToast {
         "autoDismiss"?: number;
-        "dark"?: CatppuccinTheme;
-        "light"?: CatppuccinTheme;
+        "dark"?: Theme;
+        "light"?: Theme;
         /**
           * @default 'bottom-right'
          */
         "position"?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
         "scope"?: string;
-        "theme"?: CatppuccinTheme;
+        "theme"?: Theme;
     }
     interface MyComponent {
         /**

@@ -1,7 +1,7 @@
 import { Component, Element, Prop, State, Method, Watch, h, Host } from '@stencil/core';
 import { dispatchAction } from '../../utils/context';
 import { Update } from '../../types';
-import { CatppuccinTheme } from '../../utils/themes';
+import { Theme } from '../../utils/themes';
 
 @Component({
   tag: 'changebot-drawer',
@@ -12,14 +12,14 @@ export class ChangebotDrawer {
   @Element() el: HTMLChangebotDrawerElement;
 
   @Prop() scope?: string;
-  @Prop() theme?: CatppuccinTheme;
-  @Prop() light?: CatppuccinTheme;
-  @Prop() dark?: CatppuccinTheme;
+  @Prop() theme?: Theme;
+  @Prop() light?: Theme;
+  @Prop() dark?: Theme;
   @Prop() displayMode: 'drawer-left' | 'drawer-right' | 'modal' = 'drawer-right';
 
   @State() isOpen: boolean = false;
   @State() updates: Update[] = [];
-  @State() activeTheme?: CatppuccinTheme;
+  @State() activeTheme?: Theme;
 
   private services: any;
   private unsubscribeIsOpen?: () => void;
@@ -511,9 +511,9 @@ export class ChangebotDrawer {
 declare global {
   interface HTMLChangebotDrawerElement extends HTMLElement {
     scope?: string;
-    theme?: CatppuccinTheme;
-    light?: CatppuccinTheme;
-    dark?: CatppuccinTheme;
+    theme?: Theme;
+    light?: Theme;
+    dark?: Theme;
     displayMode: 'drawer-left' | 'drawer-right' | 'modal';
     isOpen: boolean;
     updates: Update[];
