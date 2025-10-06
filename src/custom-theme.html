@@ -171,28 +171,28 @@
       --cb-badge-ripple: rgba(255, 255, 255, 0.6);
     }
 
-    changebot-drawer {
+    changebot-panel {
       /* Drawer background colors - WILD CYBERPUNK THEME! */
-      --cb-drawer-bg: #0a0014;          /* Deep purple-black background */
-      --cb-drawer-surface: #1a0033;     /* Purple surface */
-      --cb-drawer-border: #ff00ff;      /* Magenta border */
+      --cb-panel-bg: #0a0014;          /* Deep purple-black background */
+      --cb-panel-surface: #1a0033;     /* Purple surface */
+      --cb-panel-border: #ff00ff;      /* Magenta border */
 
       /* Text colors */
-      --cb-drawer-text: #00ffff;        /* Cyan text */
-      --cb-drawer-text-muted: #ff66ff;  /* Pink muted text */
+      --cb-panel-text: #00ffff;        /* Cyan text */
+      --cb-panel-text-muted: #ff66ff;  /* Pink muted text */
 
       /* Interactive colors */
-      --cb-drawer-hover: #330066;       /* Purple hover */
-      --cb-drawer-link: #00ff00;        /* Lime green links */
-      --cb-drawer-focus: #ffff00;       /* Yellow focus */
+      --cb-panel-hover: #330066;       /* Purple hover */
+      --cb-panel-link: #00ff00;        /* Lime green links */
+      --cb-panel-focus: #ffff00;       /* Yellow focus */
 
       /* Accent colors */
-      --cb-drawer-accent: #ff6600;      /* Bright orange titles (matches badge!) */
-      --cb-drawer-meta: #00ffff;        /* Cyan metadata */
-      --cb-drawer-subtle: #00ff00;      /* Lime green subtle */
+      --cb-panel-accent: #ff6600;      /* Bright orange titles (matches badge!) */
+      --cb-panel-meta: #00ffff;        /* Cyan metadata */
+      --cb-panel-subtle: #00ff00;      /* Lime green subtle */
 
       /* Effects */
-      --cb-drawer-shadow: rgba(255, 0, 255, 0.5);
+      --cb-panel-shadow: rgba(255, 0, 255, 0.5);
       --cb-backdrop: rgba(10, 0, 20, 0.9);
     }
   </style>
@@ -202,7 +202,7 @@
   <changebot-provider slug="changebot" scope="custom-theme" poll-interval="60"></changebot-provider>
 
   <!-- Drawer component -->
-  <changebot-drawer id="custom-drawer" scope="custom-theme" display-mode="drawer-right"></changebot-drawer>
+  <changebot-panel id="custom-drawer" scope="custom-theme" display-mode="drawer-right"></changebot-panel>
 
   <div class="container">
     <section>
@@ -250,14 +250,14 @@
   }
 
   /* Customize the drawer - CYBERPUNK THEME! */
-  changebot-drawer {
-    --cb-drawer-bg: #0a0014;          /* Deep purple-black background */
-    --cb-drawer-surface: #1a0033;     /* Purple card backgrounds */
-    --cb-drawer-text: #00ffff;        /* Cyan text */
-    --cb-drawer-accent: #ff6600;      /* Bright orange titles */
-    --cb-drawer-link: #00ff00;        /* Lime green links */
-    --cb-drawer-meta: #00ffff;        /* Cyan dates */
-    --cb-drawer-border: #ff00ff;      /* Magenta borders */
+  changebot-panel {
+    --cb-panel-bg: #0a0014;          /* Deep purple-black background */
+    --cb-panel-surface: #1a0033;     /* Purple card backgrounds */
+    --cb-panel-text: #00ffff;        /* Cyan text */
+    --cb-panel-accent: #ff6600;      /* Bright orange titles */
+    --cb-panel-link: #00ff00;        /* Lime green links */
+    --cb-panel-meta: #00ffff;        /* Cyan dates */
+    --cb-panel-border: #ff00ff;      /* Magenta borders */
     /* ... and more! */
   }
 &lt;/style&gt;
@@ -265,7 +265,7 @@
 &lt;!-- Then use components WITHOUT theme attributes --&gt;
 &lt;changebot-provider slug="your-team"&gt;&lt;/changebot-provider&gt;
 &lt;changebot-badge&gt;&lt;/changebot-badge&gt;
-&lt;changebot-drawer display-mode="drawer-right"&gt;&lt;/changebot-drawer&gt;</code></pre>
+&lt;changebot-panel display-mode="drawer-right"&gt;&lt;/changebot-panel&gt;</code></pre>
     </section>
 
     <section>
@@ -283,18 +283,18 @@
 
       <h3>Drawer Variables</h3>
       <div class="variables-grid">
-        <div class="variable-item">--cb-drawer-bg</div>
-        <div class="variable-item">--cb-drawer-surface</div>
-        <div class="variable-item">--cb-drawer-border</div>
-        <div class="variable-item">--cb-drawer-text</div>
-        <div class="variable-item">--cb-drawer-text-muted</div>
-        <div class="variable-item">--cb-drawer-hover</div>
-        <div class="variable-item">--cb-drawer-link</div>
-        <div class="variable-item">--cb-drawer-focus</div>
-        <div class="variable-item">--cb-drawer-accent</div>
-        <div class="variable-item">--cb-drawer-meta</div>
-        <div class="variable-item">--cb-drawer-subtle</div>
-        <div class="variable-item">--cb-drawer-shadow</div>
+        <div class="variable-item">--cb-panel-bg</div>
+        <div class="variable-item">--cb-panel-surface</div>
+        <div class="variable-item">--cb-panel-border</div>
+        <div class="variable-item">--cb-panel-text</div>
+        <div class="variable-item">--cb-panel-text-muted</div>
+        <div class="variable-item">--cb-panel-hover</div>
+        <div class="variable-item">--cb-panel-link</div>
+        <div class="variable-item">--cb-panel-focus</div>
+        <div class="variable-item">--cb-panel-accent</div>
+        <div class="variable-item">--cb-panel-meta</div>
+        <div class="variable-item">--cb-panel-subtle</div>
+        <div class="variable-item">--cb-panel-shadow</div>
         <div class="variable-item">--cb-backdrop</div>
       </div>
     </section>
@@ -306,17 +306,17 @@
       <p>Use media queries to automatically switch between light and dark themes:</p>
 
       <pre><code>@media (prefers-color-scheme: light) {
-  changebot-drawer {
-    --cb-drawer-bg: #ffffff;
-    --cb-drawer-text: #1a1d29;
+  changebot-panel {
+    --cb-panel-bg: #ffffff;
+    --cb-panel-text: #1a1d29;
     /* ... your light theme colors ... */
   }
 }
 
 @media (prefers-color-scheme: dark) {
-  changebot-drawer {
-    --cb-drawer-bg: #1a1d29;
-    --cb-drawer-text: #e8eaed;
+  changebot-panel {
+    --cb-panel-bg: #1a1d29;
+    --cb-panel-text: #e8eaed;
     /* ... your dark theme colors ... */
   }
 }</code></pre>
@@ -329,9 +329,9 @@
   --cb-badge-text: var(--your-brand-text);
 }
 
-changebot-drawer {
-  --cb-drawer-accent: var(--your-brand-primary);
-  --cb-drawer-link: var(--your-brand-link);
+changebot-panel {
+  --cb-panel-accent: var(--your-brand-primary);
+  --cb-panel-link: var(--your-brand-link);
 }</code></pre>
 
       <h3>Scope-Specific Themes</h3>
@@ -363,13 +363,13 @@ changebot-badge[scope="user"] {
       --cb-badge-text: #ffffff;    /* White */
     }
 
-    changebot-drawer {
-      --cb-drawer-bg: #0a0014;     /* Deep purple-black */
-      --cb-drawer-surface: #1a0033;/* Purple */
-      --cb-drawer-text: #00ffff;   /* Cyan */
-      --cb-drawer-accent: #ff6600; /* Bright orange */
-      --cb-drawer-link: #00ff00;   /* Lime green */
-      --cb-drawer-border: #ff00ff; /* Magenta */
+    changebot-panel {
+      --cb-panel-bg: #0a0014;     /* Deep purple-black */
+      --cb-panel-surface: #1a0033;/* Purple */
+      --cb-panel-text: #00ffff;   /* Cyan */
+      --cb-panel-accent: #ff6600; /* Bright orange */
+      --cb-panel-link: #00ff00;   /* Lime green */
+      --cb-panel-border: #ff00ff; /* Magenta */
     }
   &lt;/style&gt;
 &lt;/head&gt;
@@ -380,7 +380,7 @@ changebot-badge[scope="user"] {
   &lt;changebot-badge&gt;&lt;/changebot-badge&gt;
 
   &lt;!-- Drawer (hidden until badge is clicked) --&gt;
-  &lt;changebot-drawer display-mode="drawer-right"&gt;&lt;/changebot-drawer&gt;
+  &lt;changebot-panel display-mode="drawer-right"&gt;&lt;/changebot-panel&gt;
 &lt;/body&gt;
 &lt;/html&gt;</code></pre>
     </section>

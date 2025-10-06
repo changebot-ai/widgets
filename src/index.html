@@ -161,7 +161,7 @@
     <changebot-provider slug="changebot" poll-interval="30"></changebot-provider>
 
     <!-- Updates Drawer - Will open when badge is clicked -->
-    <changebot-drawer display-mode="drawer-right" id="main-drawer"></changebot-drawer>
+    <changebot-panel display-mode="drawer-right" id="main-drawer"></changebot-panel>
 
     <div class="container">
       <h1>Changebot Widget - Production Example</h1>
@@ -250,13 +250,13 @@
 
 &lt;!-- Updates drawer (opens when badge is clicked) --&gt;
 &lt;!-- Option 1: Auto theme based on system preference --&gt;
-&lt;changebot-drawer
+&lt;changebot-panel
   display-mode="drawer-right"
   light="catppuccin-latte"
   dark="catppuccin-mocha" /&gt;
 
 &lt;!-- Option 2: Fixed theme --&gt;
-&lt;changebot-drawer
+&lt;changebot-panel
   display-mode="drawer-right"
   theme="catppuccin-mocha" /&gt;
 
@@ -364,7 +364,7 @@
       // Change display mode dynamically
       function changeDisplayMode() {
         const select = document.getElementById('display-mode-select');
-        const drawer = document.querySelector('changebot-drawer');
+        const drawer = document.querySelector('changebot-panel');
         if (drawer && select) {
           drawer.setAttribute('display-mode', select.value);
           console.log('🎨 Changed display mode to:', select.value);

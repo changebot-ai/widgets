@@ -1,4 +1,4 @@
-# changebot-drawer
+# changebot-panel
 
 
 
@@ -20,7 +20,7 @@
 
 ### `close() => Promise<void>`
 
-Close the drawer/modal
+Close the panel
 
 #### Returns
 
@@ -30,7 +30,7 @@ Type: `Promise<void>`
 
 ### `open() => Promise<void>`
 
-Open the drawer/modal
+Open the panel
 
 #### Returns
 

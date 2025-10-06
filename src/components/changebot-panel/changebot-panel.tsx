@@ -4,12 +4,12 @@ import { Update } from '../../types';
 import { Theme } from '../../utils/themes';
 
 @Component({
-  tag: 'changebot-drawer',
-  styleUrl: 'changebot-drawer.css',
+  tag: 'changebot-panel',
+  styleUrl: 'changebot-panel.css',
   shadow: true,
 })
-export class ChangebotDrawer {
-  @Element() el: HTMLChangebotDrawerElement;
+export class ChangebotPanel {
+  @Element() el: HTMLChangebotPanelElement;
 
   @Prop() scope?: string;
   @Prop() theme?: Theme;
@@ -24,7 +24,7 @@ export class ChangebotDrawer {
   private services: any;
   private unsubscribeIsOpen?: () => void;
   private unsubscribeUpdates?: () => void;
-  private drawerElement?: HTMLDivElement;
+  private panelElement?: HTMLDivElement;
   private firstFocusableElement?: HTMLElement;
   private lastFocusableElement?: HTMLElement;
   private mediaQuery?: MediaQueryList;
@@ -50,7 +50,7 @@ export class ChangebotDrawer {
       const detail = {
         callback: (services: any) => {
           try {
-            console.log('📂 Drawer: Received services from provider', {
+            console.log('📂 Panel: Received services from provider', {
               hasStore: !!services?.store,
               hasActions: !!services?.actions,
               storeState: services?.store?.state
@@ -58,14 +58,14 @@ export class ChangebotDrawer {
             this.services = services;
             this.subscribeToStore();
           } catch (error) {
-            // If provider setup fails, drawer will still work in standalone mode
-            console.warn('Drawer: Failed to setup provider connection, using standalone mode:', error);
+            // If provider setup fails, panel will still work in standalone mode
+            console.warn('Panel: Failed to setup provider connection, using standalone mode:', error);
           }
         },
         scope: this.scope || 'default'
       };
 
-      console.log('📂 Drawer: Requesting context with scope:', detail.scope);
+      console.log('📂 Panel: Requesting context with scope:', detail.scope);
 
       this.el.dispatchEvent(
         new CustomEvent('changebot:context-request', {
@@ -76,7 +76,7 @@ export class ChangebotDrawer {
       );
     } catch (error) {
       // If provider request fails, continue in standalone mode
-      console.warn('Drawer: Failed to request provider context, using standalone mode:', error);
+      console.warn('Panel: Failed to request provider context, using standalone mode:', error);
     }
 
     // Listen for ESC key globally
@@ -153,12 +153,12 @@ export class ChangebotDrawer {
     try {
       const store = this.services.store;
 
-      console.log('📂 Drawer: Subscribing to store, current state:', store.state);
+      console.log('📂 Panel: Subscribing to store, current state:', store.state);
 
       // Subscribe to isOpen changes
       this.unsubscribeIsOpen = store.onChange('isOpen', () => {
         try {
-          console.log('📂 Drawer: isOpen changed to', store.state.isOpen);
+          console.log('📂 Panel: isOpen changed to', store.state.isOpen);
           this.isOpen = store.state.isOpen;
 
           if (this.isOpen) {
@@ -166,17 +166,17 @@ export class ChangebotDrawer {
             setTimeout(() => this.focusFirstElement(), 100);
           }
         } catch (error) {
-          console.warn('Drawer: Error in isOpen change handler:', error);
+          console.warn('Panel: Error in isOpen change handler:', error);
         }
       });
 
       // Subscribe to updates changes
       this.unsubscribeUpdates = store.onChange('updates', () => {
         try {
-          console.log('📂 Drawer: Updates changed, count:', store.state.updates?.length);
+          console.log('📂 Panel: Updates changed, count:', store.state.updates?.length);
           this.updates = store.state.updates || [];
         } catch (error) {
-          console.warn('Drawer: Error in updates change handler:', error);
+          console.warn('Panel: Error in updates change handler:', error);
         }
       });
 
@@ -184,12 +184,12 @@ export class ChangebotDrawer {
       this.isOpen = store.state.isOpen || false;
       this.updates = store.state.updates || [];
     } catch (error) {
-      console.warn('Drawer: Failed to subscribe to store:', error);
+      console.warn('Panel: Failed to subscribe to store:', error);
     }
   }
 
   /**
-   * Open the drawer/modal
+   * Open the panel
    */
   @Method()
   async open() {
@@ -200,7 +200,7 @@ export class ChangebotDrawer {
   }
 
   /**
-   * Close the drawer/modal
+   * Close the panel
    */
   @Method()
   async close() {
@@ -216,9 +216,9 @@ export class ChangebotDrawer {
   }
 
   private setupFocusTrap() {
-    if (!this.drawerElement) return;
+    if (!this.panelElement) return;
 
-    const focusableElements = this.drawerElement.querySelectorAll(
+    const focusableElements = this.panelElement.querySelectorAll(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
 
@@ -248,7 +248,7 @@ export class ChangebotDrawer {
         // If dispatch fails for any reason, close directly
         console.warn('Failed to dispatch close action from ESC key, closing directly:', error);
       } finally {
-        // Always close the drawer, regardless of provider state
+        // Always close the panel, regardless of provider state
         this.isOpen = false;
       }
     }
@@ -275,8 +275,8 @@ export class ChangebotDrawer {
       // If dispatch fails for any reason, close directly
       console.warn('Failed to dispatch close action, closing directly:', error);
     } finally {
-      // Always close the drawer, regardless of provider state
-      // This ensures errors don't prevent users from closing the drawer
+      // Always close the panel, regardless of provider state
+      // This ensures errors don't prevent users from closing the panel
       this.isOpen = false;
     }
   };
@@ -293,7 +293,7 @@ export class ChangebotDrawer {
         // If dispatch fails for any reason, close directly
         console.warn('Failed to dispatch close action from backdrop, closing directly:', error);
       } finally {
-        // Always close the drawer, regardless of provider state
+        // Always close the panel, regardless of provider state
         this.isOpen = false;
       }
     }
@@ -378,13 +378,13 @@ export class ChangebotDrawer {
   private getDisplayModeClass(): string {
     switch (this.displayMode) {
       case 'drawer-left':
-        return 'drawer--left';
+        return 'panel--left';
       case 'drawer-right':
-        return 'drawer--right';
+        return 'panel--right';
       case 'modal':
-        return 'drawer--modal';
+        return 'panel--modal';
       default:
-        return 'drawer--right';
+        return 'panel--right';
     }
   }
 
@@ -438,9 +438,9 @@ export class ChangebotDrawer {
 
   render() {
     const classes = {
-      'drawer': true,
-      'drawer--closed': !this.isOpen,
-      'drawer--open': this.isOpen,
+      'panel': true,
+      'panel--closed': !this.isOpen,
+      'panel--open': this.isOpen,
       [`theme--${this.activeTheme}`]: !!this.activeTheme,
       [this.getDisplayModeClass()]: true
     };
@@ -458,9 +458,9 @@ export class ChangebotDrawer {
           ></div>
         )}
 
-        {/* Main drawer/modal container */}
+        {/* Main panel container */}
         <div
-          ref={el => this.drawerElement = el}
+          ref={el => this.panelElement = el}
           class={classes}
           role="dialog"
           aria-modal={isModal ? 'true' : 'false'}
@@ -468,8 +468,8 @@ export class ChangebotDrawer {
           aria-hidden={!this.isOpen ? 'true' : 'false'}
         >
           {/* Header */}
-          <div class="drawer-header">
-            <h2 class="drawer-title">What's New</h2>
+          <div class="panel-header">
+            <h2 class="panel-title">What's New</h2>
             <button
               class="close-button"
               type="button"
@@ -493,7 +493,7 @@ export class ChangebotDrawer {
           </div>
 
           {/* Content */}
-          <div class="drawer-content">
+          <div class="panel-content">
             {this.renderContent()}
           </div>
 
@@ -509,7 +509,7 @@ export class ChangebotDrawer {
 
 // Type declaration for HTMLElement
 declare global {
-  interface HTMLChangebotDrawerElement extends HTMLElement {
+  interface HTMLChangebotPanelElement extends HTMLElement {
     scope?: string;
     theme?: Theme;
     light?: Theme;

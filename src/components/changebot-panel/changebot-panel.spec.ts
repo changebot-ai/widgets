@@ -1,52 +1,52 @@
 import { newSpecPage } from '@stencil/core/testing';
-import { ChangebotDrawer } from './changebot-drawer';
+import { ChangebotPanel } from './changebot-panel';
 
-describe('changebot-drawer', () => {
+describe('changebot-panel', () => {
   // Basic rendering tests
   it('renders closed by default', async () => {
     const { root } = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel></changebot-panel>',
     });
 
-    const drawer = root.shadowRoot.querySelector('.drawer');
-    expect(drawer).toHaveClass('drawer--closed');
+    const drawer = root.shadowRoot.querySelector('.panel');
+    expect(drawer).toHaveClass('panel--closed');
   });
 
   it('applies drawer-left display mode', async () => {
     const { root } = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer display-mode="drawer-left"></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel display-mode="drawer-left"></changebot-panel>',
     });
 
-    const drawer = root.shadowRoot.querySelector('.drawer');
-    expect(drawer).toHaveClass('drawer--left');
+    const drawer = root.shadowRoot.querySelector('.panel');
+    expect(drawer).toHaveClass('panel--left');
   });
 
   it('applies drawer-right display mode', async () => {
     const { root } = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer display-mode="drawer-right"></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel display-mode="drawer-right"></changebot-panel>',
     });
 
-    const drawer = root.shadowRoot.querySelector('.drawer');
-    expect(drawer).toHaveClass('drawer--right');
+    const drawer = root.shadowRoot.querySelector('.panel');
+    expect(drawer).toHaveClass('panel--right');
   });
 
   it('applies modal display mode', async () => {
     const { root } = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer display-mode="modal"></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel display-mode="modal"></changebot-panel>',
     });
 
-    const modal = root.shadowRoot.querySelector('.drawer');
-    expect(modal).toHaveClass('drawer--modal');
+    const modal = root.shadowRoot.querySelector('.panel');
+    expect(modal).toHaveClass('panel--modal');
   });
 
   it('applies custom scope attribute', async () => {
     const { root } = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer scope="admin"></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel scope="admin"></changebot-panel>',
     });
 
     expect(root.getAttribute('data-scope')).toBe('admin');
@@ -54,18 +54,18 @@ describe('changebot-drawer', () => {
 
   it('applies theme class when provided', async () => {
     const { root } = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer theme="catppuccin-mocha"></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel theme="catppuccin-mocha"></changebot-panel>',
     });
 
-    const display = root.shadowRoot.querySelector('.drawer');
+    const display = root.shadowRoot.querySelector('.panel');
     expect(display).toHaveClass('theme--catppuccin-mocha');
   });
 
   it('applies light theme when system prefers light', async () => {
     const page = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer light="catppuccin-latte" dark="catppuccin-mocha"></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel light="catppuccin-latte" dark="catppuccin-mocha"></changebot-panel>',
     });
 
     // Component should have activeTheme set (either light or dark based on system preference)
@@ -75,19 +75,19 @@ describe('changebot-drawer', () => {
 
   it('prioritizes theme prop over light/dark', async () => {
     const { root } = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer theme="catppuccin-frappe" light="catppuccin-latte" dark="catppuccin-mocha"></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel theme="catppuccin-frappe" light="catppuccin-latte" dark="catppuccin-mocha"></changebot-panel>',
     });
 
-    const display = root.shadowRoot.querySelector('.drawer');
+    const display = root.shadowRoot.querySelector('.panel');
     expect(display).toHaveClass('theme--catppuccin-frappe');
   });
 
   // Store integration tests
   it('requests context on component load', async () => {
     const page = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel></changebot-panel>',
     });
 
     // Verify component loaded successfully
@@ -102,14 +102,14 @@ describe('changebot-drawer', () => {
       state: {
         isOpen: false,
         updates: [],
-        displayMode: 'drawer'
+        displayMode: 'panel'
       },
       onChange: jest.fn()
     };
 
     const page = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel></changebot-panel>',
     });
 
     const component = page.rootInstance;
@@ -126,14 +126,14 @@ describe('changebot-drawer', () => {
       state: {
         isOpen: false,
         updates: [],
-        displayMode: 'drawer'
+        displayMode: 'panel'
       },
       onChange: jest.fn()
     };
 
     const page = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel></changebot-panel>',
     });
 
     const component = page.rootInstance;
@@ -151,7 +151,7 @@ describe('changebot-drawer', () => {
       state: {
         isOpen: false,
         updates: [],
-        displayMode: 'drawer'
+        displayMode: 'panel'
       },
       onChange: jest.fn((key, callback) => {
         if (key === 'isOpen') {
@@ -162,8 +162,8 @@ describe('changebot-drawer', () => {
     };
 
     const page = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel></changebot-panel>',
     });
 
     const component = page.rootInstance;
@@ -204,14 +204,14 @@ describe('changebot-drawer', () => {
       state: {
         isOpen: true,
         updates: mockUpdates,
-        displayMode: 'drawer'
+        displayMode: 'panel'
       },
       onChange: jest.fn().mockReturnValue(() => {})
     };
 
     const page = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel></changebot-panel>',
     });
 
     const component = page.rootInstance;
@@ -229,8 +229,8 @@ describe('changebot-drawer', () => {
   // Close interaction tests
   it('dispatches closeDisplay action on close button click', async () => {
     const page = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel></changebot-panel>',
     });
 
     const component = page.rootInstance;
@@ -263,8 +263,8 @@ describe('changebot-drawer', () => {
 
   it('dispatches closeDisplay action on ESC key', async () => {
     const page = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel></changebot-panel>',
     });
 
     const component = page.rootInstance;
@@ -293,8 +293,8 @@ describe('changebot-drawer', () => {
 
   it('closes directly when no provider (standalone mode)', async () => {
     const page = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel></changebot-panel>',
     });
 
     const component = page.rootInstance;
@@ -318,8 +318,8 @@ describe('changebot-drawer', () => {
     const dispatchEventSpy = jest.fn();
 
     const { root } = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer display-mode="modal"></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel display-mode="modal"></changebot-panel>',
     });
 
     const component = root as any;
@@ -351,7 +351,7 @@ describe('changebot-drawer', () => {
       state: {
         isOpen: false,
         updates: [],
-        displayMode: 'drawer'
+        displayMode: 'panel'
       },
       onChange: jest.fn()
         .mockReturnValueOnce(unsubscribeIsOpen)
@@ -359,8 +359,8 @@ describe('changebot-drawer', () => {
     };
 
     const page = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel></changebot-panel>',
     });
 
     const component = page.rootInstance;
@@ -377,8 +377,8 @@ describe('changebot-drawer', () => {
   // ARIA and accessibility tests
   it('has proper ARIA attributes when open', async () => {
     const page = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer display-mode="modal"></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel display-mode="modal"></changebot-panel>',
     });
 
     const component = page.rootInstance;
@@ -386,7 +386,7 @@ describe('changebot-drawer', () => {
 
     await page.waitForChanges();
 
-    const display = page.root.shadowRoot.querySelector('.drawer');
+    const display = page.root.shadowRoot.querySelector('.panel');
     expect(display.getAttribute('role')).toBe('dialog');
     expect(display.getAttribute('aria-modal')).toBe('true');
     expect(display.getAttribute('aria-label')).toBeTruthy();
@@ -394,8 +394,8 @@ describe('changebot-drawer', () => {
 
   it('has aria-live region for announcements', async () => {
     const { root } = await newSpecPage({
-      components: [ChangebotDrawer],
-      html: '<changebot-drawer></changebot-drawer>',
+      components: [ChangebotPanel],
+      html: '<changebot-panel></changebot-panel>',
     });
 
     const liveRegion = root.shadowRoot.querySelector('[aria-live]');

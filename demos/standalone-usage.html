@@ -136,7 +136,7 @@
 
       <div class="code-block">
 // Get reference to drawer
-const drawer = document.querySelector('changebot-drawer');
+const drawer = document.querySelector('changebot-panel');
 
 // Control it programmatically
 await drawer.open();
@@ -165,10 +165,10 @@ await drawer.setUpdates([...]);
     </div>
 
     <!-- Standalone drawer component -->
-    <changebot-drawer
+    <changebot-panel
       id="standalone-drawer"
       display-mode="drawer-right">
-    </changebot-drawer>
+    </changebot-panel>
   </div>
 
   <script>

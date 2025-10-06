@@ -34,7 +34,7 @@ npm install @changebot/widgets
   <changebot-badge></changebot-badge>
 
   <!-- Drawer displays updates (hidden until opened) -->
-  <changebot-drawer display-mode="drawer-right"></changebot-drawer>
+  <changebot-panel display-mode="drawer-right"></changebot-panel>
 </body>
 </html>
 ```
@@ -81,7 +81,7 @@ Badge that displays the count of new updates.
 </changebot-badge>
 ```
 
-### changebot-drawer
+### changebot-panel
 
 Drawer/modal that displays the list of updates.
 
@@ -101,10 +101,10 @@ Drawer/modal that displays the list of updates.
 - `setUpdates(updates)` - Set updates manually
 
 ```html
-<changebot-drawer
+<changebot-panel
   display-mode="drawer-right"
   theme="nord">
-</changebot-drawer>
+</changebot-panel>
 ```
 
 ## Opening the Drawer from Custom Elements
@@ -184,14 +184,14 @@ Override theme colors with CSS variables:
     --cb-badge-text: #ffffff;
   }
 
-  changebot-drawer {
-    --cb-drawer-bg: #1a1d29;
-    --cb-drawer-surface: #252938;
-    --cb-drawer-text: #e8eaed;
-    --cb-drawer-accent: #ff6600;
-    --cb-drawer-link: #5eb3f6;
-    --cb-drawer-meta: #a78bfa;
-    --cb-drawer-border: #3d4354;
+  changebot-panel {
+    --cb-panel-bg: #1a1d29;
+    --cb-panel-surface: #252938;
+    --cb-panel-text: #e8eaed;
+    --cb-panel-accent: #ff6600;
+    --cb-panel-link: #5eb3f6;
+    --cb-panel-meta: #a78bfa;
+    --cb-panel-border: #3d4354;
   }
 </style>
 ```
@@ -208,19 +208,19 @@ Use multiple providers for different update feeds:
 <!-- Admin updates -->
 <changebot-provider slug="admin-updates" scope="admin"></changebot-provider>
 <changebot-badge scope="admin"></changebot-badge>
-<changebot-drawer scope="admin"></changebot-drawer>
+<changebot-panel scope="admin"></changebot-panel>
 
 <!-- User updates -->
 <changebot-provider slug="user-updates" scope="user"></changebot-provider>
 <changebot-badge scope="user"></changebot-badge>
-<changebot-drawer scope="user"></changebot-drawer>
+<changebot-panel scope="user"></changebot-panel>
 ```
 
 ### Programmatic Control
 
 ```javascript
 // Get drawer reference
-const drawer = document.querySelector('changebot-drawer');
+const drawer = document.querySelector('changebot-panel');
 
 // Open/close programmatically
 await drawer.open();

@@ -30,7 +30,7 @@ function App() {
           <changebot-badge scope="default" />
         </header>
 
-        <changebot-drawer
+        <changebot-panel
           scope="default"
           display-mode="drawer-right"
         />
@@ -46,7 +46,7 @@ export default App;
 
 ```tsx
 import '@changebot/widgets/dist/custom-elements';
-import type { ChangebotBadge, ChangebotDrawer, ChangebotProvider } from '@changebot/widgets';
+import type { ChangebotBadge, ChangebotPanel, ChangebotProvider } from '@changebot/widgets';
 
 // Add type support for JSX
 declare global {
@@ -64,7 +64,7 @@ declare global {
         'show-count'?: boolean;
         count?: number;
       }, HTMLElement>;
-      'changebot-drawer': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
+      'changebot-panel': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
         scope?: string;
         theme?: 'light' | 'dark';
         'display-mode'?: 'drawer-left' | 'drawer-right' | 'modal';
@@ -81,7 +81,7 @@ function App() {
         <changebot-badge scope="default" />
       </header>
 
-      <changebot-drawer
+      <changebot-panel
         scope="default"
         display-mode="drawer-right"
       />
@@ -96,7 +96,7 @@ function App() {
 import { useRef, useEffect } from 'react';
 
 function App() {
-  const drawerRef = useRef<HTMLChangebotDrawerElement>(null);
+  const drawerRef = useRef<HTMLChangebotPanelElement>(null);
 
   const openDrawer = () => {
     drawerRef.current?.open();
@@ -111,7 +111,7 @@ function App() {
       <button onClick={openDrawer}>Open Updates</button>
       <button onClick={closeDrawer}>Close Updates</button>
 
-      <changebot-drawer ref={drawerRef} display-mode="modal" />
+      <changebot-panel ref={drawerRef} display-mode="modal" />
     </div>
   );
 }
@@ -148,7 +148,7 @@ app.mount('#app');
         <changebot-badge scope="default" />
       </header>
 
-      <changebot-drawer
+      <changebot-panel
         scope="default"
         display-mode="drawer-right"
       />
@@ -169,7 +169,7 @@ app.mount('#app');
     <button @click="openDrawer">Open Updates</button>
     <button @click="closeDrawer">Close Updates</button>
 
-    <changebot-drawer
+    <changebot-panel
       ref="drawerRef"
       display-mode="modal"
     />
@@ -179,7 +179,7 @@ app.mount('#app');
 <script setup lang="ts">
 import { ref } from 'vue';
 
-const drawerRef = ref<HTMLChangebotDrawerElement | null>(null);
+const drawerRef = ref<HTMLChangebotPanelElement | null>(null);
 
 const openDrawer = () => {
   drawerRef.value?.open();
@@ -250,10 +250,10 @@ import { Component } from '@angular/core';
         <changebot-badge scope="default"></changebot-badge>
       </header>
 
-      <changebot-drawer
+      <changebot-panel
         scope="default"
         [attr.display-mode]="'drawer-right'"
-      ></changebot-drawer>
+      ></changebot-panel>
     </changebot-provider>
   `
 })
@@ -274,15 +274,15 @@ import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
       <button (click)="openDrawer()">Open Updates</button>
       <button (click)="closeDrawer()">Close Updates</button>
 
-      <changebot-drawer
+      <changebot-panel
         #drawer
         [attr.display-mode]="'modal'"
-      ></changebot-drawer>
+      ></changebot-panel>
     </div>
   `
 })
 export class AppComponent implements AfterViewInit {
-  @ViewChild('drawer', { static: false }) drawer?: ElementRef<HTMLChangebotDrawerElement>;
+  @ViewChild('drawer', { static: false }) drawer?: ElementRef<HTMLChangebotPanelElement>;
 
   ngAfterViewInit() {
     console.log('Drawer element:', this.drawer?.nativeElement);
@@ -307,11 +307,11 @@ declare namespace JSX {
   interface IntrinsicElements {
     'changebot-provider': any;
     'changebot-badge': any;
-    'changebot-drawer': any;
+    'changebot-panel': any;
   }
 }
 
-interface HTMLChangebotDrawerElement extends HTMLElement {
+interface HTMLChangebotPanelElement extends HTMLElement {
   open(): Promise<void>;
   close(): Promise<void>;
   setUpdates(updates: any[]): Promise<void>;
@@ -330,12 +330,12 @@ interface HTMLChangebotDrawerElement extends HTMLElement {
 <body>
   <changebot-provider slug="your-team" scope="default">
     <changebot-badge scope="default"></changebot-badge>
-    <changebot-drawer scope="default" display-mode="drawer-right"></changebot-drawer>
+    <changebot-panel scope="default" display-mode="drawer-right"></changebot-panel>
   </changebot-provider>
 
   <script>
     // Access drawer programmatically
-    const drawer = document.querySelector('changebot-drawer');
+    const drawer = document.querySelector('changebot-panel');
 
     // Use methods
     setTimeout(async () => {
@@ -355,12 +355,12 @@ interface HTMLChangebotDrawerElement extends HTMLElement {
 <>
   <changebot-provider slug="product-team" scope="product">
     <changebot-badge scope="product" />
-    <changebot-drawer scope="product" />
+    <changebot-panel scope="product" />
   </changebot-provider>
 
   <changebot-provider slug="admin-team" scope="admin">
     <changebot-badge scope="admin" />
-    <changebot-drawer scope="admin" display-mode="modal" />
+    <changebot-panel scope="admin" display-mode="modal" />
   </changebot-provider>
 </>
 ```
@@ -370,14 +370,14 @@ interface HTMLChangebotDrawerElement extends HTMLElement {
 ```jsx
 // Dark theme example
 <changebot-badge theme="dark" scope="default" />
-<changebot-drawer theme="dark" scope="default" />
+<changebot-panel theme="dark" scope="default" />
 ```
 
 ### Programmatic Control
 
 ```javascript
 // Get reference to drawer
-const drawer = document.querySelector('changebot-drawer');
+const drawer = document.querySelector('changebot-panel');
 
 // Open
 await drawer.open();

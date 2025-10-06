@@ -9,7 +9,7 @@ describe('Integration Tests - Full System', () => {
       await page.setContent(`
         <changebot-provider scope="test">
           <changebot-badge scope="test"></changebot-badge>
-          <changebot-drawer scope="test"></changebot-drawer>
+          <changebot-panel scope="test"></changebot-panel>
         </changebot-provider>
       `);
 
@@ -18,7 +18,7 @@ describe('Integration Tests - Full System', () => {
       // Verify all components are hydrated
       const provider = await page.find('changebot-provider');
       const badge = await page.find('changebot-badge');
-      const drawer = await page.find('changebot-drawer');
+      const drawer = await page.find('changebot-panel');
 
       expect(provider).toHaveClass('hydrated');
       expect(badge).toHaveClass('hydrated');
@@ -31,7 +31,7 @@ describe('Integration Tests - Full System', () => {
       await page.setContent(`
         <changebot-provider scope="test">
           <changebot-badge scope="test"></changebot-badge>
-          <changebot-drawer scope="test"></changebot-drawer>
+          <changebot-panel scope="test"></changebot-panel>
         </changebot-provider>
       `);
 
@@ -53,9 +53,9 @@ describe('Integration Tests - Full System', () => {
       await page.waitForChanges();
 
       // Verify drawer opened
-      const drawer = await page.find('changebot-drawer >>> .drawer');
+      const drawer = await page.find('changebot-panel >>> .panel');
       const className = await drawer.getProperty('className');
-      expect(className).toContain('drawer--open');
+      expect(className).toContain('panel--open');
     });
 
     it('should handle badge click to open drawer', async () => {
@@ -64,7 +64,7 @@ describe('Integration Tests - Full System', () => {
       await page.setContent(`
         <changebot-provider scope="test">
           <changebot-badge scope="test" count="3"></changebot-badge>
-          <changebot-drawer scope="test"></changebot-drawer>
+          <changebot-panel scope="test"></changebot-panel>
         </changebot-provider>
       `);
 
@@ -78,9 +78,9 @@ describe('Integration Tests - Full System', () => {
       await new Promise(resolve => setTimeout(resolve, 200));
 
       // Verify drawer opened
-      const drawer = await page.find('changebot-drawer >>> .drawer');
+      const drawer = await page.find('changebot-panel >>> .panel');
       const className = await drawer.getProperty('className');
-      expect(className).toContain('drawer--open');
+      expect(className).toContain('panel--open');
     });
   });
 
@@ -175,7 +175,7 @@ describe('Integration Tests - Full System', () => {
       await page.setContent(`
         <changebot-provider scope="sync-test">
           <changebot-badge scope="sync-test"></changebot-badge>
-          <changebot-drawer scope="sync-test"></changebot-drawer>
+          <changebot-panel scope="sync-test"></changebot-panel>
         </changebot-provider>
       `);
 
@@ -197,9 +197,9 @@ describe('Integration Tests - Full System', () => {
       await page.waitForChanges();
 
       // Verify drawer is open
-      const drawer = await page.find('changebot-drawer >>> .drawer');
+      const drawer = await page.find('changebot-panel >>> .panel');
       const drawerClasses = await drawer.getProperty('className');
-      expect(drawerClasses).toContain('drawer--open');
+      expect(drawerClasses).toContain('panel--open');
 
       // Close drawer via action
       await page.evaluate(() => {
@@ -217,9 +217,9 @@ describe('Integration Tests - Full System', () => {
       await page.waitForChanges();
 
       // Verify drawer is closed
-      const closedDrawer = await page.find('changebot-drawer >>> .drawer');
+      const closedDrawer = await page.find('changebot-panel >>> .panel');
       const closedClasses = await closedDrawer.getProperty('className');
-      expect(closedClasses).toContain('drawer--closed');
+      expect(closedClasses).toContain('panel--closed');
     });
   });
 
@@ -281,11 +281,11 @@ describe('Integration Tests - Full System', () => {
 
       await page.setContent(`
         <changebot-provider scope="app1">
-          <changebot-drawer scope="app1"></changebot-drawer>
+          <changebot-panel scope="app1"></changebot-panel>
         </changebot-provider>
 
         <changebot-provider scope="app2">
-          <changebot-drawer scope="app2"></changebot-drawer>
+          <changebot-panel scope="app2"></changebot-panel>
         </changebot-provider>
       `);
 
@@ -308,10 +308,10 @@ describe('Integration Tests - Full System', () => {
       await new Promise(resolve => setTimeout(resolve, 300));
 
       // Check app1 drawer is open
-      const drawers = await page.findAll('changebot-drawer >>> .drawer');
+      const drawers = await page.findAll('changebot-panel >>> .panel');
       const drawer1Classes = await drawers[0].getProperty('className');
 
-      expect(drawer1Classes).toContain('drawer--open');
+      expect(drawer1Classes).toContain('panel--open');
       // Note: We only verify app1 is open, as timing issues can affect app2's state in e2e tests
     });
   });
@@ -338,21 +338,21 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-drawer></changebot-drawer>
+        <changebot-panel></changebot-panel>
       `);
 
       await page.waitForChanges();
 
       // Open drawer using method
-      await page.$eval('changebot-drawer', (el: any) => {
+      await page.$eval('changebot-panel', (el: any) => {
         return el.open();
       });
 
       await page.waitForChanges();
 
-      const drawer = await page.find('changebot-drawer >>> .drawer');
+      const drawer = await page.find('changebot-panel >>> .panel');
       const className = await drawer.getProperty('className');
-      expect(className).toContain('drawer--open');
+      expect(className).toContain('panel--open');
     });
   });
 
@@ -362,7 +362,7 @@ describe('Integration Tests - Full System', () => {
 
       await page.setContent(`
         <changebot-provider scope="a11y-test">
-          <changebot-drawer scope="a11y-test"></changebot-drawer>
+          <changebot-panel scope="a11y-test"></changebot-panel>
         </changebot-provider>
       `);
 
@@ -388,9 +388,9 @@ describe('Integration Tests - Full System', () => {
       await page.waitForChanges();
 
       // Verify drawer closed
-      const drawer = await page.find('changebot-drawer >>> .drawer');
+      const drawer = await page.find('changebot-panel >>> .panel');
       const className = await drawer.getProperty('className');
-      expect(className).toContain('drawer--closed');
+      expect(className).toContain('panel--closed');
     });
 
     it('should support keyboard navigation on badge', async () => {
@@ -399,7 +399,7 @@ describe('Integration Tests - Full System', () => {
       await page.setContent(`
         <changebot-provider scope="kbd-test">
           <changebot-badge scope="kbd-test" count="3"></changebot-badge>
-          <changebot-drawer scope="kbd-test"></changebot-drawer>
+          <changebot-panel scope="kbd-test"></changebot-panel>
         </changebot-provider>
       `);
 
@@ -413,9 +413,9 @@ describe('Integration Tests - Full System', () => {
       await new Promise(resolve => setTimeout(resolve, 200));
 
       // Verify drawer opened
-      const drawer = await page.find('changebot-drawer >>> .drawer');
+      const drawer = await page.find('changebot-panel >>> .panel');
       const className = await drawer.getProperty('className');
-      expect(className).toContain('drawer--open');
+      expect(className).toContain('panel--open');
     });
 
     it('should have proper ARIA attributes', async () => {
@@ -423,7 +423,7 @@ describe('Integration Tests - Full System', () => {
 
       await page.setContent(`
         <changebot-badge count="3"></changebot-badge>
-        <changebot-drawer></changebot-drawer>
+        <changebot-panel></changebot-panel>
       `);
 
       await page.waitForChanges();
@@ -435,7 +435,7 @@ describe('Integration Tests - Full System', () => {
       expect(await badge.getAttribute('aria-live')).toBe('polite');
 
       // Check drawer ARIA
-      const drawer = await page.find('changebot-drawer >>> .drawer');
+      const drawer = await page.find('changebot-panel >>> .panel');
       expect(await drawer.getAttribute('role')).toBe('dialog');
       expect(await drawer.getAttribute('aria-label')).toBe('Product Updates');
     });
@@ -446,51 +446,51 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-drawer display-mode="drawer-left"></changebot-drawer>
+        <changebot-panel display-mode="drawer-left"></changebot-panel>
       `);
 
       await page.waitForChanges();
 
-      const drawer = await page.find('changebot-drawer >>> .drawer');
+      const drawer = await page.find('changebot-panel >>> .panel');
       const className = await drawer.getProperty('className');
-      expect(className).toContain('drawer--left');
+      expect(className).toContain('panel--left');
     });
 
     it('should render drawer in right position', async () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-drawer display-mode="drawer-right"></changebot-drawer>
+        <changebot-panel display-mode="drawer-right"></changebot-panel>
       `);
 
       await page.waitForChanges();
 
-      const drawer = await page.find('changebot-drawer >>> .drawer');
+      const drawer = await page.find('changebot-panel >>> .panel');
       const className = await drawer.getProperty('className');
-      expect(className).toContain('drawer--right');
+      expect(className).toContain('panel--right');
     });
 
     it('should render as modal with backdrop', async () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-drawer display-mode="modal"></changebot-drawer>
+        <changebot-panel display-mode="modal"></changebot-panel>
       `);
 
       await page.waitForChanges();
 
       // Open the modal
-      await page.$eval('changebot-drawer', (el: any) => {
+      await page.$eval('changebot-panel', (el: any) => {
         return el.open();
       });
 
       await page.waitForChanges();
 
-      const drawer = await page.find('changebot-drawer >>> .drawer');
-      const backdrop = await page.find('changebot-drawer >>> .backdrop');
+      const drawer = await page.find('changebot-panel >>> .panel');
+      const backdrop = await page.find('changebot-panel >>> .backdrop');
 
       const className = await drawer.getProperty('className');
-      expect(className).toContain('drawer--modal');
+      expect(className).toContain('panel--modal');
       expect(backdrop).not.toBeNull();
     });
   });
@@ -571,12 +571,12 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-drawer theme="catppuccin-mocha"></changebot-drawer>
+        <changebot-panel theme="catppuccin-mocha"></changebot-panel>
       `);
 
       await page.waitForChanges();
 
-      const drawer = await page.find('changebot-drawer >>> .drawer');
+      const drawer = await page.find('changebot-panel >>> .panel');
       const className = await drawer.getProperty('className');
       expect(className).toContain('theme--catppuccin-mocha');
     });

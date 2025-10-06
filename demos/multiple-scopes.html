@@ -80,13 +80,13 @@
       <code>&lt;!-- App 1 --&gt;
 &lt;changebot-provider scope="app1"&gt;
   &lt;changebot-badge scope="app1"&gt;&lt;/changebot-badge&gt;
-  &lt;changebot-drawer scope="app1"&gt;&lt;/changebot-drawer&gt;
+  &lt;changebot-panel scope="app1"&gt;&lt;/changebot-panel&gt;
 &lt;/changebot-provider&gt;
 
 &lt;!-- App 2 --&gt;
 &lt;changebot-provider scope="app2"&gt;
   &lt;changebot-badge scope="app2"&gt;&lt;/changebot-badge&gt;
-  &lt;changebot-drawer scope="app2"&gt;&lt;/changebot-drawer&gt;
+  &lt;changebot-panel scope="app2"&gt;&lt;/changebot-panel&gt;
 &lt;/changebot-provider&gt;</code>
     </div>
 
@@ -101,10 +101,10 @@
         <p>Click the badge to see updates specific to this application.</p>
       </div>
 
-      <changebot-drawer
+      <changebot-panel
         scope="app1"
         display-mode="drawer-right">
-      </changebot-drawer>
+      </changebot-panel>
     </changebot-provider>
 
     <!-- Second Application Scope -->
@@ -118,10 +118,10 @@
         <p>Notice how the badge and updates are separate from Application 1.</p>
       </div>
 
-      <changebot-drawer
+      <changebot-panel
         scope="app2"
         display-mode="drawer-left">
-      </changebot-drawer>
+      </changebot-panel>
     </changebot-provider>
   </div>
 
