@@ -156,6 +156,145 @@ const defaultStore = createStore<StoreState>({
   isOpen: false
 });
 
+/**
+ * Create a scoped store instance for multi-provider setups
+ * This ensures each provider has its own isolated state
+ */
+export function createScopedStore() {
+  const store = createStore<StoreState>({
+    updates: [],
+    lastViewed: null,
+    isDrawerOpen: false,
+    isModalOpen: false,
+    displayMode: 'panel',
+    drawerPosition: 'right',
+    newUpdatesCount: 0,
+    isLoading: false,
+    error: null,
+    isOpen: false
+  });
+
+  const scopedActions = {
+    async loadUpdates(slug?: string, url?: string) {
+      store.state.isLoading = true;
+      store.state.error = null;
+
+      try {
+        let apiUrl: string;
+        if (slug) {
+          apiUrl = `https://api.changebot.ai/v1/updates/${slug}`;
+        } else if (url) {
+          apiUrl = url;
+        } else {
+          throw new Error('Either slug or url must be provided');
+        }
+
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+          mode: 'cors',
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch updates: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        // Parse the API response format
+        let updates = [];
+        if (Array.isArray(data)) {
+          updates = data;
+        } else if (data.data && Array.isArray(data.data)) {
+          updates = data.data.map((item: any) => ({
+            id: item.id.toString(),
+            title: item.attributes?.title || 'Untitled',
+            description: item.attributes?.content?.body || '',
+            date: item.attributes?.published_at || new Date().toISOString(),
+            timestamp: new Date(item.attributes?.published_at || Date.now()).getTime(),
+            tags: []
+          }));
+        } else if (data.updates) {
+          updates = data.updates;
+        }
+
+        store.state.updates = updates;
+        store.state.isLoading = false;
+        store.state.newUpdatesCount = calculateNewUpdatesCount(store.state.updates, store.state.lastViewed);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to load updates';
+        store.state.error = errorMessage;
+        store.state.isLoading = false;
+        console.warn('⚠️ Changebot widget: Could not load updates.', {
+          error: errorMessage,
+          slug,
+          url
+        });
+      }
+    },
+
+    markViewed(timestamp?: string) {
+      const now = timestamp ? new Date(timestamp).getTime() : Date.now();
+      store.state.lastViewed = now;
+      store.state.newUpdatesCount = calculateNewUpdatesCount(store.state.updates, now);
+    },
+
+    markAllViewed() {
+      const now = Date.now();
+      store.state.lastViewed = now;
+      store.state.newUpdatesCount = 0;
+    },
+
+    openDisplay() {
+      store.state.isOpen = true;
+      if (store.state.displayMode === 'drawer') {
+        store.state.isDrawerOpen = true;
+        store.state.isModalOpen = false;
+      } else {
+        store.state.isModalOpen = true;
+        store.state.isDrawerOpen = false;
+      }
+    },
+
+    closeDisplay() {
+      store.state.isOpen = false;
+      store.state.isDrawerOpen = false;
+      store.state.isModalOpen = false;
+    },
+
+    toggleDisplay() {
+      store.state.isOpen = !store.state.isOpen;
+      if (store.state.displayMode === 'drawer') {
+        store.state.isDrawerOpen = !store.state.isDrawerOpen;
+      } else {
+        store.state.isModalOpen = !store.state.isModalOpen;
+      }
+    },
+
+    setDisplayMode(mode: 'drawer' | 'modal') {
+      store.state.displayMode = mode;
+      store.state.isOpen = false;
+      store.state.isDrawerOpen = false;
+      store.state.isModalOpen = false;
+    },
+
+    setDrawerPosition(position: 'left' | 'right') {
+      store.state.drawerPosition = position;
+    },
+
+    calculateNewCount() {
+      store.state.newUpdatesCount = calculateNewUpdatesCount(store.state.updates, store.state.lastViewed);
+    }
+  };
+
+  return {
+    store,
+    actions: scopedActions
+  };
+}
+
 // Export the default store state
 export const updatesStore = defaultStore;
 

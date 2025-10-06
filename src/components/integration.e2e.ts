@@ -667,5 +667,70 @@ describe('Integration Tests - Full System', () => {
       badgeClasses = await badge.getProperty('className');
       expect(badgeClasses).toContain('badge--hidden');
     });
+
+    it('should not interact when badge and panel have different scopes', async () => {
+      const page = await newE2EPage();
+
+      await page.setContent(`
+        <changebot-provider scope="badge-scope">
+          <changebot-badge scope="badge-scope" count="5"></changebot-badge>
+        </changebot-provider>
+        <changebot-provider scope="panel-scope">
+          <changebot-panel scope="panel-scope"></changebot-panel>
+        </changebot-provider>
+      `);
+
+      await page.waitForChanges();
+
+      // Verify badge initially shows count
+      let badge = await page.find('changebot-badge >>> .badge');
+      let badgeClasses = await badge.getProperty('className');
+      expect(badgeClasses).not.toContain('badge--hidden');
+
+      let badgeCount = await page.find('changebot-badge >>> .badge__count');
+      let countText = await badgeCount.textContent;
+      expect(countText).toBe('5');
+
+      // Verify panel is initially closed
+      let panel = await page.find('changebot-panel >>> .panel');
+      let panelClasses = await panel.getProperty('className');
+      expect(panelClasses).toContain('panel--closed');
+      expect(panelClasses).not.toContain('panel--open');
+
+      // Click the badge - this should NOT open the panel (different scope)
+      const badgeButton = await page.find('changebot-badge >>> .badge');
+      await badgeButton.click();
+
+      await page.waitForChanges();
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Verify panel is still closed (different scope prevents opening)
+      panel = await page.find('changebot-panel >>> .panel');
+      panelClasses = await panel.getProperty('className');
+      expect(panelClasses).toContain('panel--closed');
+      expect(panelClasses).not.toContain('panel--open');
+
+      // Now open the panel programmatically
+      await page.$eval('changebot-panel', (el: any) => {
+        return el.open();
+      });
+
+      await page.waitForChanges();
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Verify panel is now open
+      panel = await page.find('changebot-panel >>> .panel');
+      panelClasses = await panel.getProperty('className');
+      expect(panelClasses).toContain('panel--open');
+
+      // Verify badge count is NOT cleared (different scope prevents clearing)
+      badge = await page.find('changebot-badge >>> .badge');
+      badgeClasses = await badge.getProperty('className');
+      expect(badgeClasses).not.toContain('badge--hidden');
+
+      badgeCount = await page.find('changebot-badge >>> .badge__count');
+      countText = await badgeCount.textContent;
+      expect(countText).toBe('5');
+    });
   });
 });

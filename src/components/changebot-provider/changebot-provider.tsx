@@ -1,5 +1,5 @@
 import { Component, h, Prop, Listen, Element } from '@stencil/core';
-import { updatesStore, actions } from '../../store';
+import { createScopedStore } from '../../store';
 
 @Component({
   tag: 'changebot-provider',
@@ -16,10 +16,13 @@ export class ChangebotProvider {
 
   pollTimer?: NodeJS.Timeout;  // Made public for testing
 
+  // Create a dedicated store instance for this provider's scope
+  private scopedStore = createScopedStore();
+
   // Initialize services immediately when component is created
   private services = {
-    store: updatesStore,
-    actions: actions,
+    store: this.scopedStore.store,
+    actions: this.scopedStore.actions,
     config: {
       url: this.url,
       slug: this.slug,
@@ -90,13 +93,13 @@ export class ChangebotProvider {
     if (actionScope === this.scope) {
       const { type, payload } = event.detail;
 
-      // Dispatch action to store
-      if (type in actions) {
+      // Dispatch action to store using scoped actions
+      if (type in this.scopedStore.actions) {
         try {
           if (payload !== undefined) {
-            actions[type](payload);
+            this.scopedStore.actions[type](payload);
           } else {
-            actions[type]();
+            this.scopedStore.actions[type]();
           }
         } catch (error) {
           console.error(`Error executing action ${type}:`, error);
@@ -109,7 +112,7 @@ export class ChangebotProvider {
 
   private async loadUpdates() {
     try {
-      await actions.loadUpdates(this.slug, this.url);
+      await this.scopedStore.actions.loadUpdates(this.slug, this.url);
     } catch (error) {
       console.error('🔌 Provider: Failed to load updates:', error);
       // Store error is already handled in the action
