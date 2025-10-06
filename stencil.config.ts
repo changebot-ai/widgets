@@ -18,7 +18,7 @@ export const config: Config = {
     {
       type: 'www',
       serviceWorker: null, // disable service workers
-      copy: [{ src: 'banner.html' },{ src: 'custom-theme.html' }, { src: 'toast.html' }],
+      copy: [{ src: 'panel.html' }, { src: 'banner.html' }, { src: 'custom-theme.html' }, { src: 'toast.html' }],
     },
   ],
   testing: {

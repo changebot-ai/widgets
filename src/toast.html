@@ -161,6 +161,20 @@
       ul {
         line-height: 1.8;
       }
+
+      .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        padding: 8px 16px;
+        background: #f0f0f0;
+        border-radius: 4px;
+        color: #333;
+      }
+
+      .back-link:hover {
+        background: #e0e0e0;
+        text-decoration: none;
+      }
     </style>
   </head>
   <body>
@@ -174,6 +188,8 @@
     <changebot-toast id="toast-bottom-left" position="bottom-left" scope="toast-demos"></changebot-toast>
 
     <div class="container">
+      <a href="/" class="back-link">← Back to Index</a>
+
       <h1>Changebot Toast - Production Example</h1>
       <p>Toast notifications automatically display the most recent unviewed update from your Changebot feed.</p>
 
