@@ -581,4 +581,91 @@ describe('Integration Tests - Full System', () => {
       expect(className).toContain('theme--catppuccin-mocha');
     });
   });
+
+  describe('Badge Count Clearing', () => {
+    it('should clear badge count when panel opens programmatically', async () => {
+      const page = await newE2EPage();
+
+      await page.setContent(`
+        <changebot-provider scope="badge-clear-test">
+          <changebot-badge scope="badge-clear-test" count="5"></changebot-badge>
+          <changebot-panel scope="badge-clear-test"></changebot-panel>
+        </changebot-provider>
+      `);
+
+      await page.waitForChanges();
+
+      // Verify badge initially shows count
+      let badgeCount = await page.find('changebot-badge >>> .badge__count');
+      let countText = await badgeCount.textContent;
+      expect(countText).toBe('5');
+
+      // Verify badge is visible
+      let badge = await page.find('changebot-badge >>> .badge');
+      let badgeClasses = await badge.getProperty('className');
+      expect(badgeClasses).not.toContain('badge--hidden');
+
+      // Open panel programmatically using the open() method
+      await page.$eval('changebot-panel', (el: any) => {
+        return el.open();
+      });
+
+      await page.waitForChanges();
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Verify panel is open
+      const panel = await page.find('changebot-panel >>> .panel');
+      const panelClasses = await panel.getProperty('className');
+      expect(panelClasses).toContain('panel--open');
+
+      // Verify badge count is cleared (should be 0 and hidden)
+      badge = await page.find('changebot-badge >>> .badge');
+      badgeClasses = await badge.getProperty('className');
+      expect(badgeClasses).toContain('badge--hidden');
+    });
+
+    it('should clear badge count when panel opens via action event', async () => {
+      const page = await newE2EPage();
+
+      await page.setContent(`
+        <changebot-provider scope="badge-clear-action-test">
+          <changebot-badge scope="badge-clear-action-test" count="3"></changebot-badge>
+          <changebot-panel scope="badge-clear-action-test"></changebot-panel>
+        </changebot-provider>
+      `);
+
+      await page.waitForChanges();
+
+      // Verify badge initially shows count
+      let badge = await page.find('changebot-badge >>> .badge');
+      let badgeClasses = await badge.getProperty('className');
+      expect(badgeClasses).not.toContain('badge--hidden');
+
+      // Open panel via action event (simulating programmatic opening)
+      await page.evaluate(() => {
+        const event = new CustomEvent('changebot:action', {
+          detail: {
+            type: 'openDisplay',
+            scope: 'badge-clear-action-test'
+          },
+          bubbles: true,
+          composed: true
+        });
+        document.dispatchEvent(event);
+      });
+
+      await page.waitForChanges();
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Verify panel is open
+      const panel = await page.find('changebot-panel >>> .panel');
+      const panelClasses = await panel.getProperty('className');
+      expect(panelClasses).toContain('panel--open');
+
+      // Verify badge count is cleared
+      badge = await page.find('changebot-badge >>> .badge');
+      badgeClasses = await badge.getProperty('className');
+      expect(badgeClasses).toContain('badge--hidden');
+    });
+  });
 });

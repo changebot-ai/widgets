@@ -189,9 +189,14 @@ export class ChangebotBadge {
     // Only respond to events for our scope
     if (eventScope === badgeScope) {
       console.log('📛 Badge: Received lastViewed change event, recalculating count');
+
       // Recalculate badge count based on new lastViewed time
       if (this.services?.store) {
         this.calculateNewUpdatesCount(this.services.store.state);
+      } else {
+        // If no store (standalone mode or using count prop), just clear the badge
+        this.newUpdatesCount = 0;
+        this.isVisible = false;
       }
     }
   }

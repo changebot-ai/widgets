@@ -122,7 +122,7 @@ declare global {
         new (): HTMLChangebotBannerElement;
     };
     interface HTMLChangebotPanelElementEventMap {
-        "changebotLastViewed": { scope: string };
+        "changebot:lastViewed": { scope: string };
     }
     interface HTMLChangebotPanelElement extends Components.ChangebotPanel, HTMLStencilElement {
         addEventListener<K extends keyof HTMLChangebotPanelElementEventMap>(type: K, listener: (this: HTMLChangebotPanelElement, ev: ChangebotPanelCustomEvent<HTMLChangebotPanelElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -190,7 +190,7 @@ declare namespace LocalJSX {
          */
         "displayMode"?: 'drawer-left' | 'drawer-right' | 'modal';
         "light"?: Theme;
-        "onChangebotLastViewed"?: (event: ChangebotPanelCustomEvent<{ scope: string }>) => void;
+        "onChangebot:lastViewed"?: (event: ChangebotPanelCustomEvent<{ scope: string }>) => void;
         "scope"?: string;
         "theme"?: Theme;
     }
