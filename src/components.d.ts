@@ -21,6 +21,24 @@ export namespace Components {
         "showCount": boolean;
         "theme"?: Theme;
     }
+    interface ChangebotBanner {
+        "dark"?: Theme;
+        /**
+          * Dismiss the banner
+         */
+        "dismiss": () => Promise<void>;
+        "light"?: Theme;
+        "scope"?: string;
+        /**
+          * Show the banner with a specific update
+         */
+        "show": (update: Update) => Promise<void>;
+        "theme"?: Theme;
+        /**
+          * Toggle expanded state
+         */
+        "toggle": () => Promise<void>;
+    }
     interface ChangebotDrawer {
         /**
           * Close the drawer/modal
@@ -93,6 +111,12 @@ declare global {
         prototype: HTMLChangebotBadgeElement;
         new (): HTMLChangebotBadgeElement;
     };
+    interface HTMLChangebotBannerElement extends Components.ChangebotBanner, HTMLStencilElement {
+    }
+    var HTMLChangebotBannerElement: {
+        prototype: HTMLChangebotBannerElement;
+        new (): HTMLChangebotBannerElement;
+    };
     interface HTMLChangebotDrawerElement extends Components.ChangebotDrawer, HTMLStencilElement {
     }
     var HTMLChangebotDrawerElement: {
@@ -119,6 +143,7 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "changebot-badge": HTMLChangebotBadgeElement;
+        "changebot-banner": HTMLChangebotBannerElement;
         "changebot-drawer": HTMLChangebotDrawerElement;
         "changebot-provider": HTMLChangebotProviderElement;
         "changebot-toast": HTMLChangebotToastElement;
@@ -135,6 +160,12 @@ declare namespace LocalJSX {
           * @default true
          */
         "showCount"?: boolean;
+        "theme"?: Theme;
+    }
+    interface ChangebotBanner {
+        "dark"?: Theme;
+        "light"?: Theme;
+        "scope"?: string;
         "theme"?: Theme;
     }
     interface ChangebotDrawer {
@@ -183,6 +214,7 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "changebot-badge": ChangebotBadge;
+        "changebot-banner": ChangebotBanner;
         "changebot-drawer": ChangebotDrawer;
         "changebot-provider": ChangebotProvider;
         "changebot-toast": ChangebotToast;
@@ -194,6 +226,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "changebot-badge": LocalJSX.ChangebotBadge & JSXBase.HTMLAttributes<HTMLChangebotBadgeElement>;
+            "changebot-banner": LocalJSX.ChangebotBanner & JSXBase.HTMLAttributes<HTMLChangebotBannerElement>;
             "changebot-drawer": LocalJSX.ChangebotDrawer & JSXBase.HTMLAttributes<HTMLChangebotDrawerElement>;
             "changebot-provider": LocalJSX.ChangebotProvider & JSXBase.HTMLAttributes<HTMLChangebotProviderElement>;
             "changebot-toast": LocalJSX.ChangebotToast & JSXBase.HTMLAttributes<HTMLChangebotToastElement>;
