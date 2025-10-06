@@ -1,4 +1,4 @@
-import { Component, Element, Prop, State, Method, Watch, h, Host } from '@stencil/core';
+import { Component, Element, Prop, State, Method, Watch, Listen, Event, EventEmitter, h, Host } from '@stencil/core';
 import { dispatchAction } from '../../utils/context';
 import { Update } from '../../types';
 import { Theme } from '../../utils/themes';
@@ -20,6 +20,9 @@ export class ChangebotPanel {
   @State() isOpen: boolean = false;
   @State() updates: Update[] = [];
   @State() activeTheme?: Theme;
+  @State() prefersDark: boolean = false;
+
+  @Event() changebotLastViewed: EventEmitter<{ scope: string }>;
 
   private services: any;
   private unsubscribeIsOpen?: () => void;
@@ -33,6 +36,7 @@ export class ChangebotPanel {
   @Watch('theme')
   @Watch('light')
   @Watch('dark')
+  @Watch('prefersDark')
   onThemeChange() {
     this.updateActiveTheme();
   }
@@ -78,9 +82,6 @@ export class ChangebotPanel {
       // If provider request fails, continue in standalone mode
       console.warn('Panel: Failed to request provider context, using standalone mode:', error);
     }
-
-    // Listen for ESC key globally
-    document.addEventListener('keydown', this.handleKeyDown);
   }
 
   componentDidLoad() {
@@ -96,9 +97,6 @@ export class ChangebotPanel {
     if (this.unsubscribeUpdates) {
       this.unsubscribeUpdates();
     }
-
-    // Remove event listener
-    document.removeEventListener('keydown', this.handleKeyDown);
 
     // Cleanup media query listener
     if (this.mediaQuery && this.mediaQueryListener) {
@@ -116,11 +114,12 @@ export class ChangebotPanel {
     // If light and dark are provided, listen to system preference
     if (this.light || this.dark) {
       this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      this.prefersDark = this.mediaQuery.matches;
       this.updateActiveTheme();
 
       // Listen for changes in system preference
-      this.mediaQueryListener = () => {
-        this.updateActiveTheme();
+      this.mediaQueryListener = (e: MediaQueryListEvent) => {
+        this.prefersDark = e.matches; // Triggers @Watch and re-render
       };
       this.mediaQuery.addEventListener('change', this.mediaQueryListener);
     }
@@ -134,11 +133,9 @@ export class ChangebotPanel {
     }
 
     // Use system preference to choose between light and dark
-    const prefersDark = this.mediaQuery?.matches || window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    if (prefersDark && this.dark) {
+    if (this.prefersDark && this.dark) {
       this.activeTheme = this.dark;
-    } else if (!prefersDark && this.light) {
+    } else if (!this.prefersDark && this.light) {
       this.activeTheme = this.light;
     } else if (this.light) {
       this.activeTheme = this.light;
@@ -238,13 +235,8 @@ export class ChangebotPanel {
     localStorage.setItem(key, Date.now().toString());
     console.log('📂 Panel: Marked as viewed at', new Date().toLocaleTimeString());
 
-    // Dispatch event to notify badge that lastViewed has changed
-    const event = new CustomEvent('changebot:lastViewed', {
-      detail: { scope: this.scope || 'default' },
-      bubbles: true,
-      composed: true
-    });
-    this.el.dispatchEvent(event);
+    // Emit event to notify badge that lastViewed has changed
+    this.changebotLastViewed.emit({ scope: this.scope || 'default' });
   }
 
   private focusFirstElement() {
@@ -253,7 +245,8 @@ export class ChangebotPanel {
     }
   }
 
-  public handleKeyDown = (event: KeyboardEvent) => {
+  @Listen('keydown', { target: 'document' })
+  handleKeyDown(event: KeyboardEvent) {
     if (!this.isOpen) return;
 
     if (event.key === 'Escape') {
@@ -282,7 +275,7 @@ export class ChangebotPanel {
         this.firstFocusableElement?.focus();
       }
     }
-  };
+  }
 
   private handleClose = () => {
     try {

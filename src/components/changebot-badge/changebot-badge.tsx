@@ -1,4 +1,4 @@
-import { Component, Element, Prop, State, Watch, h } from '@stencil/core';
+import { Component, Element, Prop, State, Watch, Listen, h } from '@stencil/core';
 import { dispatchAction } from '../../utils/context';
 import { StoreState } from '../../types';
 import { Theme } from '../../utils/themes';
@@ -21,6 +21,7 @@ export class ChangebotBadge {
   @State() newUpdatesCount: number = 0;
   @State() isVisible: boolean = false;
   @State() activeTheme?: Theme;
+  @State() prefersDark: boolean = false;
 
   private services: any;
   private unsubscribe?: () => void;
@@ -38,6 +39,7 @@ export class ChangebotBadge {
   @Watch('theme')
   @Watch('light')
   @Watch('dark')
+  @Watch('prefersDark')
   onThemeChange() {
     this.updateActiveTheme();
   }
@@ -48,9 +50,6 @@ export class ChangebotBadge {
     if (this.scope) {
       this.el.setAttribute('data-scope', this.scope);
     }
-
-    // Listen for lastViewed changes from panel
-    document.addEventListener('changebot:lastViewed', this.handleLastViewedChange);
 
     // If count prop is provided, use it directly (for testing)
     if (this.count !== undefined) {
@@ -91,7 +90,6 @@ export class ChangebotBadge {
     if (this.mediaQuery && this.mediaQueryListener) {
       this.mediaQuery.removeEventListener('change', this.mediaQueryListener);
     }
-    document.removeEventListener('changebot:lastViewed', this.handleLastViewedChange);
   }
 
   private setupTheme() {
@@ -104,11 +102,12 @@ export class ChangebotBadge {
     // If light and dark are provided, listen to system preference
     if (this.light || this.dark) {
       this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      this.prefersDark = this.mediaQuery.matches;
       this.updateActiveTheme();
 
       // Listen for changes in system preference
-      this.mediaQueryListener = () => {
-        this.updateActiveTheme();
+      this.mediaQueryListener = (e: MediaQueryListEvent) => {
+        this.prefersDark = e.matches; // Triggers @Watch and re-render
       };
       this.mediaQuery.addEventListener('change', this.mediaQueryListener);
     }
@@ -122,11 +121,9 @@ export class ChangebotBadge {
     }
 
     // Use system preference to choose between light and dark
-    const prefersDark = this.mediaQuery?.matches || window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    if (prefersDark && this.dark) {
+    if (this.prefersDark && this.dark) {
       this.activeTheme = this.dark;
-    } else if (!prefersDark && this.light) {
+    } else if (!this.prefersDark && this.light) {
       this.activeTheme = this.light;
     } else if (this.light) {
       this.activeTheme = this.light;
@@ -184,7 +181,8 @@ export class ChangebotBadge {
     return stored ? parseInt(stored, 10) : 0;
   }
 
-  private handleLastViewedChange = (event: CustomEvent) => {
+  @Listen('changebot:lastViewed', { target: 'document' })
+  handleLastViewedChange(event: CustomEvent) {
     const eventScope = event.detail?.scope || 'default';
     const badgeScope = this.scope || 'default';
 
@@ -196,7 +194,7 @@ export class ChangebotBadge {
         this.calculateNewUpdatesCount(this.services.store.state);
       }
     }
-  };
+  }
 
   private handleClick = () => {
     // Mark as viewed

@@ -16,6 +16,13 @@
 | `theme`       | `theme`        |             | `"catppuccin-frappe" \| "catppuccin-latte" \| "catppuccin-macchiato" \| "catppuccin-mocha" \| "cyberpunk" \| "dracula" \| "everforest-dark" \| "everforest-light" \| "gruvbox-dark" \| "gruvbox-light" \| "nord" \| "solarized-dark" \| "solarized-light" \| "tokyo-night"` | `undefined`      |
 
 
+## Events
+
+| Event                 | Description | Type                              |
+| --------------------- | ----------- | --------------------------------- |
+| `changebotLastViewed` |             | `CustomEvent<{ scope: string; }>` |
+
+
 ## Methods
 
 ### `close() => Promise<void>`
