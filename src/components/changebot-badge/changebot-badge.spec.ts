@@ -149,79 +149,88 @@ describe('changebot-badge', () => {
   });
 
   it('dispatches openDisplay action on click', async () => {
-    const dispatchEventSpy = jest.fn();
-
-    const { root } = await newSpecPage({
+    const page = await newSpecPage({
       components: [ChangebotBadge],
       html: '<changebot-badge count="3"></changebot-badge>',
     });
 
-    // Mock the element's dispatchEvent
-    const component = root as HTMLChangebotBadgeElement;
-    component.dispatchEvent = dispatchEventSpy;
+    // Listen for the action event
+    let eventDetail: any;
+    const eventPromise = new Promise<void>(resolve => {
+      page.root.addEventListener('changebot:action', ((e: CustomEvent) => {
+        eventDetail = e.detail;
+        resolve();
+      }) as EventListener);
+    });
 
-    const badge = root.shadowRoot.querySelector('.badge') as HTMLElement;
+    const badge = page.root.shadowRoot.querySelector('.badge') as HTMLElement;
     badge.click();
 
-    expect(dispatchEventSpy).toHaveBeenCalledWith(
+    await eventPromise;
+    await page.waitForChanges();
+
+    expect(eventDetail).toEqual(
       expect.objectContaining({
-        type: 'changebot:action',
-        bubbles: true,
-        composed: true,
-        detail: expect.objectContaining({
-          type: 'openDisplay',
-          scope: 'default'
-        })
+        type: 'openDisplay',
+        scope: 'default'
       })
     );
   });
 
   it('handles keyboard navigation with Enter key', async () => {
-    const dispatchEventSpy = jest.fn();
-
-    const { root } = await newSpecPage({
+    const page = await newSpecPage({
       components: [ChangebotBadge],
       html: '<changebot-badge count="3"></changebot-badge>',
     });
 
-    const component = root as HTMLChangebotBadgeElement;
-    component.dispatchEvent = dispatchEventSpy;
+    // Listen for the action event
+    let eventDetail: any;
+    const eventPromise = new Promise<void>(resolve => {
+      page.root.addEventListener('changebot:action', ((e: CustomEvent) => {
+        eventDetail = e.detail;
+        resolve();
+      }) as EventListener);
+    });
 
-    const badge = root.shadowRoot.querySelector('.badge') as HTMLElement;
-    const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
+    const badge = page.root.shadowRoot.querySelector('.badge') as HTMLElement;
+    const enterEvent = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
     badge.dispatchEvent(enterEvent);
 
-    expect(dispatchEventSpy).toHaveBeenCalledWith(
+    await eventPromise;
+    await page.waitForChanges();
+
+    expect(eventDetail).toEqual(
       expect.objectContaining({
-        type: 'changebot:action',
-        detail: expect.objectContaining({
-          type: 'openDisplay'
-        })
+        type: 'openDisplay'
       })
     );
   });
 
   it('handles keyboard navigation with Space key', async () => {
-    const dispatchEventSpy = jest.fn();
-
-    const { root } = await newSpecPage({
+    const page = await newSpecPage({
       components: [ChangebotBadge],
       html: '<changebot-badge count="3"></changebot-badge>',
     });
 
-    const component = root as HTMLChangebotBadgeElement;
-    component.dispatchEvent = dispatchEventSpy;
+    // Listen for the action event
+    let eventDetail: any;
+    const eventPromise = new Promise<void>(resolve => {
+      page.root.addEventListener('changebot:action', ((e: CustomEvent) => {
+        eventDetail = e.detail;
+        resolve();
+      }) as EventListener);
+    });
 
-    const badge = root.shadowRoot.querySelector('.badge') as HTMLElement;
-    const spaceEvent = new KeyboardEvent('keydown', { key: ' ' });
+    const badge = page.root.shadowRoot.querySelector('.badge') as HTMLElement;
+    const spaceEvent = new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true });
     badge.dispatchEvent(spaceEvent);
 
-    expect(dispatchEventSpy).toHaveBeenCalledWith(
+    await eventPromise;
+    await page.waitForChanges();
+
+    expect(eventDetail).toEqual(
       expect.objectContaining({
-        type: 'changebot:action',
-        detail: expect.objectContaining({
-          type: 'openDisplay'
-        })
+        type: 'openDisplay'
       })
     );
   });

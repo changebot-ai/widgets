@@ -99,16 +99,27 @@ describe('changebot-provider', () => {
       document.dispatchEvent(event);
       await page.waitForChanges();
 
-      expect(mockCallback).toHaveBeenCalledWith({
-        store: updatesStore,
-        actions: actions,
-        config: {
-          url: undefined,
-          slug: undefined,
-          scope: 'default',
-          pollInterval: undefined
-        }
-      });
+      // Verify callback was called with services (scoped store, not global)
+      expect(mockCallback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          store: expect.objectContaining({
+            state: expect.any(Object),
+            onChange: expect.any(Function)
+          }),
+          actions: expect.objectContaining({
+            loadUpdates: expect.any(Function),
+            openDisplay: expect.any(Function),
+            closeDisplay: expect.any(Function),
+            toggleDisplay: expect.any(Function)
+          }),
+          config: {
+            url: undefined,
+            slug: undefined,
+            scope: 'default',
+            pollInterval: undefined
+          }
+        })
+      );
     });
 
     it('only responds to matching scope in context requests', async () => {
@@ -189,7 +200,8 @@ describe('changebot-provider', () => {
         html: `<changebot-provider></changebot-provider>`,
       });
 
-      const actionSpy = jest.spyOn(actions, 'toggleDisplay').mockImplementation(() => {});
+      // Spy on the provider's scoped store actions
+      const actionSpy = jest.spyOn((page.rootInstance as any).scopedStore.actions, 'toggleDisplay').mockImplementation(() => {});
 
       const event = new CustomEvent('changebot:action', {
         detail: {
@@ -213,7 +225,8 @@ describe('changebot-provider', () => {
         html: `<changebot-provider></changebot-provider>`,
       });
 
-      const actionSpy = jest.spyOn(actions, 'markViewed').mockImplementation(() => {});
+      // Spy on the provider's scoped store actions
+      const actionSpy = jest.spyOn((page.rootInstance as any).scopedStore.actions, 'markViewed').mockImplementation(() => {});
       const testTimestamp = new Date().toISOString();
 
       const event = new CustomEvent('changebot:action', {
@@ -239,7 +252,8 @@ describe('changebot-provider', () => {
         html: `<changebot-provider scope="custom-scope"></changebot-provider>`,
       });
 
-      const actionSpy = jest.spyOn(actions, 'toggleDisplay').mockImplementation(() => {});
+      // Spy on the provider's scoped store actions
+      const actionSpy = jest.spyOn((page.rootInstance as any).scopedStore.actions, 'toggleDisplay').mockImplementation(() => {});
 
       const event = new CustomEvent('changebot:action', {
         detail: {
@@ -264,54 +278,48 @@ describe('changebot-provider', () => {
     });
 
     it('loads updates on mount when slug is provided', async () => {
-      let loadResolve;
-      const loadPromise = new Promise(resolve => { loadResolve = resolve; });
-      const loadSpy = jest.spyOn(actions, 'loadUpdates').mockImplementation(() => {
-        loadResolve();
-        return Promise.resolve();
-      });
-
-      const page = await newSpecPage({
+      await newSpecPage({
         components: [ChangebotProvider],
         html: `<changebot-provider slug="test-team"></changebot-provider>`,
       });
 
-      await page.waitForChanges();
-      await loadPromise;
-
-      expect(loadSpy).toHaveBeenCalledWith('test-team', undefined);
+      // Verify fetch was called with the correct URL
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.changebot.ai/v1/updates/test-team',
+        expect.objectContaining({
+          method: 'GET',
+          headers: { 'Accept': 'application/json' }
+        })
+      );
     });
 
     it('loads updates on mount when url is provided', async () => {
-      let loadResolve;
-      const loadPromise = new Promise(resolve => { loadResolve = resolve; });
-      const loadSpy = jest.spyOn(actions, 'loadUpdates').mockImplementation(() => {
-        loadResolve();
-        return Promise.resolve();
-      });
-
-      const page = await newSpecPage({
+      await newSpecPage({
         components: [ChangebotProvider],
         html: `<changebot-provider url="https://api.example.com/updates"></changebot-provider>`,
       });
 
-      await page.waitForChanges();
-      await loadPromise;
-
-      expect(loadSpy).toHaveBeenCalledWith(undefined, 'https://api.example.com/updates');
+      // Verify fetch was called with the correct URL
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.example.com/updates',
+        expect.objectContaining({
+          method: 'GET',
+          headers: { 'Accept': 'application/json' }
+        })
+      );
     });
 
     it('does not load updates when neither slug nor url provided', async () => {
-      const loadSpy = jest.spyOn(actions, 'loadUpdates').mockResolvedValue();
+      // Clear any previous fetch calls
+      fetchMock.mockClear();
 
-      const page = await newSpecPage({
+      await newSpecPage({
         components: [ChangebotProvider],
         html: `<changebot-provider></changebot-provider>`,
       });
 
-      await page.waitForChanges();
-
-      expect(loadSpy).not.toHaveBeenCalled();
+      // Verify fetch was not called
+      expect(fetchMock).not.toHaveBeenCalled();
     });
   });
 

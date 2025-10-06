@@ -202,13 +202,17 @@ export class ChangebotBadge {
   }
 
   private handleClick = () => {
-    // Mark as viewed
-    const key = `changebot:lastViewed:${this.scope || 'default'}`;
-    localStorage.setItem(key, Date.now().toString());
+    // Only clear badge and mark as viewed if connected to a provider
+    // Standalone badges with count prop shouldn't be cleared on click
+    if (this.services) {
+      // Mark as viewed
+      const key = `changebot:lastViewed:${this.scope || 'default'}`;
+      localStorage.setItem(key, Date.now().toString());
 
-    // Clear badge immediately
-    this.newUpdatesCount = 0;
-    this.isVisible = false;
+      // Clear badge immediately
+      this.newUpdatesCount = 0;
+      this.isVisible = false;
+    }
 
     // Dispatch open action
     dispatchAction(this.el, 'openDisplay', undefined, this.scope);

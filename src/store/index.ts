@@ -202,7 +202,7 @@ export function createScopedStore() {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load updates';
         store.state.error = errorMessage;
         store.state.isLoading = false;
-        console.warn('⚠️ Changebot widget: Could not load updates.', {
+        console.warn('⚠️ Changebot widget: Could not load updates. Widget functionality will continue to work.', {
           error: errorMessage,
           slug,
           url

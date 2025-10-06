@@ -446,7 +446,7 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-panel display-mode="drawer-left"></changebot-panel>
+        <changebot-panel mode="drawer-left"></changebot-panel>
       `);
 
       await page.waitForChanges();
@@ -460,7 +460,7 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-panel display-mode="drawer-right"></changebot-panel>
+        <changebot-panel mode="drawer-right"></changebot-panel>
       `);
 
       await page.waitForChanges();
@@ -474,7 +474,7 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-panel display-mode="modal"></changebot-panel>
+        <changebot-panel mode="modal"></changebot-panel>
       `);
 
       await page.waitForChanges();

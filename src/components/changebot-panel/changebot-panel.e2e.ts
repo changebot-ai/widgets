@@ -22,7 +22,7 @@ describe('changebot-panel e2e', () => {
 
   it('renders with drawer-left class when specified', async () => {
     const page = await newE2EPage();
-    await page.setContent('<changebot-panel display-mode="drawer-left"></changebot-panel>');
+    await page.setContent('<changebot-panel mode="drawer-left"></changebot-panel>');
 
     const drawer = await page.find('changebot-panel >>> .panel');
     const className = await drawer.getProperty('className');
@@ -32,7 +32,7 @@ describe('changebot-panel e2e', () => {
 
   it('renders with modal class when specified', async () => {
     const page = await newE2EPage();
-    await page.setContent('<changebot-panel display-mode="modal"></changebot-panel>');
+    await page.setContent('<changebot-panel mode="modal"></changebot-panel>');
 
     const drawer = await page.find('changebot-panel >>> .panel');
     const className = await drawer.getProperty('className');
