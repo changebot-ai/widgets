@@ -15,7 +15,7 @@ export class ChangebotPanel {
   @Prop() theme?: Theme;
   @Prop() light?: Theme;
   @Prop() dark?: Theme;
-  @Prop() displayMode: 'drawer-left' | 'drawer-right' | 'modal' = 'drawer-right';
+  @Prop() mode: 'modal' | 'drawer-left' | 'drawer-right' = 'drawer-right';
 
   @State() isOpen: boolean = false;
   @State() updates: Update[] = [];
@@ -266,7 +266,7 @@ export class ChangebotPanel {
     }
 
     // Focus trap for modal mode
-    if (this.displayMode === 'modal' && event.key === 'Tab') {
+    if (this.mode === 'modal' && event.key === 'Tab') {
       if (event.shiftKey && document.activeElement === this.firstFocusableElement) {
         event.preventDefault();
         this.lastFocusableElement?.focus();
@@ -387,8 +387,8 @@ export class ChangebotPanel {
     return div.innerHTML;
   }
 
-  private getDisplayModeClass(): string {
-    switch (this.displayMode) {
+  private getModeClass(): string {
+    switch (this.mode) {
       case 'drawer-left':
         return 'panel--left';
       case 'drawer-right':
@@ -454,10 +454,10 @@ export class ChangebotPanel {
       'panel--closed': !this.isOpen,
       'panel--open': this.isOpen,
       [`theme--${this.activeTheme}`]: !!this.activeTheme,
-      [this.getDisplayModeClass()]: true
+      [this.getModeClass()]: true
     };
 
-    const isModal = this.displayMode === 'modal';
+    const isModal = this.mode === 'modal';
 
     return (
       <Host>
@@ -526,7 +526,7 @@ declare global {
     theme?: Theme;
     light?: Theme;
     dark?: Theme;
-    displayMode: 'drawer-left' | 'drawer-right' | 'modal';
+    mode: 'modal' | 'drawer-left' | 'drawer-right';
     isOpen: boolean;
     updates: Update[];
   }

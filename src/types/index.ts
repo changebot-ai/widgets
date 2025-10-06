@@ -16,11 +16,8 @@ export interface Update {
 export interface StoreState {
   updates: Update[];
   lastViewed: number | null;
-  isDrawerOpen: boolean;
-  isModalOpen: boolean;
   isOpen: boolean;
-  displayMode: 'drawer' | 'modal';
-  drawerPosition: 'left' | 'right';
+  mode: 'modal' | 'drawer-left' | 'drawer-right';
   newUpdatesCount: number;
   isLoading: boolean;
   error: string | null;
@@ -31,8 +28,7 @@ export interface StoreConfig {
   scope?: string;
   fetchOnInit?: boolean;
   persistLastViewed?: boolean;
-  displayMode?: 'drawer' | 'modal';
-  drawerPosition?: 'left' | 'right';
+  mode?: 'modal' | 'drawer-left' | 'drawer-right';
 }
 
 export interface StoreActions {
@@ -41,8 +37,7 @@ export interface StoreActions {
   openDisplay: () => void;
   closeDisplay: () => void;
   toggleDisplay: () => void;
-  setDisplayMode: (mode: 'drawer' | 'modal') => void;
-  setDrawerPosition: (position: 'left' | 'right') => void;
+  setMode: (mode: 'modal' | 'drawer-left' | 'drawer-right') => void;
   calculateNewCount: () => void;
 }
 

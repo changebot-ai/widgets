@@ -13,30 +13,30 @@ describe('changebot-panel', () => {
     expect(drawer).toHaveClass('panel--closed');
   });
 
-  it('applies drawer-left display mode', async () => {
+  it('applies drawer-left mode', async () => {
     const { root } = await newSpecPage({
       components: [ChangebotPanel],
-      html: '<changebot-panel display-mode="drawer-left"></changebot-panel>',
+      html: '<changebot-panel mode="drawer-left"></changebot-panel>',
     });
 
     const drawer = root.shadowRoot.querySelector('.panel');
     expect(drawer).toHaveClass('panel--left');
   });
 
-  it('applies drawer-right display mode', async () => {
+  it('applies drawer-right mode', async () => {
     const { root } = await newSpecPage({
       components: [ChangebotPanel],
-      html: '<changebot-panel display-mode="drawer-right"></changebot-panel>',
+      html: '<changebot-panel mode="drawer-right"></changebot-panel>',
     });
 
     const drawer = root.shadowRoot.querySelector('.panel');
     expect(drawer).toHaveClass('panel--right');
   });
 
-  it('applies modal display mode', async () => {
+  it('applies modal mode', async () => {
     const { root } = await newSpecPage({
       components: [ChangebotPanel],
-      html: '<changebot-panel display-mode="modal"></changebot-panel>',
+      html: '<changebot-panel mode="modal"></changebot-panel>',
     });
 
     const modal = root.shadowRoot.querySelector('.panel');
@@ -102,7 +102,7 @@ describe('changebot-panel', () => {
       state: {
         isOpen: false,
         updates: [],
-        displayMode: 'panel'
+        mode: 'drawer-right'
       },
       onChange: jest.fn()
     };
@@ -126,7 +126,7 @@ describe('changebot-panel', () => {
       state: {
         isOpen: false,
         updates: [],
-        displayMode: 'panel'
+        mode: 'drawer-right'
       },
       onChange: jest.fn()
     };
@@ -151,7 +151,7 @@ describe('changebot-panel', () => {
       state: {
         isOpen: false,
         updates: [],
-        displayMode: 'panel'
+        mode: 'drawer-right'
       },
       onChange: jest.fn((key, callback) => {
         if (key === 'isOpen') {
@@ -204,7 +204,7 @@ describe('changebot-panel', () => {
       state: {
         isOpen: true,
         updates: mockUpdates,
-        displayMode: 'panel'
+        mode: 'drawer-right'
       },
       onChange: jest.fn().mockReturnValue(() => {})
     };
@@ -319,7 +319,7 @@ describe('changebot-panel', () => {
 
     const { root } = await newSpecPage({
       components: [ChangebotPanel],
-      html: '<changebot-panel display-mode="modal"></changebot-panel>',
+      html: '<changebot-panel mode="modal"></changebot-panel>',
     });
 
     const component = root as any;
@@ -351,7 +351,7 @@ describe('changebot-panel', () => {
       state: {
         isOpen: false,
         updates: [],
-        displayMode: 'panel'
+        mode: 'drawer-right'
       },
       onChange: jest.fn()
         .mockReturnValueOnce(unsubscribeIsOpen)
@@ -378,7 +378,7 @@ describe('changebot-panel', () => {
   it('has proper ARIA attributes when open', async () => {
     const page = await newSpecPage({
       components: [ChangebotPanel],
-      html: '<changebot-panel display-mode="modal"></changebot-panel>',
+      html: '<changebot-panel mode="modal"></changebot-panel>',
     });
 
     const component = page.rootInstance;

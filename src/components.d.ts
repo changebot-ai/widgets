@@ -45,11 +45,11 @@ export namespace Components {
          */
         "close": () => Promise<void>;
         "dark"?: Theme;
+        "light"?: Theme;
         /**
           * @default 'drawer-right'
          */
-        "displayMode": 'drawer-left' | 'drawer-right' | 'modal';
-        "light"?: Theme;
+        "mode": 'modal' | 'drawer-left' | 'drawer-right';
         /**
           * Open the panel
          */
@@ -185,11 +185,11 @@ declare namespace LocalJSX {
     }
     interface ChangebotPanel {
         "dark"?: Theme;
+        "light"?: Theme;
         /**
           * @default 'drawer-right'
          */
-        "displayMode"?: 'drawer-left' | 'drawer-right' | 'modal';
-        "light"?: Theme;
+        "mode"?: 'modal' | 'drawer-left' | 'drawer-right';
         "onChangebot:lastViewed"?: (event: ChangebotPanelCustomEvent<{ scope: string }>) => void;
         "scope"?: string;
         "theme"?: Theme;

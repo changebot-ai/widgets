@@ -44,10 +44,8 @@ describe('createWidgetStore', () => {
 
       expect(store.state.updates).toEqual([]);
       expect(store.state.lastViewed).toBeNull();
-      expect(store.state.isDrawerOpen).toBe(false);
-      expect(store.state.isModalOpen).toBe(false);
-      expect(store.state.displayMode).toBe('drawer');
-      expect(store.state.drawerPosition).toBe('right');
+      expect(store.state.isOpen).toBe(false);
+      expect(store.state.mode).toBe('drawer-right');
       expect(store.state.newUpdatesCount).toBe(0);
       expect(store.state.isLoading).toBe(false);
       expect(store.state.error).toBeNull();
@@ -56,14 +54,12 @@ describe('createWidgetStore', () => {
     it('should use config values for display settings', () => {
       const configWithDisplay: StoreConfig = {
         ...mockConfig,
-        displayMode: 'modal',
-        drawerPosition: 'left'
+        mode: 'modal'
       };
 
       const store = createWidgetStore(configWithDisplay);
 
-      expect(store.state.displayMode).toBe('modal');
-      expect(store.state.drawerPosition).toBe('left');
+      expect(store.state.mode).toBe('modal');
     });
 
     it('should load lastViewed from localStorage when persistLastViewed is true', () => {
@@ -169,76 +165,50 @@ describe('createWidgetStore', () => {
     });
 
     describe('display actions', () => {
-      it('should open drawer when displayMode is drawer', () => {
+      it('should open display', () => {
         const store = createWidgetStore(mockConfig);
         store.actions.openDisplay();
 
-        expect(store.state.isDrawerOpen).toBe(true);
-        expect(store.state.isModalOpen).toBe(false);
+        expect(store.state.isOpen).toBe(true);
       });
 
-      it('should open modal when displayMode is modal', () => {
-        const store = createWidgetStore({ ...mockConfig, displayMode: 'modal' });
-        store.actions.openDisplay();
-
-        expect(store.state.isModalOpen).toBe(true);
-        expect(store.state.isDrawerOpen).toBe(false);
-      });
-
-      it('should close all displays', () => {
+      it('should close display', () => {
         const store = createWidgetStore(mockConfig);
-        store.state.isDrawerOpen = true;
-        store.state.isModalOpen = true;
+        store.state.isOpen = true;
 
         store.actions.closeDisplay();
 
-        expect(store.state.isDrawerOpen).toBe(false);
-        expect(store.state.isModalOpen).toBe(false);
+        expect(store.state.isOpen).toBe(false);
       });
 
-      it('should toggle drawer display', () => {
+      it('should toggle display', () => {
         const store = createWidgetStore(mockConfig);
 
         store.actions.toggleDisplay();
-        expect(store.state.isDrawerOpen).toBe(true);
+        expect(store.state.isOpen).toBe(true);
 
         store.actions.toggleDisplay();
-        expect(store.state.isDrawerOpen).toBe(false);
-      });
-
-      it('should toggle modal display', () => {
-        const store = createWidgetStore({ ...mockConfig, displayMode: 'modal' });
-
-        store.actions.toggleDisplay();
-        expect(store.state.isModalOpen).toBe(true);
-
-        store.actions.toggleDisplay();
-        expect(store.state.isModalOpen).toBe(false);
+        expect(store.state.isOpen).toBe(false);
       });
     });
 
-    describe('setDisplayMode', () => {
-      it('should change display mode and close displays', () => {
+    describe('setMode', () => {
+      it('should change mode and close display', () => {
         const store = createWidgetStore(mockConfig);
-        store.state.isDrawerOpen = true;
+        store.state.isOpen = true;
 
-        store.actions.setDisplayMode('modal');
+        store.actions.setMode('modal');
 
-        expect(store.state.displayMode).toBe('modal');
-        expect(store.state.isDrawerOpen).toBe(false);
-        expect(store.state.isModalOpen).toBe(false);
+        expect(store.state.mode).toBe('modal');
+        expect(store.state.isOpen).toBe(false);
       });
-    });
 
-    describe('setDrawerPosition', () => {
-      it('should update drawer position', () => {
+      it('should change mode to drawer-left', () => {
         const store = createWidgetStore(mockConfig);
 
-        store.actions.setDrawerPosition('left');
-        expect(store.state.drawerPosition).toBe('left');
+        store.actions.setMode('drawer-left');
 
-        store.actions.setDrawerPosition('right');
-        expect(store.state.drawerPosition).toBe('right');
+        expect(store.state.mode).toBe('drawer-left');
       });
     });
   });

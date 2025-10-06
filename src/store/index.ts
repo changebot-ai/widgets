@@ -45,11 +45,8 @@ export function createWidgetStore(config: StoreConfig) {
   const { state, onChange, reset, get } = createStore<StoreState>({
     updates: [],
     lastViewed: config.persistLastViewed ? getLastViewed() : null,
-    isDrawerOpen: false,
-    isModalOpen: false,
     isOpen: false,
-    displayMode: config.displayMode || 'drawer',
-    drawerPosition: config.drawerPosition || 'right',
+    mode: config.mode || 'drawer-right',
     newUpdatesCount: 0,
     isLoading: false,
     error: null
@@ -95,37 +92,21 @@ export function createWidgetStore(config: StoreConfig) {
     },
 
     openDisplay() {
-      if (state.displayMode === 'drawer') {
-        state.isDrawerOpen = true;
-        state.isModalOpen = false;
-      } else {
-        state.isModalOpen = true;
-        state.isDrawerOpen = false;
-      }
+      state.isOpen = true;
     },
 
     closeDisplay() {
-      state.isDrawerOpen = false;
-      state.isModalOpen = false;
+      state.isOpen = false;
     },
 
     toggleDisplay() {
-      if (state.displayMode === 'drawer') {
-        state.isDrawerOpen = !state.isDrawerOpen;
-      } else {
-        state.isModalOpen = !state.isModalOpen;
-      }
+      state.isOpen = !state.isOpen;
     },
 
-    setDisplayMode(mode: 'drawer' | 'modal') {
-      state.displayMode = mode;
+    setMode(mode: 'modal' | 'drawer-left' | 'drawer-right') {
+      state.mode = mode;
       // Close any open displays when switching modes
-      state.isDrawerOpen = false;
-      state.isModalOpen = false;
-    },
-
-    setDrawerPosition(position: 'left' | 'right') {
-      state.drawerPosition = position;
+      state.isOpen = false;
     },
 
     calculateNewCount() {
@@ -146,14 +127,11 @@ export function createWidgetStore(config: StoreConfig) {
 const defaultStore = createStore<StoreState>({
   updates: [],
   lastViewed: getLastViewed(),
-  isDrawerOpen: false,
-  isModalOpen: false,
-  displayMode: 'drawer',
-  drawerPosition: 'right',
+  isOpen: false,
+  mode: 'drawer-right',
   newUpdatesCount: 0,
   isLoading: false,
-  error: null,
-  isOpen: false
+  error: null
 });
 
 /**
@@ -164,14 +142,11 @@ export function createScopedStore() {
   const store = createStore<StoreState>({
     updates: [],
     lastViewed: null,
-    isDrawerOpen: false,
-    isModalOpen: false,
-    displayMode: 'panel',
-    drawerPosition: 'right',
+    isOpen: false,
+    mode: 'drawer-right',
     newUpdatesCount: 0,
     isLoading: false,
-    error: null,
-    isOpen: false
+    error: null
   });
 
   const scopedActions = {
@@ -249,39 +224,19 @@ export function createScopedStore() {
 
     openDisplay() {
       store.state.isOpen = true;
-      if (store.state.displayMode === 'drawer') {
-        store.state.isDrawerOpen = true;
-        store.state.isModalOpen = false;
-      } else {
-        store.state.isModalOpen = true;
-        store.state.isDrawerOpen = false;
-      }
     },
 
     closeDisplay() {
       store.state.isOpen = false;
-      store.state.isDrawerOpen = false;
-      store.state.isModalOpen = false;
     },
 
     toggleDisplay() {
       store.state.isOpen = !store.state.isOpen;
-      if (store.state.displayMode === 'drawer') {
-        store.state.isDrawerOpen = !store.state.isDrawerOpen;
-      } else {
-        store.state.isModalOpen = !store.state.isModalOpen;
-      }
     },
 
-    setDisplayMode(mode: 'drawer' | 'modal') {
-      store.state.displayMode = mode;
+    setMode(mode: 'modal' | 'drawer-left' | 'drawer-right') {
+      store.state.mode = mode;
       store.state.isOpen = false;
-      store.state.isDrawerOpen = false;
-      store.state.isModalOpen = false;
-    },
-
-    setDrawerPosition(position: 'left' | 'right') {
-      store.state.drawerPosition = position;
     },
 
     calculateNewCount() {
@@ -446,40 +401,20 @@ export const actions: StoreActions & { loadUpdates: (slug?: string, url?: string
 
   openDisplay() {
     updatesStore.state.isOpen = true;
-    if (updatesStore.state.displayMode === 'drawer') {
-      updatesStore.state.isDrawerOpen = true;
-      updatesStore.state.isModalOpen = false;
-    } else {
-      updatesStore.state.isModalOpen = true;
-      updatesStore.state.isDrawerOpen = false;
-    }
   },
 
   closeDisplay() {
     updatesStore.state.isOpen = false;
-    updatesStore.state.isDrawerOpen = false;
-    updatesStore.state.isModalOpen = false;
   },
 
   toggleDisplay() {
     updatesStore.state.isOpen = !updatesStore.state.isOpen;
-    if (updatesStore.state.displayMode === 'drawer') {
-      updatesStore.state.isDrawerOpen = !updatesStore.state.isDrawerOpen;
-    } else {
-      updatesStore.state.isModalOpen = !updatesStore.state.isModalOpen;
-    }
   },
 
-  setDisplayMode(mode: 'drawer' | 'modal') {
-    updatesStore.state.displayMode = mode;
+  setMode(mode: 'modal' | 'drawer-left' | 'drawer-right') {
+    updatesStore.state.mode = mode;
     // Close any open displays when switching modes
     updatesStore.state.isOpen = false;
-    updatesStore.state.isDrawerOpen = false;
-    updatesStore.state.isModalOpen = false;
-  },
-
-  setDrawerPosition(position: 'left' | 'right') {
-    updatesStore.state.drawerPosition = position;
   },
 
   calculateNewCount() {
