@@ -159,9 +159,12 @@ export class ChangebotPanel {
       this.unsubscribeIsOpen = store.onChange('isOpen', () => {
         try {
           console.log('📂 Panel: isOpen changed to', store.state.isOpen);
+          const wasOpen = this.isOpen;
           this.isOpen = store.state.isOpen;
 
-          if (this.isOpen) {
+          if (this.isOpen && !wasOpen) {
+            // Mark as viewed when opening
+            this.markAsViewed();
             // Focus first element when opening
             setTimeout(() => this.focusFirstElement(), 100);
           }
@@ -194,6 +197,7 @@ export class ChangebotPanel {
   @Method()
   async open() {
     this.isOpen = true;
+    this.markAsViewed();
     if (this.isOpen) {
       setTimeout(() => this.focusFirstElement(), 100);
     }
@@ -226,6 +230,21 @@ export class ChangebotPanel {
       this.firstFocusableElement = focusableElements[0] as HTMLElement;
       this.lastFocusableElement = focusableElements[focusableElements.length - 1] as HTMLElement;
     }
+  }
+
+  private markAsViewed() {
+    // Set the last viewed timestamp in localStorage
+    const key = `changebot:lastViewed:${this.scope || 'default'}`;
+    localStorage.setItem(key, Date.now().toString());
+    console.log('📂 Panel: Marked as viewed at', new Date().toLocaleTimeString());
+
+    // Dispatch event to notify badge that lastViewed has changed
+    const event = new CustomEvent('changebot:lastViewed', {
+      detail: { scope: this.scope || 'default' },
+      bubbles: true,
+      composed: true
+    });
+    this.el.dispatchEvent(event);
   }
 
   private focusFirstElement() {

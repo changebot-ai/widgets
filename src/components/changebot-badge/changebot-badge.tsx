@@ -49,6 +49,9 @@ export class ChangebotBadge {
       this.el.setAttribute('data-scope', this.scope);
     }
 
+    // Listen for lastViewed changes from panel
+    document.addEventListener('changebot:lastViewed', this.handleLastViewedChange);
+
     // If count prop is provided, use it directly (for testing)
     if (this.count !== undefined) {
       this.newUpdatesCount = this.count;
@@ -88,6 +91,7 @@ export class ChangebotBadge {
     if (this.mediaQuery && this.mediaQueryListener) {
       this.mediaQuery.removeEventListener('change', this.mediaQueryListener);
     }
+    document.removeEventListener('changebot:lastViewed', this.handleLastViewedChange);
   }
 
   private setupTheme() {
@@ -179,6 +183,20 @@ export class ChangebotBadge {
     const stored = localStorage.getItem(key);
     return stored ? parseInt(stored, 10) : 0;
   }
+
+  private handleLastViewedChange = (event: CustomEvent) => {
+    const eventScope = event.detail?.scope || 'default';
+    const badgeScope = this.scope || 'default';
+
+    // Only respond to events for our scope
+    if (eventScope === badgeScope) {
+      console.log('📛 Badge: Received lastViewed change event, recalculating count');
+      // Recalculate badge count based on new lastViewed time
+      if (this.services?.store) {
+        this.calculateNewUpdatesCount(this.services.store.state);
+      }
+    }
+  };
 
   private handleClick = () => {
     // Mark as viewed

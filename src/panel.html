@@ -221,9 +221,6 @@
     <!-- Provider Component - Fetches updates from Changebot API -->
     <changebot-provider slug="changebot" poll-interval="30"></changebot-provider>
 
-    <!-- Badge Component - Shows in header -->
-    <changebot-badge id="badge-demo"></changebot-badge>
-
     <!-- Panel Component - Opens when badge is clicked -->
     <changebot-panel id="panel-demo" display-mode="drawer-right"></changebot-panel>
 
@@ -545,9 +542,8 @@ await panel.setUpdates([
     </div>
 
     <script>
-      // Get panel and badge elements
+      // Get panel element
       const panel = document.getElementById('panel-demo');
-      const badge = document.getElementById('badge-demo');
 
       // Mock update data
       const mockUpdates = [
@@ -635,13 +631,13 @@ await panel.setUpdates([
 
       // Theme control
       function setTheme(theme) {
-        const badge = document.getElementById('badge-demo');
+        const badge = document.querySelector('changebot-badge');
         if (theme) {
           panel.setAttribute('theme', theme);
-          badge.setAttribute('theme', theme);
+          if (badge) badge.setAttribute('theme', theme);
         } else {
           panel.removeAttribute('theme');
-          badge.removeAttribute('theme');
+          if (badge) badge.removeAttribute('theme');
         }
         console.log('Theme set to:', theme || 'default');
       }
