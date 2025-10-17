@@ -55,3 +55,7 @@ Tests run in headless shell mode (configured in `stencil.config.ts`). Unit tests
 - JSX factory: `h` (Stencil's JSX pragma)
 - Decorators enabled for Stencil's `@Component`, `@Prop`, etc.
 - Strict unused locals/parameters checking enabled
+
+## Documentation Style
+
+- Use self-closing syntax for components in documentation (e.g., `<changebot-provider />` not `<changebot-provider></changebot-provider>`)
