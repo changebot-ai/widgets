@@ -148,10 +148,12 @@ export class ChangebotToast {
 
     const lastViewed = this.getLastViewedTime();
 
-    // Find the most recent update that's newer than lastViewed
+    // Find the most recent update that's newer than lastViewed AND has highlight_target="toast"
     const newUpdate = updates.find(update => {
-      const updateTime = update.timestamp || new Date(update.date).getTime();
-      return lastViewed === 0 || updateTime > lastViewed;
+      const updateTime = new Date(update.published_at).getTime();
+      const isNewer = lastViewed === 0 || updateTime > lastViewed;
+      const isToast = update.highlight_target === 'toast';
+      return isNewer && isToast;
     });
 
     if (newUpdate && newUpdate.id !== this.currentUpdate?.id) {
@@ -189,7 +191,7 @@ export class ChangebotToast {
 
     // Mark this update as viewed
     if (this.currentUpdate) {
-      const updateTime = this.currentUpdate.timestamp || new Date(this.currentUpdate.date).getTime();
+      const updateTime = new Date(this.currentUpdate.published_at).getTime();
       const key = `changebot:lastViewed:${this.scope || 'default'}`;
       localStorage.setItem(key, updateTime.toString());
       console.log('🍞 Toast: Marked update as viewed:', this.currentUpdate.title);
@@ -268,11 +270,24 @@ export class ChangebotToast {
       [this.getPositionClass()]: true
     };
 
+    const titleContent = this.currentUpdate.hosted_url ? (
+      <a
+        href={this.currentUpdate.hosted_url}
+        class="toast-title-link"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {this.currentUpdate.title}
+      </a>
+    ) : (
+      this.currentUpdate.title
+    );
+
     return (
       <Host>
         <div class={classes} role="alert" aria-live="polite">
           <div class="toast-header">
-            <h3 class="toast-title">{this.currentUpdate.title}</h3>
+            <h3 class="toast-title">{titleContent}</h3>
             <button
               class="toast-close"
               type="button"
@@ -295,11 +310,11 @@ export class ChangebotToast {
               </svg>
             </button>
           </div>
-          {this.currentUpdate.description && (
-            <div class="toast-content" innerHTML={this.currentUpdate.description}></div>
+          {this.currentUpdate.content && (
+            <div class="toast-content" innerHTML={this.currentUpdate.content}></div>
           )}
-          <time class="toast-date" dateTime={this.currentUpdate.date}>
-            {this.formatDate(this.currentUpdate.date)}
+          <time class="toast-date" dateTime={this.currentUpdate.display_date}>
+            {this.formatDate(this.currentUpdate.display_date)}
           </time>
         </div>
       </Host>
