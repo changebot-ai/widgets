@@ -218,7 +218,7 @@
         <div class="demo-card">
           <h4>Bottom Right (Default)</h4>
           <code>position="bottom-right"</code>
-          <button onclick="testToast('toast-default', 'bottom-right')">Show Toast</button>
+          <button onclick="testToast('toast-automatic', 'bottom-right')">Show Toast</button>
         </div>
 
         <div class="demo-card">
@@ -409,7 +409,7 @@
       // Show all toast positions
       async function showAllToasts() {
         const toasts = [
-          { id: 'toast-default', pos: 'bottom-right' },
+          { id: 'toast-automatic', pos: 'bottom-right' },
           { id: 'toast-top-right', pos: 'top-right' },
           { id: 'toast-top-left', pos: 'top-left' },
           { id: 'toast-bottom-left', pos: 'bottom-left' }
@@ -448,31 +448,37 @@
         setTimeout(() => location.reload(), 1000);
       }
 
-      // Change theme of automatic toast
+      // Change theme of all toasts
       function changeTheme() {
         const select = document.getElementById('theme-select');
-        const toast = document.getElementById('toast-automatic');
-
-        if (!toast || !select) return;
+        if (!select) return;
 
         const theme = select.value;
 
         // Save to localStorage
         localStorage.setItem('changebot:toast:theme', theme);
 
+        // Apply theme to all toasts
+        const toasts = document.querySelectorAll('changebot-toast');
+        toasts.forEach(toast => {
+          if (theme === '') {
+            // System auto mode - use light and dark props
+            toast.removeAttribute('theme');
+            toast.setAttribute('light', 'catppuccin-latte');
+            toast.setAttribute('dark', 'catppuccin-mocha');
+          } else {
+            // Explicit theme - remove light/dark and set theme
+            toast.removeAttribute('light');
+            toast.removeAttribute('dark');
+            toast.setAttribute('theme', theme);
+          }
+        });
+
         if (theme === '') {
-          // System auto mode - use light and dark props
-          toast.removeAttribute('theme');
-          toast.setAttribute('light', 'catppuccin-latte');
-          toast.setAttribute('dark', 'catppuccin-mocha');
-          console.log('🎨 Changed automatic toast to system auto theme (Latte/Mocha)');
+          console.log('🎨 Changed all toasts to system auto theme (Latte/Mocha)');
           updateStatus('Changed to system auto theme');
         } else {
-          // Explicit theme - remove light/dark and set theme
-          toast.removeAttribute('light');
-          toast.removeAttribute('dark');
-          toast.setAttribute('theme', theme);
-          console.log('🎨 Changed automatic toast to explicit theme:', theme);
+          console.log('🎨 Changed all toasts to explicit theme:', theme);
           updateStatus(`Changed to ${theme} theme`);
         }
       }
@@ -496,37 +502,40 @@
 
       // Apply saved theme and position on load
       function applySavedPreferences() {
-        const toast = document.getElementById('toast-automatic');
+        const automaticToast = document.getElementById('toast-automatic');
         const themeSelect = document.getElementById('theme-select');
         const positionSelect = document.getElementById('position-select');
 
-        if (!toast) return;
-
-        // Apply saved theme
+        // Apply saved theme to all toasts
         const savedTheme = localStorage.getItem('changebot:toast:theme');
-        if (savedTheme !== null) {
-          if (themeSelect) themeSelect.value = savedTheme;
+        if (themeSelect) themeSelect.value = savedTheme || '';
 
-          if (savedTheme === '') {
-            toast.removeAttribute('theme');
+        const toasts = document.querySelectorAll('changebot-toast');
+        toasts.forEach(toast => {
+          if (savedTheme !== null) {
+            if (savedTheme === '') {
+              toast.removeAttribute('theme');
+              toast.setAttribute('light', 'catppuccin-latte');
+              toast.setAttribute('dark', 'catppuccin-mocha');
+            } else {
+              toast.removeAttribute('light');
+              toast.removeAttribute('dark');
+              toast.setAttribute('theme', savedTheme);
+            }
+          } else {
+            // Default to system auto
             toast.setAttribute('light', 'catppuccin-latte');
             toast.setAttribute('dark', 'catppuccin-mocha');
-          } else {
-            toast.removeAttribute('light');
-            toast.removeAttribute('dark');
-            toast.setAttribute('theme', savedTheme);
           }
-        } else {
-          // Default to system auto
-          toast.setAttribute('light', 'catppuccin-latte');
-          toast.setAttribute('dark', 'catppuccin-mocha');
-        }
+        });
 
-        // Apply saved position
-        const savedPosition = localStorage.getItem('changebot:toast:position');
-        if (savedPosition) {
-          if (positionSelect) positionSelect.value = savedPosition;
-          toast.setAttribute('position', savedPosition);
+        // Apply saved position (only to automatic toast)
+        if (automaticToast) {
+          const savedPosition = localStorage.getItem('changebot:toast:position');
+          if (savedPosition) {
+            if (positionSelect) positionSelect.value = savedPosition;
+            automaticToast.setAttribute('position', savedPosition);
+          }
         }
       }
 
