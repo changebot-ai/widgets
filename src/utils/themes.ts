@@ -1,6 +1,6 @@
 /**
  * Color theme palettes
- * Supports: Catppuccin, Gruvbox, Dracula, Nord, Solarized, Everforest, Tokyo Night, Cyberpunk
+ * Supports: Catppuccin, Gruvbox, Dracula, Nord, Solarized, Everforest, Tokyo Night, Cyberpunk, Baremetrics
  */
 
 // Generic theme palette interface
@@ -297,6 +297,25 @@ export const cyberpunk: ThemePalette = {
   backdrop: 'rgba(10, 0, 20, 0.9)'
 };
 
+// Baremetrics
+export const baremetrics: ThemePalette = {
+  bg: '#ffffff',          // clean white
+  bgAlt: '#f5f7fa',       // very light gray
+  surface: '#ffffff',     // white surface
+  text: '#2e3d49',        // dark slate
+  textMuted: '#8a9199',   // muted gray
+  border: '#e1e4e8',      // light gray border
+  hover: '#f5f7fa',       // light gray hover
+  primary: '#4d7cfe',     // bright blue (subscribe button)
+  link: '#4d7cfe',        // bright blue links
+  focus: '#4d7cfe',       // bright blue focus
+  accent: '#2e3d49',      // dark slate - for titles
+  meta: '#8a9199',        // muted gray - for dates/metadata
+  subtle: '#4d7cfe',      // bright blue - for decorative elements
+  shadow: 'rgba(46, 61, 73, 0.08)',
+  backdrop: 'rgba(46, 61, 73, 0.5)'
+};
+
 // Theme registry
 export const themes = {
   // Catppuccin
@@ -317,7 +336,8 @@ export const themes = {
   'everforest-dark': everforestDark,
   'everforest-light': everforestLight,
   'tokyo-night': tokyoNight,
-  'cyberpunk': cyberpunk
+  'cyberpunk': cyberpunk,
+  'baremetrics': baremetrics
 } as const;
 
 export type Theme = keyof typeof themes;
