@@ -1,20 +1,30 @@
 export interface Tag {
-  text: string;
-  color: string; // Can be hex, rgb, or CSS color name
+  id: number;
+  name: string;
+  color: string; // Hex color code (e.g., "#3b82f6")
 }
 
 export interface Update {
-  id: string;
+  id: number;
   title: string;
-  description: string;
-  date: string;
-  tags?: Tag[];
-  details?: string;
-  [key: string]: any; // Allow additional custom fields
+  content: string; // HTML content from ActionText
+  display_date: string; // YYYY-MM-DD format
+  published_at: string; // ISO 8601 timestamp
+  expires_on: string | null; // Optional expiration date
+  highlight_target: 'banner' | 'toast' | null; // Display emphasis mode
+  hosted_url: string | null; // Full URL to hosted changelog page
+  tags: Tag[];
+}
+
+export interface Widget {
+  title: string;
+  subheading: string | null;
+  slug: string;
 }
 
 export interface StoreState {
   updates: Update[];
+  widget: Widget | null;
   lastViewed: number | null;
   isOpen: boolean;
   mode: 'modal' | 'drawer-left' | 'drawer-right';
