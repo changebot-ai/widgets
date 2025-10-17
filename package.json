@@ -6,11 +6,7 @@
   "scripts": {
     "build": "pnpm --filter @changebot/core run build && pnpm --filter @changebot/widgets-react run build && pnpm --filter @changebot/widgets-vue run build",
     "start": "pnpm --filter @changebot/core run start",
-    "test": "pnpm --filter @changebot/core run test",
-    "version": "./scripts/version.sh",
-    "deploy:cdn": "./scripts/deploy-cdn.sh",
-    "deploy:npm": "./scripts/publish-npm.sh",
-    "deploy": "pnpm run build && pnpm run deploy:cdn && pnpm run deploy:npm"
+    "test": "pnpm --filter @changebot/core run test"
   },
   "devDependencies": {},
   "license": "Apache-2.0",
