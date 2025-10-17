@@ -199,9 +199,18 @@
   left: 0;
   width: 100%;
   z-index: 9999;
+  pointer-events: none;
+}
+
+:host * {
+  pointer-events: auto;
 }
 
 .banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-areas: "main close";
@@ -222,6 +231,7 @@
 
 .banner--expanded {
   max-height: 600px;
+  overflow-y: auto;
 }
 
 .banner--dismissing {
@@ -285,6 +295,23 @@
   color: var(--cb-banner-title);
   white-space: nowrap;
   transition: opacity 0.2s ease;
+}
+
+.banner-title-link {
+  color: inherit;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.banner-title-link:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.banner-title-link:focus-visible {
+  outline: 2px solid var(--cb-banner-title);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 .banner--expanded .banner-title {

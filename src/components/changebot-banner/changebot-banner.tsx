@@ -144,10 +144,12 @@ export class ChangebotBanner {
 
     const lastViewed = this.getLastViewedTime();
 
-    // Find the most recent update that's newer than lastViewed
+    // Find the most recent update that's newer than lastViewed AND has highlight_target="banner"
     const newUpdate = updates.find(update => {
-      const updateTime = update.timestamp || new Date(update.date).getTime();
-      return lastViewed === 0 || updateTime > lastViewed;
+      const updateTime = new Date(update.published_at).getTime();
+      const isNewer = lastViewed === 0 || updateTime > lastViewed;
+      const isBanner = update.highlight_target === 'banner';
+      return isNewer && isBanner;
     });
 
     if (newUpdate && newUpdate.id !== this.currentUpdate?.id) {
@@ -181,7 +183,7 @@ export class ChangebotBanner {
 
     // Mark this update as viewed
     if (this.currentUpdate) {
-      const updateTime = this.currentUpdate.timestamp || new Date(this.currentUpdate.date).getTime();
+      const updateTime = new Date(this.currentUpdate.published_at).getTime();
       const key = `changebot:lastViewed:${this.scope || 'default'}`;
       localStorage.setItem(key, updateTime.toString());
       console.log('🎯 Banner: Marked update as viewed:', this.currentUpdate.title);
@@ -270,8 +272,22 @@ export class ChangebotBanner {
       [`theme--${this.activeTheme}`]: !!this.activeTheme,
     };
 
-    const hasMore = this.currentUpdate.description && this.hasMoreContent(this.currentUpdate.description);
-    const firstSentence = this.currentUpdate.description ? this.getFirstSentence(this.currentUpdate.description) : '';
+    const hasMore = this.currentUpdate.content && this.hasMoreContent(this.currentUpdate.content);
+    const firstSentence = this.currentUpdate.content ? this.getFirstSentence(this.currentUpdate.content) : '';
+
+    const titleContent = this.currentUpdate.hosted_url ? (
+      <a
+        href={this.currentUpdate.hosted_url}
+        class="banner-title-link"
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {this.currentUpdate.title}
+      </a>
+    ) : (
+      this.currentUpdate.title
+    );
 
     return (
       <Host>
@@ -286,14 +302,14 @@ export class ChangebotBanner {
             aria-label={this.isExpanded ? 'Update expanded' : 'Expand update'}
             style={{ cursor: this.isExpanded ? 'default' : 'pointer' }}
           >
-            <h3 class="banner-title">{this.currentUpdate.title}</h3>
-            <time class="banner-date" dateTime={this.currentUpdate.date}>
-              {this.formatDate(this.currentUpdate.date)}
+            <h3 class="banner-title">{titleContent}</h3>
+            <time class="banner-date" dateTime={this.currentUpdate.display_date}>
+              {this.formatDate(this.currentUpdate.display_date)}
             </time>
             <div class="banner-content">
-              {this.currentUpdate.description &&
+              {this.currentUpdate.content &&
                 (this.isExpanded ? (
-                  <div class="banner-description" innerHTML={this.currentUpdate.description}></div>
+                  <div class="banner-description" innerHTML={this.currentUpdate.content}></div>
                 ) : (
                   <div class="banner-preview">
                     {firstSentence}
