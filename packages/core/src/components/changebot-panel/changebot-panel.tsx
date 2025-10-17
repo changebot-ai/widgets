@@ -251,7 +251,16 @@ export class ChangebotPanel {
     localStorage.setItem(key, Date.now().toString());
     console.log('📂 Panel: Marked as viewed at', new Date().toLocaleTimeString());
 
-    // Emit event to notify badge that lastViewed has changed
+    // Dispatch event to document so badge can listen for it
+    document.dispatchEvent(
+      new CustomEvent('changebot:lastViewed', {
+        detail: { scope: this.scope || 'default' },
+        bubbles: true,
+        composed: true
+      })
+    );
+
+    // Also emit the Stencil event for backward compatibility
     this.changebotLastViewed.emit({ scope: this.scope || 'default' });
   }
 
