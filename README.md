@@ -4,7 +4,7 @@ Web components for displaying product updates from Changebot.
 
 ## Features
 
-- 🎨 **14+ Built-in Themes** - Catppuccin, Gruvbox, Dracula, Nord, Solarized, Everforest, Tokyo Night, Cyberpunk, and more
+- 🎨 **15 Built-in Themes** - Catppuccin, Gruvbox, Dracula, Nord, Solarized, Everforest, Tokyo Night, Cyberpunk, Baremetrics, and more
 - 🌓 **Light/Dark Mode** - Automatic theme switching based on system preferences
 - 🎯 **Multiple Display Modes** - Drawer (left/right) or modal
 - 📱 **Fully Responsive** - Works on all screen sizes
@@ -34,7 +34,7 @@ npm install @changebot/widgets
   <changebot-badge></changebot-badge>
 
   <!-- Drawer displays updates (hidden until opened) -->
-  <changebot-panel display-mode="drawer-right"></changebot-panel>
+  <changebot-panel mode="drawer-right"></changebot-panel>
 </body>
 </html>
 ```
@@ -46,8 +46,8 @@ npm install @changebot/widgets
 Required component that manages state and API calls.
 
 **Props:**
-- `slug` (string) - Your Changebot product slug
-- `url` (string, optional) - Custom API URL (if not using slug)
+- `slug` (string, optional) - Your Changebot product slug (either `slug` or `url` required)
+- `url` (string, optional) - Custom API URL (either `slug` or `url` required)
 - `scope` (string, default: "default") - Scope for multiple providers
 - `poll-interval` (number, optional) - Polling interval in seconds
 
@@ -90,7 +90,7 @@ Drawer/modal that displays the list of updates.
 - `theme` (string, optional) - Theme name
 - `light` (string, optional) - Theme for light mode
 - `dark` (string, optional) - Theme for dark mode
-- `display-mode` (string, default: "drawer-right") - Display mode:
+- `mode` (string, default: "drawer-right") - Display mode:
   - `drawer-right` - Slides in from right
   - `drawer-left` - Slides in from left
   - `modal` - Centered overlay
@@ -102,7 +102,7 @@ Drawer/modal that displays the list of updates.
 
 ```html
 <changebot-panel
-  display-mode="drawer-right"
+  mode="drawer-right"
   theme="nord">
 </changebot-panel>
 ```
@@ -172,6 +172,7 @@ You can trigger it from anywhere:
 - `everforest-dark`
 - `tokyo-night`
 - `cyberpunk`
+- `baremetrics`
 
 ### Custom Themes
 
