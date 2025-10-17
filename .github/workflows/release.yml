@@ -27,7 +27,7 @@ jobs:
         run: pnpm install
 
       - name: Install Puppeteer browsers
-        run: pnpm exec puppeteer browsers install chrome-headless-shell
+        run: pnpm --filter @changebot/core exec puppeteer browsers install chrome-headless-shell
 
       - name: Run tests
         run: pnpm test
