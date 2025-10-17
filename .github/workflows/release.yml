@@ -5,6 +5,17 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deployment (skip release-please check)'
+        required: false
+        default: false
+        type: boolean
+      skip_tests:
+        description: 'Skip tests (for faster re-deployments)'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -13,6 +24,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    if: ${{ !inputs.skip_tests }}
     steps:
       - uses: actions/checkout@v5
 
@@ -35,6 +47,7 @@ jobs:
 
   release-please:
     needs: test
+    if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-latest
     outputs:
       releases_created: ${{ steps.release.outputs.releases_created }}
@@ -44,7 +57,7 @@ jobs:
 
   deploy:
     needs: release-please
-    if: ${{ needs.release-please.outputs.releases_created == 'true' }}
+    if: ${{ needs.release-please.outputs.releases_created == 'true' || inputs.force_deploy }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
