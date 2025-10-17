@@ -387,13 +387,11 @@
 </head>
 
 <body>
-  <!-- Providers for each component -->
-  <changebot-provider slug="changebot" feed="panel" scope="panel"></changebot-provider>
-  <changebot-provider slug="changebot" feed="toast" scope="toast"></changebot-provider>
-  <changebot-provider slug="changebot" feed="banner" scope="banner"></changebot-provider>
+  <!-- Single provider for all components -->
+  <changebot-provider url="http://api.localhost:3000/v1/widgets/d8dea851f305be5b7511a9b9/updates"></changebot-provider>
 
-  <!-- Banner at top -->
-  <changebot-banner scope="banner" position="top"></changebot-banner>
+  <!-- Banner at top - will show updates with highlight_target="banner" -->
+  <changebot-banner position="top"></changebot-banner>
 
   <!-- Navbar -->
   <nav class="navbar">
@@ -450,7 +448,7 @@
               <span class="menu-icon">📝</span>
               <span>Changelog</span>
             </div>
-            <changebot-badge scope="panel" show-count="true"></changebot-badge>
+            <changebot-badge show-count="true"></changebot-badge>
           </a>
           <a class="menu-item">
             <div class="menu-item-content">
@@ -615,11 +613,11 @@
     </main>
   </div>
 
-  <!-- Panel Component (drawer-left mode) -->
-  <changebot-panel scope="panel" mode="drawer-right"></changebot-panel>
+  <!-- Panel Component (drawer-right mode) - shows all updates -->
+  <changebot-panel mode="drawer-right"></changebot-panel>
 
-  <!-- Toast Component (bottom-right position) -->
-  <changebot-toast scope="toast" position="bottom-left"></changebot-toast>
+  <!-- Toast Component (bottom-left position) - will show updates with highlight_target="toast" -->
+  <changebot-toast position="bottom-left"></changebot-toast>
 
   <script>
     // Open changelog panel
@@ -627,7 +625,6 @@
       const event = new CustomEvent('changebot:action', {
         detail: {
           type: 'openDisplay',
-          scope: 'panel',
         },
         bubbles: true,
         composed: true,
@@ -635,71 +632,37 @@
       document.dispatchEvent(event);
     }
 
-    // Show toast notification
+    // Show toast notification (no longer needed - toasts show automatically)
     function showToast() {
-      const event = new CustomEvent('changebot:action', {
-        detail: {
-          type: 'showToast',
-          scope: 'toast',
-        },
-        bubbles: true,
-        composed: true,
-      });
-      document.dispatchEvent(event);
+      alert('Toast notifications now show automatically based on highlight_target="toast"');
     }
 
-    // Show banner
+    // Show banner (no longer needed - banners show automatically)
     function showBanner() {
-      const event = new CustomEvent('changebot:action', {
-        detail: {
-          type: 'showBanner',
-          scope: 'banner',
-        },
-        bubbles: true,
-        composed: true,
-      });
-      document.dispatchEvent(event);
+      alert('Banners now show automatically based on highlight_target="banner"');
     }
 
     // Reset badge counter - clear last viewed time so badge appears again
     function resetBadge() {
-      localStorage.removeItem('changebot:lastViewed:panel');
+      localStorage.removeItem('changebot:lastViewed:default');
       // Reload the page to reset the badge count
       location.reload();
     }
 
     // Reset toast - clear last viewed time so it appears again
     function resetToast() {
-      localStorage.removeItem('changebot:lastViewed:toast');
-      // Trigger a re-check by dispatching a custom event
-      const event = new CustomEvent('changebot:action', {
-        detail: {
-          type: 'showToast',
-          scope: 'toast',
-        },
-        bubbles: true,
-        composed: true,
-      });
-      document.dispatchEvent(event);
+      localStorage.removeItem('changebot:lastViewed:default');
+      location.reload();
     }
 
     // Reset banner - clear last viewed time so it appears again
     function resetBanner() {
-      localStorage.removeItem('changebot:lastViewed:banner');
-      // Trigger a re-check by dispatching a custom event
-      const event = new CustomEvent('changebot:action', {
-        detail: {
-          type: 'showBanner',
-          scope: 'banner',
-        },
-        bubbles: true,
-        composed: true,
-      });
-      document.dispatchEvent(event);
+      localStorage.removeItem('changebot:lastViewed:default');
+      location.reload();
     }
 
     // Highlight active menu when changelog is open
-    const panel = document.querySelector('changebot-panel[scope="panel"]');
+    const panel = document.querySelector('changebot-panel');
     if (panel) {
       panel.addEventListener('changebot:panelOpened', () => {
         document.querySelector('.menu-item[onclick="openChangelog()"]')?.classList.add('active');
