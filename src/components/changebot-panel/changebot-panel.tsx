@@ -1,6 +1,6 @@
 import { Component, Element, Prop, State, Method, Watch, Listen, Event, EventEmitter, h, Host } from '@stencil/core';
 import { dispatchAction } from '../../utils/context';
-import { Update } from '../../types';
+import { Update, Widget } from '../../types';
 import { Theme } from '../../utils/themes';
 
 @Component({
@@ -19,6 +19,7 @@ export class ChangebotPanel {
 
   @State() isOpen: boolean = false;
   @State() updates: Update[] = [];
+  @State() widget: Widget | null = null;
   @State() activeTheme?: Theme;
   @State() prefersDark: boolean = false;
 
@@ -27,6 +28,7 @@ export class ChangebotPanel {
   private services: any;
   private unsubscribeIsOpen?: () => void;
   private unsubscribeUpdates?: () => void;
+  private unsubscribeWidget?: () => void;
   private panelElement?: HTMLDivElement;
   private firstFocusableElement?: HTMLElement;
   private lastFocusableElement?: HTMLElement;
@@ -96,6 +98,9 @@ export class ChangebotPanel {
     }
     if (this.unsubscribeUpdates) {
       this.unsubscribeUpdates();
+    }
+    if (this.unsubscribeWidget) {
+      this.unsubscribeWidget();
     }
 
     // Cleanup media query listener
@@ -180,9 +185,20 @@ export class ChangebotPanel {
         }
       });
 
+      // Subscribe to widget metadata changes
+      this.unsubscribeWidget = store.onChange('widget', () => {
+        try {
+          console.log('📂 Panel: Widget metadata changed:', store.state.widget);
+          this.widget = store.state.widget;
+        } catch (error) {
+          console.warn('Panel: Error in widget change handler:', error);
+        }
+      });
+
       // Initialize state safely
       this.isOpen = store.state.isOpen || false;
       this.updates = store.state.updates || [];
+      this.widget = store.state.widget || null;
     } catch (error) {
       console.warn('Panel: Failed to subscribe to store:', error);
     }
@@ -400,33 +416,66 @@ export class ChangebotPanel {
     }
   }
 
+  /**
+   * Calculate the appropriate text color (white or black) for a given background color
+   * to ensure sufficient contrast and readability
+   */
+  private getContrastColor(hexColor: string): string {
+    // Remove # if present
+    const hex = hexColor.replace('#', '');
+
+    // Convert to RGB
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+
+    // Calculate relative luminance using WCAG formula
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+    // Return white for dark backgrounds, black for light backgrounds
+    return luminance > 0.5 ? '#000000' : '#ffffff';
+  }
+
   private renderUpdateItem(update: Update) {
+    const titleContent = update.hosted_url ? (
+      <a
+        href={update.hosted_url}
+        class="update-title-link"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {update.title}
+      </a>
+    ) : (
+      update.title
+    );
+
     return (
       <div class="update-item" key={update.id}>
         <div class="update-header">
-          <h3 class="update-title">{update.title}</h3>
-          <time class="update-date" dateTime={update.date}>
-            {this.formatDate(update.date)}
+          <h3 class="update-title">{titleContent}</h3>
+          <time class="update-date" dateTime={update.display_date}>
+            {this.formatDate(update.display_date)}
           </time>
         </div>
-        {update.description && (
-          <div class="update-description" innerHTML={this.transformHtmlUrls(update.description)}></div>
+        {update.content && (
+          <div class="update-description" innerHTML={this.transformHtmlUrls(update.content)}></div>
         )}
         {update.tags && update.tags.length > 0 && (
           <div class="update-tags">
             {update.tags.map(tag => (
               <span
                 class="update-tag"
-                key={tag.text}
-                style={{ backgroundColor: tag.color }}
+                key={tag.id}
+                style={{
+                  backgroundColor: tag.color,
+                  color: this.getContrastColor(tag.color)
+                }}
               >
-                {tag.text}
+                {tag.name}
               </span>
             ))}
           </div>
-        )}
-        {update.details && (
-          <div class="update-details" innerHTML={this.transformHtmlUrls(update.details)}></div>
         )}
       </div>
     );
@@ -481,7 +530,12 @@ export class ChangebotPanel {
         >
           {/* Header */}
           <div class="panel-header">
-            <h2 class="panel-title">What's New</h2>
+            <div class="panel-header-content">
+              <h2 class="panel-title">{this.widget?.title || "What's New"}</h2>
+              {this.widget?.subheading && (
+                <p class="panel-subheading">{this.widget.subheading}</p>
+              )}
+            </div>
             <button
               class="close-button"
               type="button"
