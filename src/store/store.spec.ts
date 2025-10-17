@@ -82,18 +82,26 @@ describe('createWidgetStore', () => {
       it('should fetch and set updates successfully', async () => {
         const mockUpdates: Update[] = [
           {
-            id: '1',
+            id: 1,
             title: 'Update 1',
-            description: 'Description 1',
-            date: '2024-01-01',
-            tags: [{ text: 'feature', color: '#00ff00' }]
+            content: 'Description 1',
+            display_date: '2024-01-01',
+            published_at: '2024-01-01T00:00:00Z',
+            expires_on: null,
+            highlight_target: null,
+            hosted_url: null,
+            tags: [{ id: 1, name: 'feature', color: '#00ff00' }]
           },
           {
-            id: '2',
+            id: 2,
             title: 'Update 2',
-            description: 'Description 2',
-            date: '2024-01-02',
-            tags: [{ text: 'bugfix', color: '#ff0000' }]
+            content: 'Description 2',
+            display_date: '2024-01-02',
+            published_at: '2024-01-02T00:00:00Z',
+            expires_on: null,
+            highlight_target: null,
+            hosted_url: null,
+            tags: [{ id: 2, name: 'bugfix', color: '#ff0000' }]
           }
         ];
 
@@ -220,22 +228,37 @@ describe('createWidgetStore', () => {
 
       const updates: Update[] = [
         {
-          id: '1',
+          id: 1,
           title: 'Old Update',
-          description: 'Old',
-          date: '2024-01-01'
+          content: 'Old',
+          display_date: '2024-01-01',
+          published_at: '2024-01-01T00:00:00Z',
+          expires_on: null,
+          highlight_target: null,
+          hosted_url: null,
+          tags: []
         },
         {
-          id: '2',
+          id: 2,
           title: 'New Update 1',
-          description: 'New',
-          date: '2024-01-03'
+          content: 'New',
+          display_date: '2024-01-03',
+          published_at: '2024-01-03T00:00:00Z',
+          expires_on: null,
+          highlight_target: null,
+          hosted_url: null,
+          tags: []
         },
         {
-          id: '3',
+          id: 3,
           title: 'New Update 2',
-          description: 'New',
-          date: '2024-01-04'
+          content: 'New',
+          display_date: '2024-01-04',
+          published_at: '2024-01-04T00:00:00Z',
+          expires_on: null,
+          highlight_target: null,
+          hosted_url: null,
+          tags: []
         }
       ];
 
@@ -247,16 +270,26 @@ describe('createWidgetStore', () => {
     it('should calculate newUpdatesCount when lastViewed changes', () => {
       const updates: Update[] = [
         {
-          id: '1',
+          id: 1,
           title: 'Update 1',
-          description: 'Desc 1',
-          date: '2024-01-01'
+          content: 'Desc 1',
+          display_date: '2024-01-01',
+          published_at: '2024-01-01T00:00:00Z',
+          expires_on: null,
+          highlight_target: null,
+          hosted_url: null,
+          tags: []
         },
         {
-          id: '2',
+          id: 2,
           title: 'Update 2',
-          description: 'Desc 2',
-          date: '2024-01-03'
+          content: 'Desc 2',
+          display_date: '2024-01-03',
+          published_at: '2024-01-03T00:00:00Z',
+          expires_on: null,
+          highlight_target: null,
+          hosted_url: null,
+          tags: []
         }
       ];
 
@@ -274,16 +307,26 @@ describe('createWidgetStore', () => {
 
       const updates: Update[] = [
         {
-          id: '1',
+          id: 1,
           title: 'Update 1',
-          description: 'Desc 1',
-          date: '2024-01-01'
+          content: 'Desc 1',
+          display_date: '2024-01-01',
+          published_at: '2024-01-01T00:00:00Z',
+          expires_on: null,
+          highlight_target: null,
+          hosted_url: null,
+          tags: []
         },
         {
-          id: '2',
+          id: 2,
           title: 'Update 2',
-          description: 'Desc 2',
-          date: '2024-01-02'
+          content: 'Desc 2',
+          display_date: '2024-01-02',
+          published_at: '2024-01-02T00:00:00Z',
+          expires_on: null,
+          highlight_target: null,
+          hosted_url: null,
+          tags: []
         }
       ];
 

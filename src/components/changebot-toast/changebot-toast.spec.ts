@@ -18,11 +18,15 @@ describe('changebot-toast', () => {
 
   it('displays toast when there is a new update', async () => {
     const mockUpdate = {
-      id: '1',
+      id: 1,
       title: 'New Feature',
-      description: 'Check out our new feature!',
-      date: new Date().toISOString(),
-      timestamp: Date.now()
+      content: 'Check out our new feature!',
+      display_date: new Date().toISOString().split('T')[0],
+      published_at: new Date().toISOString(),
+      expires_on: null,
+      highlight_target: null,
+      hosted_url: null,
+      tags: []
     };
 
     const page = await newSpecPage({
@@ -47,10 +51,15 @@ describe('changebot-toast', () => {
 
   it('applies correct position class', async () => {
     const mockUpdate = {
-      id: '1',
+      id: 1,
       title: 'Update',
-      date: new Date().toISOString(),
-      timestamp: Date.now()
+      content: '',
+      display_date: new Date().toISOString().split('T')[0],
+      published_at: new Date().toISOString(),
+      expires_on: null,
+      highlight_target: null,
+      hosted_url: null,
+      tags: []
     };
 
     const page = await newSpecPage({
@@ -69,10 +78,15 @@ describe('changebot-toast', () => {
 
   it('applies default bottom-right position', async () => {
     const mockUpdate = {
-      id: '1',
+      id: 1,
       title: 'Update',
-      date: new Date().toISOString(),
-      timestamp: Date.now()
+      content: '',
+      display_date: new Date().toISOString().split('T')[0],
+      published_at: new Date().toISOString(),
+      expires_on: null,
+      highlight_target: null,
+      hosted_url: null,
+      tags: []
     };
 
     const page = await newSpecPage({
@@ -100,10 +114,15 @@ describe('changebot-toast', () => {
 
   it('applies theme class when provided', async () => {
     const mockUpdate = {
-      id: '1',
+      id: 1,
       title: 'Update',
-      date: new Date().toISOString(),
-      timestamp: Date.now()
+      content: '',
+      display_date: new Date().toISOString().split('T')[0],
+      published_at: new Date().toISOString(),
+      expires_on: null,
+      highlight_target: null,
+      hosted_url: null,
+      tags: []
     };
 
     const page = await newSpecPage({
@@ -122,10 +141,15 @@ describe('changebot-toast', () => {
 
   it('hides toast when dismissed', async () => {
     const mockUpdate = {
-      id: '1',
+      id: 1,
       title: 'Update',
-      date: new Date().toISOString(),
-      timestamp: Date.now()
+      content: '',
+      display_date: new Date().toISOString().split('T')[0],
+      published_at: new Date().toISOString(),
+      expires_on: null,
+      highlight_target: null,
+      hosted_url: null,
+      tags: []
     };
 
     const page = await newSpecPage({
@@ -146,11 +170,17 @@ describe('changebot-toast', () => {
   });
 
   it('marks update as viewed when dismissed', async () => {
+    const publishedAt = new Date().toISOString();
     const mockUpdate = {
-      id: '1',
+      id: 1,
       title: 'Update',
-      date: new Date().toISOString(),
-      timestamp: Date.now()
+      content: '',
+      display_date: new Date().toISOString().split('T')[0],
+      published_at: publishedAt,
+      expires_on: null,
+      highlight_target: null,
+      hosted_url: null,
+      tags: []
     };
 
     const page = await newSpecPage({
@@ -168,15 +198,20 @@ describe('changebot-toast', () => {
     await page.waitForChanges();
 
     const lastViewed = localStorage.getItem('changebot:lastViewed:test');
-    expect(lastViewed).toBe(mockUpdate.timestamp.toString());
+    expect(lastViewed).toBe(new Date(publishedAt).getTime().toString());
   });
 
   it('handles keyboard navigation with Enter key', async () => {
     const mockUpdate = {
-      id: '1',
+      id: 1,
       title: 'Update',
-      date: new Date().toISOString(),
-      timestamp: Date.now()
+      content: '',
+      display_date: new Date().toISOString().split('T')[0],
+      published_at: new Date().toISOString(),
+      expires_on: null,
+      highlight_target: null,
+      hosted_url: null,
+      tags: []
     };
 
     const page = await newSpecPage({
@@ -199,10 +234,15 @@ describe('changebot-toast', () => {
 
   it('handles keyboard navigation with Space key', async () => {
     const mockUpdate = {
-      id: '1',
+      id: 1,
       title: 'Update',
-      date: new Date().toISOString(),
-      timestamp: Date.now()
+      content: '',
+      display_date: new Date().toISOString().split('T')[0],
+      published_at: new Date().toISOString(),
+      expires_on: null,
+      highlight_target: null,
+      hosted_url: null,
+      tags: []
     };
 
     const page = await newSpecPage({
@@ -225,10 +265,15 @@ describe('changebot-toast', () => {
 
   it('formats date correctly', async () => {
     const mockUpdate = {
-      id: '1',
+      id: 1,
       title: 'Update',
-      date: '2025-10-04T12:00:00.000Z',
-      timestamp: new Date('2025-10-04T12:00:00.000Z').getTime()
+      content: '',
+      display_date: '2025-10-04',
+      published_at: '2025-10-04T12:00:00.000Z',
+      expires_on: null,
+      highlight_target: null,
+      hosted_url: null,
+      tags: []
     };
 
     const page = await newSpecPage({
@@ -262,7 +307,17 @@ describe('changebot-toast', () => {
     const mockStore = {
       state: {
         updates: [
-          { id: '1', title: 'Update 1', timestamp: Date.now(), date: new Date().toISOString() }
+          {
+            id: 1,
+            title: 'Update 1',
+            content: '',
+            display_date: new Date().toISOString().split('T')[0],
+            published_at: new Date().toISOString(),
+            expires_on: null,
+            highlight_target: null,
+            hosted_url: null,
+            tags: []
+          }
         ]
       },
       onChange: jest.fn()

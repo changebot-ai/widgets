@@ -1,6 +1,6 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { ChangebotProvider } from './changebot-provider';
-import { updatesStore, actions } from '../../store';
+import { updatesStore } from '../../store';
 
 describe('changebot-provider', () => {
   let fetchMock: jest.SpyInstance;
@@ -285,7 +285,7 @@ describe('changebot-provider', () => {
 
       // Verify fetch was called with the correct URL
       expect(fetchMock).toHaveBeenCalledWith(
-        'https://api.changebot.ai/v1/updates/test-team',
+        'https://app.changebot.ai/api/v1/widgets/test-team/updates',
         expect.objectContaining({
           method: 'GET',
           headers: { 'Accept': 'application/json' }
