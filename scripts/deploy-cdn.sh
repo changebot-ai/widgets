@@ -11,8 +11,8 @@ NC='\033[0m' # No Color
 
 # Get version from core package.json
 VERSION=$(node -p "require('./packages/core/package.json').version")
-BUCKET="${TIGRIS_BUCKET:-your-bucket-name}"
-ENDPOINT="${TIGRIS_ENDPOINT:-https://fly.storage.tigris.dev}"
+BUCKET="widgets"
+ENDPOINT="https://t3.storage.dev"
 
 echo -e "${BLUE}🚀 Deploying Changebot Widgets to Tigris CDN${NC}"
 echo -e "${BLUE}Version: ${VERSION}${NC}"
@@ -62,8 +62,8 @@ echo ""
 echo -e "${GREEN}✅ Deployment complete!${NC}"
 echo ""
 echo "CDN URLs:"
-echo "  Versioned: https://${BUCKET}.fly.storage.tigris.dev/v${VERSION}/loader/index.js"
-echo "  Latest:    https://${BUCKET}.fly.storage.tigris.dev/latest/loader/index.js"
+echo "  Versioned: ${ENDPOINT}/v${VERSION}/loader/index.js"
+echo "  Latest:    ${ENDPOINT}/latest/loader/index.js"
 echo ""
 echo "Usage:"
-echo '  <script type="module" src="https://'"${BUCKET}"'.fly.storage.tigris.dev/v'"${VERSION}"'/loader/index.js"></script>'
+echo '  <script type="module" src="'"${ENDPOINT}"'/v'"${VERSION}"'/loader/index.js"></script>'

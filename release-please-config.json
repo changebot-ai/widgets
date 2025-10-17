@@ -1,0 +1,30 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    "packages/core": {
+      "release-type": "node",
+      "package-name": "@changebot/core",
+      "changelog-path": "CHANGELOG.md",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/react": {
+      "release-type": "node",
+      "package-name": "@changebot/widgets-react",
+      "changelog-path": "CHANGELOG.md",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    },
+    "packages/vue": {
+      "release-type": "node",
+      "package-name": "@changebot/widgets-vue",
+      "changelog-path": "CHANGELOG.md",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    }
+  },
+  "bootstrap-sha": "3a0b8a5f1a2d3e4b5c6d7e8f9a0b1c2d3e4f5a6b",
+  "group-pull-request-title-pattern": "chore: release ${version}",
+  "release-search-depth": 100,
+  "separate-pull-requests": false
+}
