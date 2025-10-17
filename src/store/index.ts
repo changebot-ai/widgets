@@ -33,7 +33,7 @@ function calculateNewUpdatesCount(updates: Update[], lastViewed: number | null):
   if (!lastViewed) return updates.length;
 
   return updates.filter(update => {
-    const updateTime = new Date(update.date).getTime();
+    const updateTime = new Date(update.published_at).getTime();
     return updateTime > lastViewed;
   }).length;
 }
@@ -44,6 +44,7 @@ function calculateNewUpdatesCount(updates: Update[], lastViewed: number | null):
 export function createWidgetStore(config: StoreConfig) {
   const { state, onChange, reset, get } = createStore<StoreState>({
     updates: [],
+    widget: null,
     lastViewed: config.persistLastViewed ? getLastViewed() : null,
     isOpen: false,
     mode: config.mode || 'drawer-right',
@@ -126,6 +127,7 @@ export function createWidgetStore(config: StoreConfig) {
 // Create a default global store instance
 const defaultStore = createStore<StoreState>({
   updates: [],
+  widget: null,
   lastViewed: getLastViewed(),
   isOpen: false,
   mode: 'drawer-right',
@@ -141,6 +143,7 @@ const defaultStore = createStore<StoreState>({
 export function createScopedStore() {
   const store = createStore<StoreState>({
     updates: [],
+    widget: null,
     lastViewed: null,
     isOpen: false,
     mode: 'drawer-right',
@@ -157,7 +160,7 @@ export function createScopedStore() {
       try {
         let apiUrl: string;
         if (slug) {
-          apiUrl = `https://api.changebot.ai/v1/updates/${slug}`;
+          apiUrl = `https://app.changebot.ai/api/v1/widgets/${slug}/updates`;
         } else if (url) {
           apiUrl = url;
         } else {
@@ -178,21 +181,33 @@ export function createScopedStore() {
 
         const data = await response.json();
 
-        // Parse the API response format
+        // API returns {widget: {...}, publications: [...]}
         let updates = [];
-        if (Array.isArray(data)) {
-          updates = data;
-        } else if (data.data && Array.isArray(data.data)) {
-          updates = data.data.map((item: any) => ({
-            id: item.id.toString(),
-            title: item.attributes?.title || 'Untitled',
-            description: item.attributes?.content?.body || '',
-            date: item.attributes?.published_at || new Date().toISOString(),
-            timestamp: new Date(item.attributes?.published_at || Date.now()).getTime(),
-            tags: []
+        if (data.publications && Array.isArray(data.publications)) {
+          // Transform publications to match our Update type
+          updates = data.publications.map((pub: any) => ({
+            ...pub,
+            // Transform tags from string array to object array if needed
+            tags: Array.isArray(pub.tags)
+              ? pub.tags.map((tag: any) =>
+                  typeof tag === 'string'
+                    ? { id: 0, name: tag, color: '#667eea' }
+                    : tag
+                )
+              : []
           }));
-        } else if (data.updates) {
-          updates = data.updates;
+        } else if (Array.isArray(data)) {
+          // Fallback: if API returns array directly
+          updates = data;
+        }
+
+        // Extract widget metadata
+        if (data.widget) {
+          store.state.widget = {
+            title: data.widget.title || 'Updates',
+            subheading: data.widget.subheading || null,
+            slug: data.widget.slug || ''
+          };
         }
 
         store.state.updates = updates;
@@ -262,10 +277,8 @@ export const actions: StoreActions & { loadUpdates: (slug?: string, url?: string
     try {
       let apiUrl: string;
       if (slug) {
-        // Slug takes precedence - always use the standard API format
-        apiUrl = `https://api.changebot.ai/v1/updates/${slug}`;
+        apiUrl = `https://app.changebot.ai/api/v1/widgets/${slug}/updates`;
       } else if (url) {
-        // Use url as-is without modification
         apiUrl = url;
       } else {
         throw new Error('Either slug or url must be provided');
@@ -346,22 +359,33 @@ export const actions: StoreActions & { loadUpdates: (slug?: string, url?: string
 
       const data = await response.json();
 
-      // Parse the API response format
+      // API returns {widget: {...}, publications: [...]}
       let updates = [];
-      if (Array.isArray(data)) {
-        updates = data;
-      } else if (data.data && Array.isArray(data.data)) {
-        // Transform API response to our Update format
-        updates = data.data.map((item: any) => ({
-          id: item.id.toString(),
-          title: item.attributes?.title || 'Untitled',
-          description: item.attributes?.content?.body || '',
-          date: item.attributes?.published_at || new Date().toISOString(),
-          timestamp: new Date(item.attributes?.published_at || Date.now()).getTime(),
-          tags: []
+      if (data.publications && Array.isArray(data.publications)) {
+        // Transform publications to match our Update type
+        updates = data.publications.map((pub: any) => ({
+          ...pub,
+          // Transform tags from string array to object array if needed
+          tags: Array.isArray(pub.tags)
+            ? pub.tags.map((tag: any) =>
+                typeof tag === 'string'
+                  ? { id: 0, name: tag, color: '#667eea' }
+                  : tag
+              )
+            : []
         }));
-      } else if (data.updates) {
-        updates = data.updates;
+      } else if (Array.isArray(data)) {
+        // Fallback: if API returns array directly
+        updates = data;
+      }
+
+      // Extract widget metadata
+      if (data.widget) {
+        updatesStore.state.widget = {
+          title: data.widget.title || 'Updates',
+          subheading: data.widget.subheading || null,
+          slug: data.widget.slug || ''
+        };
       }
 
       updatesStore.state.updates = updates;
