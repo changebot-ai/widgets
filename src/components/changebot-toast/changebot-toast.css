@@ -10,7 +10,8 @@
   --cb-toast-content-text: #333333;
 
   /* Sizing variables */
-  --toast-max-width: 400px;
+  --toast-min-width: 400px;
+  --toast-max-width: 600px;
   --toast-padding: 16px;
   --toast-border-radius: 8px;
   --toast-animation-duration: 0.3s;
@@ -28,6 +29,7 @@
   border: 1px solid var(--cb-toast-border);
   border-radius: var(--toast-border-radius);
   box-shadow: 0 4px 12px var(--cb-toast-shadow);
+  min-width: var(--toast-min-width);
   max-width: var(--toast-max-width);
   padding: var(--toast-padding);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
