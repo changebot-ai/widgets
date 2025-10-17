@@ -34,5 +34,5 @@
     "url": "https://github.com/changebot-ai/widgets.git",
     "directory": "packages/react"
   },
-  "license": "UNLICENSED"
+  "license": "Apache-2.0"
 }

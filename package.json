@@ -13,7 +13,7 @@
     "deploy": "pnpm run build && pnpm run deploy:cdn && pnpm run deploy:npm"
   },
   "devDependencies": {},
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/changebot-ai/widgets.git"

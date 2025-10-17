@@ -30,5 +30,5 @@
     "url": "https://github.com/changebot-ai/widgets.git",
     "directory": "packages/vue"
   },
-  "license": "UNLICENSED"
+  "license": "Apache-2.0"
 }

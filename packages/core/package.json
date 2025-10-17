@@ -49,7 +49,7 @@
     "jest-cli": "^29.7.0",
     "puppeteer": "^24.3.0"
   },
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "dependencies": {
     "@stencil/store": "^2.2.0"
   }
