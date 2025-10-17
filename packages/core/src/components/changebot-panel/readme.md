@@ -18,9 +18,9 @@
 
 ## Events
 
-| Event                  | Description | Type                              |
-| ---------------------- | ----------- | --------------------------------- |
-| `changebot:lastViewed` |             | `CustomEvent<{ scope: string; }>` |
+| Event                   | Description | Type                              |
+| ----------------------- | ----------- | --------------------------------- |
+| `changebot-last-viewed` |             | `CustomEvent<{ scope: string; }>` |
 
 
 ## Methods

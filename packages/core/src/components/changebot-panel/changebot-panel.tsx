@@ -23,7 +23,7 @@ export class ChangebotPanel {
   @State() activeTheme?: Theme;
   @State() prefersDark: boolean = false;
 
-  @Event({ eventName: 'changebot:lastViewed' }) changebotLastViewed: EventEmitter<{ scope: string }>;
+  @Event({ eventName: 'changebot-last-viewed' }) changebotLastViewed: EventEmitter<{ scope: string }>;
 
   private services: any;
   private unsubscribeIsOpen?: () => void;

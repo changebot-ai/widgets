@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Changebot Widgets - Vue Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 2rem;
+    }
+    #app {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .demo-section {
+      margin-bottom: 2rem;
+    }
+    .demo-section h2 {
+      color: #555;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+    button {
+      background: #42b983;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-right: 0.5rem;
+    }
+    button:hover {
+      background: #359268;
+    }
+    .code {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      overflow-x: auto;
+      margin-top: 1rem;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>Changebot Widgets - Vue Demo</h1>
+  <p class="subtitle">Using Changebot web components in a Vue 3 application (loaded from CDN)</p>
+
+  <div id="app"></div>
+
+  <!-- Load Vue 3 from CDN -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+  <!-- Load Changebot components -->
+  <script type="module" src="/build/widgets.esm.js"></script>
+
+  <!-- Vue App -->
+  <script type="module">
+    const { createApp, ref, onMounted } = Vue;
+
+    const App = {
+      setup() {
+        const badgeCount = ref(0);
+        const panelOpen = ref(false);
+        const panelRef = ref(null);
+
+        const mockUpdates = [
+          {
+            id: '1',
+            title: 'New Dashboard Features',
+            content: '<p>We have added new analytics to the dashboard.</p>',
+            display_date: new Date().toISOString(),
+            tags: [{ id: '1', name: 'Feature', color: '#4CAF50' }]
+          },
+          {
+            id: '2',
+            title: 'Performance Improvements',
+            content: '<p>The app is now 2x faster!</p>',
+            display_date: new Date(Date.now() - 86400000).toISOString(),
+            tags: [{ id: '2', name: 'Enhancement', color: '#2196F3' }]
+          }
+        ];
+
+        onMounted(() => {
+          // Set initial updates on the panel
+          if (panelRef.value) {
+            panelRef.value.setUpdates(mockUpdates);
+          }
+        });
+
+        const handleBadgeClick = () => {
+          if (panelRef.value) {
+            panelRef.value.open();
+            panelOpen.value = true;
+          }
+        };
+
+        const handleOpenPanel = () => {
+          if (panelRef.value) {
+            panelRef.value.open();
+            panelOpen.value = true;
+          }
+        };
+
+        const handleClosePanel = () => {
+          if (panelRef.value) {
+            panelRef.value.close();
+            panelOpen.value = false;
+          }
+        };
+
+        const handleAddUpdate = () => {
+          if (panelRef.value) {
+            const newUpdate = {
+              id: Date.now().toString(),
+              title: 'New Update Added',
+              content: '<p>This update was added dynamically from Vue!</p>',
+              display_date: new Date().toISOString(),
+              tags: [{ id: '3', name: 'Dynamic', color: '#FF9800' }]
+            };
+            panelRef.value.setUpdates([newUpdate, ...mockUpdates]);
+          }
+        };
+
+        return {
+          badgeCount,
+          panelOpen,
+          panelRef,
+          handleBadgeClick,
+          handleOpenPanel,
+          handleClosePanel,
+          handleAddUpdate
+        };
+      },
+      template: `
+        <div>
+          <div class="demo-section">
+            <h2>Badge Component</h2>
+            <p>Click the badge to open the panel:</p>
+            <changebot-badge
+              scope="vue-demo"
+              theme="default"
+              :show-count="true"
+              :count="badgeCount"
+              @click="handleBadgeClick"
+            />
+            <div class="code">&lt;changebot-badge scope="vue-demo" theme="default" :show-count="true" :count="{{ badgeCount }}" /&gt;</div>
+          </div>
+
+          <div class="demo-section">
+            <h2>Panel Component (Drawer Mode)</h2>
+            <p>Control the panel programmatically:</p>
+            <button @click="handleOpenPanel">Open Panel</button>
+            <button @click="handleClosePanel">Close Panel</button>
+            <button @click="handleAddUpdate">Add Dynamic Update</button>
+
+            <changebot-panel
+              ref="panelRef"
+              scope="vue-demo"
+              mode="drawer-right"
+              theme="default"
+            />
+            <div class="code">&lt;changebot-panel ref="panelRef" scope="vue-demo" mode="drawer-right" theme="default" /&gt;</div>
+          </div>
+
+          <div class="demo-section">
+            <h2>Toast Notifications</h2>
+            <p>Toast notifications appear in the corner:</p>
+            <changebot-toast
+              scope="vue-demo"
+              position="bottom-right"
+              theme="default"
+              :auto-dismiss="true"
+            />
+            <div class="code">&lt;changebot-toast scope="vue-demo" position="bottom-right" theme="default" :auto-dismiss="true" /&gt;</div>
+          </div>
+
+          <div class="demo-section">
+            <h2>Integration Notes</h2>
+            <p><strong>Using in Vue 3:</strong></p>
+            <ul>
+              <li>Web components work directly in Vue templates</li>
+              <li>Use <code>ref</code> to access component methods like <code>open()</code>, <code>close()</code>, <code>setUpdates()</code></li>
+              <li>Vue automatically handles prop binding with <code>:prop-name</code> syntax</li>
+              <li>Event listeners work with <code>@event-name</code> syntax</li>
+              <li>For production, use the Vue wrapper package: <code>npm install @changebot/widgets-vue</code></li>
+            </ul>
+            <div class="code">import { ChangebotPanel } from '@changebot/widgets-vue';
+
+export default {
+  components: { ChangebotPanel },
+  template: '&lt;changebot-panel scope="my-app" mode="drawer-right" /&gt;'
+}</div>
+          </div>
+        </div>
+      `
+    };
+
+    createApp(App).mount('#app');
+  </script>
+</body>
+</html>

@@ -1,53 +1,21 @@
 {
-  "name": "widgets",
+  "name": "@changebot/widgets-monorepo",
   "version": "0.0.1",
-  "description": "Stencil Component Starter",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.js",
-  "types": "dist/types/index.d.ts",
-  "collection": "dist/collection/collection-manifest.json",
-  "collection:main": "dist/collection/index.js",
-  "unpkg": "dist/widgets/widgets.esm.js",
-  "exports": {
-    ".": {
-      "import": "./dist/widgets/widgets.esm.js",
-      "require": "./dist/widgets/widgets.cjs.js"
-    },
-    "./my-component": {
-      "import": "./dist/components/my-component.js",
-      "types": "./dist/components/my-component.d.ts"
-    },
-    "./loader": {
-      "import": "./loader/index.js",
-      "require": "./loader/index.cjs",
-      "types": "./loader/index.d.ts"
-    }
+  "private": true,
+  "description": "Changebot widgets component library monorepo",
+  "scripts": {
+    "build": "pnpm --filter @changebot/core run build && pnpm --filter @changebot/widgets-react run build && pnpm --filter @changebot/widgets-vue run build",
+    "start": "pnpm --filter @changebot/core run start",
+    "test": "pnpm --filter @changebot/core run test",
+    "version": "./scripts/version.sh",
+    "deploy:cdn": "./scripts/deploy-cdn.sh",
+    "deploy:npm": "./scripts/publish-npm.sh",
+    "deploy": "pnpm run build && pnpm run deploy:cdn && pnpm run deploy:npm"
   },
+  "devDependencies": {},
+  "license": "UNLICENSED",
   "repository": {
     "type": "git",
-    "url": "https://github.com/stenciljs/component-starter.git"
-  },
-  "files": [
-    "dist/",
-    "loader/"
-  ],
-  "scripts": {
-    "build": "stencil build",
-    "start": "stencil build --dev --watch --serve",
-    "test": "stencil test --spec --e2e",
-    "test.watch": "stencil test --spec --e2e --watchAll",
-    "generate": "stencil generate"
-  },
-  "devDependencies": {
-    "@stencil/core": "^4.27.1",
-    "@types/jest": "^29.5.14",
-    "@types/node": "^22.13.5",
-    "jest": "^29.7.0",
-    "jest-cli": "^29.7.0",
-    "puppeteer": "^24.3.0"
-  },
-  "license": "UNLICENSED",
-  "dependencies": {
-    "@stencil/store": "^2.2.0"
+    "url": "https://github.com/changebot-ai/widgets.git"
   }
 }

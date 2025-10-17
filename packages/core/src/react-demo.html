@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Changebot Widgets - React Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 2rem;
+    }
+    #root {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .demo-section {
+      margin-bottom: 2rem;
+    }
+    .demo-section h2 {
+      color: #555;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-right: 0.5rem;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .code {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Changebot Widgets - React Demo</h1>
+  <p class="subtitle">Using Changebot web components in a React application (loaded from CDN)</p>
+
+  <div id="root"></div>
+
+  <!-- Load React from CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <!-- Load Babel standalone for JSX transformation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Load Changebot components -->
+  <script type="module" src="/build/widgets.esm.js"></script>
+
+  <!-- React App -->
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    function App() {
+      const [badgeCount, setBadgeCount] = useState(0);
+      const [panelOpen, setPanelOpen] = useState(false);
+      const panelRef = useRef(null);
+      const providerRef = useRef(null);
+
+      const mockUpdates = [
+        {
+          id: '1',
+          title: 'New Dashboard Features',
+          content: '<p>We have added new analytics to the dashboard.</p>',
+          display_date: new Date().toISOString(),
+          tags: [{ id: '1', name: 'Feature', color: '#4CAF50' }]
+        },
+        {
+          id: '2',
+          title: 'Performance Improvements',
+          content: '<p>The app is now 2x faster!</p>',
+          display_date: new Date(Date.now() - 86400000).toISOString(),
+          tags: [{ id: '2', name: 'Enhancement', color: '#2196F3' }]
+        }
+      ];
+
+      useEffect(() => {
+        // Access the web component ref
+        const panel = panelRef.current;
+        if (panel) {
+          // Set initial updates
+          panel.setUpdates(mockUpdates);
+        }
+      }, []);
+
+      const handleBadgeClick = () => {
+        const panel = panelRef.current;
+        if (panel) {
+          panel.open();
+          setPanelOpen(true);
+        }
+      };
+
+      const handleOpenPanel = () => {
+        const panel = panelRef.current;
+        if (panel) {
+          panel.open();
+          setPanelOpen(true);
+        }
+      };
+
+      const handleClosePanel = () => {
+        const panel = panelRef.current;
+        if (panel) {
+          panel.close();
+          setPanelOpen(false);
+        }
+      };
+
+      const handleAddUpdate = () => {
+        const panel = panelRef.current;
+        if (panel) {
+          const newUpdate = {
+            id: Date.now().toString(),
+            title: 'New Update Added',
+            content: '<p>This update was added dynamically from React!</p>',
+            display_date: new Date().toISOString(),
+            tags: [{ id: '3', name: 'Dynamic', color: '#FF9800' }]
+          };
+          panel.setUpdates([newUpdate, ...mockUpdates]);
+        }
+      };
+
+      return (
+        <div>
+          <div className="demo-section">
+            <h2>Badge Component</h2>
+            <p>Click the badge to open the panel:</p>
+            <changebot-badge
+              scope="react-demo"
+              theme="default"
+              show-count={true}
+              count={badgeCount}
+              onClick={handleBadgeClick}
+            />
+            <div className="code">
+              {'<changebot-badge scope="react-demo" theme="default" show-count={true} count={' + badgeCount + '} />'}
+            </div>
+          </div>
+
+          <div className="demo-section">
+            <h2>Panel Component (Drawer Mode)</h2>
+            <p>Control the panel programmatically:</p>
+            <button onClick={handleOpenPanel}>Open Panel</button>
+            <button onClick={handleClosePanel}>Close Panel</button>
+            <button onClick={handleAddUpdate}>Add Dynamic Update</button>
+
+            <changebot-panel
+              ref={panelRef}
+              scope="react-demo"
+              mode="drawer-right"
+              theme="default"
+            />
+            <div className="code">
+              {'<changebot-panel ref={panelRef} scope="react-demo" mode="drawer-right" theme="default" />'}
+            </div>
+          </div>
+
+          <div className="demo-section">
+            <h2>Toast Notifications</h2>
+            <p>Toast notifications appear in the corner:</p>
+            <changebot-toast
+              scope="react-demo"
+              position="bottom-right"
+              theme="default"
+              auto-dismiss={true}
+            />
+            <div className="code">
+              {'<changebot-toast scope="react-demo" position="bottom-right" theme="default" auto-dismiss={true} />'}
+            </div>
+          </div>
+
+          <div className="demo-section">
+            <h2>Integration Notes</h2>
+            <p><strong>Using in React:</strong></p>
+            <ul>
+              <li>Web components work directly in React JSX</li>
+              <li>Use <code>ref</code> to access component methods like <code>open()</code>, <code>close()</code>, <code>setUpdates()</code></li>
+              <li>Properties with kebab-case in HTML become camelCase props in JSX</li>
+              <li>For production, use the React wrapper package: <code>npm install @changebot/widgets-react</code></li>
+            </ul>
+            <div className="code">
+{`import { ChangebotPanel } from '@changebot/widgets-react';
+
+function App() {
+  return <ChangebotPanel scope="my-app" mode="drawer-right" />;
+}`}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Render the app
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>

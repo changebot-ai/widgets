@@ -1,0 +1,38 @@
+{
+  "name": "@changebot/widgets-react",
+  "version": "0.0.1",
+  "description": "React wrapper components for Changebot widgets",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "dependencies": {
+    "@changebot/core": "workspace:*",
+    "@stencil/react-output-target": "^1.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/changebot-ai/widgets.git",
+    "directory": "packages/react"
+  },
+  "license": "UNLICENSED"
+}
