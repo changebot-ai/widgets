@@ -6,6 +6,16 @@ on:
       - main
   workflow_dispatch:
     inputs:
+      deploy_npm:
+        description: 'Deploy to npm'
+        required: false
+        default: true
+        type: boolean
+      deploy_tigris:
+        description: 'Deploy to Tigris CDN'
+        required: false
+        default: true
+        type: boolean
       force_deploy:
         description: 'Force deployment (skip release-please check)'
         required: false
@@ -55,17 +65,12 @@ jobs:
       - uses: googleapis/release-please-action@v4
         id: release
 
-  deploy:
+  deploy-tigris:
     needs: [test, release-please]
-    if: ${{ always() && !failure() && !cancelled() && (needs.release-please.outputs.releases_created == 'true' || inputs.force_deploy == true) }}
+    if: ${{ always() && !failure() && !cancelled() && (needs.release-please.outputs.releases_created == 'true' || inputs.force_deploy == true) && (github.event_name == 'push' || inputs.deploy_tigris == true) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          registry-url: "https://registry.npmjs.org"
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -122,6 +127,29 @@ jobs:
             --exclude "*.map"
 
           echo "CDN: ${ENDPOINT}/v${VERSION}/loader/index.js"
+
+  deploy-npm:
+    needs: [test, release-please]
+    if: ${{ always() && !failure() && !cancelled() && (needs.release-please.outputs.releases_created == 'true' || inputs.force_deploy == true) && (github.event_name == 'push' || inputs.deploy_npm == true) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build packages
+        run: pnpm run build
 
       - name: Publish to npm
         run: |
