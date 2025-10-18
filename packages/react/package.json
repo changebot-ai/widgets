@@ -16,7 +16,7 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "@changebot/core": "workspace:*",
+    "@changebot/core": "workspace:^",
     "@stencil/react-output-target": "^1.2.0"
   },
   "devDependencies": {
