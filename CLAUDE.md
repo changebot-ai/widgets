@@ -59,3 +59,12 @@ Tests run in headless shell mode (configured in `stencil.config.ts`). Unit tests
 ## Documentation Style
 
 - Use self-closing syntax for components in documentation (e.g., `<changebot-provider />` not `<changebot-provider></changebot-provider>`)
+
+## Testing-Only Props
+
+The following props are for internal testing purposes only and should **not** be documented in public-facing documentation (README files, NPM docs, etc.):
+
+- `pollInterval` (changebot-provider) - Used for testing automatic polling behavior
+- `url` (changebot-provider) - Custom API endpoint URL for testing purposes
+
+These props should be omitted from all customer-facing documentation.
