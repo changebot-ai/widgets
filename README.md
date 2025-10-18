@@ -268,6 +268,302 @@ await drawer.setUpdates([
 <changebot-provider url="https://your-api.com/updates" poll-interval="30"> </changebot-provider>
 ```
 
+### Using with React
+
+Install the React wrapper:
+
+```bash
+npm install @changebot/widgets-react
+```
+
+Then use the components in your React app:
+
+```tsx
+import { ChangebotProvider, ChangebotBadge, ChangebotPanel } from '@changebot/widgets-react';
+
+function App() {
+  return (
+    <div>
+      <ChangebotProvider slug="your-slug" />
+
+      <header>
+        <h1>My App</h1>
+        <ChangebotBadge theme="nord" />
+      </header>
+
+      <ChangebotPanel mode="drawer-right" light="catppuccin-latte" dark="catppuccin-mocha" />
+    </div>
+  );
+}
+```
+
+### Using with Vue
+
+Install the Vue wrapper:
+
+```bash
+npm install @changebot/widgets-vue
+```
+
+Then use the components in your Vue app:
+
+```vue
+<template>
+  <div>
+    <changebot-provider slug="your-slug" :poll-interval="60" />
+
+    <header>
+      <h1>My App</h1>
+      <changebot-badge theme="nord" />
+    </header>
+
+    <changebot-panel mode="drawer-right" light="catppuccin-latte" dark="catppuccin-mocha" />
+  </div>
+</template>
+
+<script setup>
+import { ChangebotProvider, ChangebotBadge, ChangebotPanel } from '@changebot/widgets-vue';
+</script>
+```
+
+## API Reference
+
+### changebot-provider
+
+Required component that manages state and API calls.
+
+| Prop            | Type   | Default     | Description                                                   |
+| --------------- | ------ | ----------- | ------------------------------------------------------------- |
+| `slug`          | string | -           | Your Changebot product slug (either `slug` or `url` required) |
+| `url`           | string | -           | Custom API URL (either `slug` or `url` required)              |
+| `scope`         | string | `"default"` | Scope for multiple providers                                  |
+| `poll-interval` | number | -           | Polling interval in seconds (minimum 1)                       |
+
+**Events:**
+
+- Listens to `changebot:context-request` - Provides services to child components
+- Listens to `changebot:action` - Handles actions dispatched by other components
+
+### changebot-badge
+
+Badge that displays the count of new updates.
+
+| Prop         | Type    | Default     | Description                                         |
+| ------------ | ------- | ----------- | --------------------------------------------------- |
+| `scope`      | string  | `"default"` | Connect to matching provider                        |
+| `theme`      | string  | -           | Fixed theme name (see themes below)                 |
+| `light`      | string  | -           | Theme for light mode                                |
+| `dark`       | string  | -           | Theme for dark mode                                 |
+| `show-count` | boolean | `true`      | Show number or just dot                             |
+| `count`      | number  | -           | Manual count override (for testing/standalone mode) |
+
+**Events:**
+
+- Dispatches `changebot:context-request` - Requests services from provider
+- Dispatches `changebot:action` - Opens the panel when clicked
+- Listens to `changebot:lastViewed` - Updates count when panel is viewed
+
+**Methods:**
+
+- None (interaction via click)
+
+**Behavior:**
+
+- Automatically calculates new updates based on `localStorage` timestamp
+- Clicking clears the badge and opens the panel
+- Supports keyboard navigation (Enter/Space)
+
+### changebot-panel
+
+Drawer/modal that displays the list of updates.
+
+| Prop    | Type   | Default          | Description                                             |
+| ------- | ------ | ---------------- | ------------------------------------------------------- |
+| `scope` | string | `"default"`      | Connect to matching provider                            |
+| `theme` | string | -                | Fixed theme name                                        |
+| `light` | string | -                | Theme for light mode                                    |
+| `dark`  | string | -                | Theme for dark mode                                     |
+| `mode`  | string | `"drawer-right"` | Display mode: `drawer-right`, `drawer-left`, or `modal` |
+
+**Methods:**
+
+- `open()` - Open the panel programmatically
+- `close()` - Close the panel programmatically
+- `setUpdates(updates)` - Set updates manually (for standalone mode)
+
+**Events:**
+
+- Dispatches `changebot:context-request` - Requests services from provider
+- Dispatches `changebot:action` - Closes panel via action system
+- Dispatches `changebot:lastViewed` - Notifies when panel is viewed
+- Emits `changebot-last-viewed` - Stencil event for backward compatibility
+
+**Behavior:**
+
+- Automatically marks updates as viewed when opened
+- Supports keyboard navigation (Escape to close, Tab for focus trap in modal mode)
+- Clicking backdrop closes the panel
+- Displays widget metadata (title, subheading) from API
+
+## CSS Customization
+
+### Badge CSS Variables
+
+Override these CSS variables to customize the badge appearance:
+
+```css
+changebot-badge {
+  /* Colors */
+  --cb-badge-bg: #ff4444; /* Background color */
+  --cb-badge-text: white; /* Text/icon color */
+  --cb-badge-shadow: rgba(0, 0, 0, 0.15); /* Box shadow color */
+  --cb-badge-pulse: rgba(255, 68, 68, 0.7); /* Pulse animation color */
+  --cb-badge-hover-mix: black; /* Color to mix on hover */
+  --cb-badge-ripple: rgba(255, 255, 255, 0.3); /* Click ripple color */
+
+  /* Sizing */
+  --badge-size: 20px; /* Badge height and min-width */
+  --badge-font-size: 11px; /* Font size for count */
+  --badge-animation-duration: 0.3s; /* Animation duration */
+}
+```
+
+### Panel CSS Variables
+
+Override these CSS variables to customize the panel appearance:
+
+```css
+changebot-panel {
+  /* Background & Surfaces */
+  --cb-panel-bg: #ffffff; /* Main background */
+  --cb-panel-surface: #f9fafb; /* Update card background */
+  --cb-panel-border: #e5e7eb; /* Border color */
+
+  /* Text Colors */
+  --cb-panel-text: #111827; /* Primary text */
+  --cb-panel-text-muted: #6b7280; /* Secondary text */
+
+  /* Interactive Elements */
+  --cb-panel-hover: #f3f4f6; /* Hover background */
+  --cb-panel-link: #3b82f6; /* Link color */
+  --cb-panel-focus: #3b82f6; /* Focus outline color */
+
+  /* Accent Colors */
+  --cb-panel-accent: #3b82f6; /* Accent color (titles) */
+  --cb-panel-meta: #6b7280; /* Metadata color (dates) */
+  --cb-panel-subtle: #3b82f6; /* Subtle accents */
+
+  /* Effects */
+  --cb-panel-shadow: rgba(0, 0, 0, 0.1); /* Shadow color */
+  --cb-backdrop: rgba(0, 0, 0, 0.5); /* Backdrop overlay color */
+}
+```
+
+## Events & Communication
+
+### Custom Event System
+
+Components communicate using a custom event system. You can hook into these events:
+
+#### `changebot:action`
+
+Dispatch actions to control components:
+
+```javascript
+// Open the panel
+document.dispatchEvent(
+  new CustomEvent('changebot:action', {
+    detail: {
+      type: 'openDisplay',
+      scope: 'default', // Match your provider scope
+    },
+    bubbles: true,
+    composed: true,
+  }),
+);
+
+// Close the panel
+document.dispatchEvent(
+  new CustomEvent('changebot:action', {
+    detail: {
+      type: 'closeDisplay',
+      scope: 'default',
+    },
+    bubbles: true,
+    composed: true,
+  }),
+);
+```
+
+#### `changebot:lastViewed`
+
+Listen for when the panel is viewed:
+
+```javascript
+document.addEventListener('changebot:lastViewed', event => {
+  console.log('Panel viewed for scope:', event.detail.scope);
+  // Badge will automatically update
+});
+```
+
+#### `changebot:context-request`
+
+Internal event used by components to request services from the provider. Typically not used in application code.
+
+## Accessibility Features
+
+The widgets are built with accessibility in mind:
+
+### Keyboard Navigation
+
+- **Badge**: Focusable with Tab, activatable with Enter or Space
+- **Panel**:
+  - Close with Escape key
+  - Focus trap in modal mode (Tab cycles through focusable elements)
+  - Auto-focus on first element when opened
+
+### Screen Reader Support
+
+- **Badge**:
+  - `role="status"` with `aria-live="polite"` for count announcements
+  - Dynamic `aria-label` describing update count
+  - Proper button semantics
+
+- **Panel**:
+  - `role="dialog"` with appropriate `aria-modal` attribute
+  - `aria-label` for panel title
+  - Live region announces update count when opened
+  - Visually hidden text for screen reader announcements
+
+### Focus Management
+
+- Visible focus indicators on all interactive elements
+- Focus returns to trigger element when panel closes
+- No focus trap in drawer modes (allows page navigation)
+- Focus trap in modal mode (prevents interaction with page)
+
+### Motion & Contrast
+
+- Respects `prefers-reduced-motion` - disables animations
+- Respects `prefers-contrast: high` - adds borders for clarity
+- All themes meet WCAG contrast requirements
+- Dynamic contrast calculation for tag colors
+
+### localStorage Tracking
+
+Updates are tracked as "viewed" using localStorage:
+
+```javascript
+// Key format
+const key = `changebot:lastViewed:${scope}`;
+
+// Value is timestamp in milliseconds
+localStorage.setItem(key, Date.now().toString());
+
+// Badge automatically calculates new updates by comparing
+// update timestamps with this value
+```
+
 ## Development
 
 ```bash
