@@ -24,7 +24,7 @@ Load directly from CDN - no build step required:
   <head>
     <title>My App</title>
     <!-- Module scripts are deferred by default and won't block rendering -->
-    <script type="module" src="https://widgets.changebot.ai/widgets/latest/loader/index.js"></script>
+    <script type="module" src="https://widgets.changebot.ai/latest.js"></script>
   </head>
   <body>
     <changebot-provider slug="your-slug" />
@@ -43,7 +43,7 @@ Load directly from CDN - no build step required:
 For production, pin to a specific version:
 
 ```html
-<script type="module" src="https://widgets.changebot.ai/widgets/latest/loader/index.js"></script>
+<script type="module" src="https://widgets.changebot.ai/v0.0.2.js"></script>
 ```
 
 ### Option 2: npm (For bundled apps)

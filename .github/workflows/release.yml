@@ -109,6 +109,14 @@ jobs:
             --cache-control "public, max-age=31536000, immutable" \
             --exclude "*.map"
 
+          # Copy loader to shorter URL: /v{version}.js
+          aws s3 cp packages/core/loader/index.js "s3://${BUCKET}/v${VERSION}.js" \
+            --endpoint-url "${ENDPOINT}" \
+            --region auto \
+            --acl public-read \
+            --cache-control "public, max-age=31536000, immutable" \
+            --content-type "application/javascript"
+
           # Update 'latest' symlink
           aws s3 sync packages/core/dist/esm/ "s3://${BUCKET}/latest/dist/esm/" \
             --endpoint-url "${ENDPOINT}" \
@@ -126,7 +134,17 @@ jobs:
             --delete \
             --exclude "*.map"
 
-          echo "CDN: ${ENDPOINT}/v${VERSION}/loader/index.js"
+          # Copy loader to shorter URL: /latest.js
+          aws s3 cp packages/core/loader/index.js "s3://${BUCKET}/latest.js" \
+            --endpoint-url "${ENDPOINT}" \
+            --region auto \
+            --acl public-read \
+            --cache-control "public, max-age=300" \
+            --content-type "application/javascript"
+
+          echo "CDN URLs:"
+          echo "  Latest: ${ENDPOINT}/latest.js"
+          echo "  Versioned: ${ENDPOINT}/v${VERSION}.js"
 
   deploy-npm:
     needs: [test, release-please]
