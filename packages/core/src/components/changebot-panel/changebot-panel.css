@@ -94,6 +94,7 @@
 
 .panel--closed {
   pointer-events: none;
+  box-shadow: none;
 }
 
 /* Header */
