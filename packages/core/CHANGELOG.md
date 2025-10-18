@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.5](https://github.com/changebot-ai/widgets/compare/core-v0.0.4...core-v0.0.5) (2025-10-18)
+
+
+### Features
+
+* Add "Powered by Changebot" footer to panel ([b611d3e](https://github.com/changebot-ai/widgets/commit/b611d3ebcef3f0279e45cc6465b792da900e000c))
+
+
+### Bug Fixes
+
+* Update API endpoint to use api subdomain ([a8c68d2](https://github.com/changebot-ai/widgets/commit/a8c68d2b7ac4b5b284d604a95a24f099a778ef58))
+
 ## [0.0.3](https://github.com/changebot-ai/widgets/compare/core-v0.0.2...core-v0.0.3) (2025-10-18)
 
 
