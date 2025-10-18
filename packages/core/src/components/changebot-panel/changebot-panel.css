@@ -399,6 +399,93 @@
   background-color: var(--cb-panel-text);
 }
 
+/* Footer with Powered by Changebot */
+.panel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--cb-panel-border);
+  flex-shrink: 0;
+  background-color: var(--cb-panel-bg);
+}
+
+.powered-by-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  color: var(--cb-panel-text-muted);
+  text-decoration: none;
+  border-radius: 6px;
+  transition: color 0.2s ease, background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.powered-by-link:hover {
+  color: var(--cb-panel-text);
+  background-color: var(--cb-panel-hover);
+}
+
+.powered-by-link:focus-visible {
+  outline: 2px solid var(--cb-panel-focus);
+  outline-offset: 2px;
+}
+
+.powered-by-text {
+  font-weight: 500;
+}
+
+.powered-by-brand {
+  font-weight: 600;
+}
+
+/* Hover tooltip */
+.powered-by-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(0.5rem);
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--cb-panel-surface);
+  border: 1px solid var(--cb-panel-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px var(--cb-panel-shadow);
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+}
+
+.powered-by-link:hover .powered-by-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.tooltip-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--cb-panel-text);
+}
+
+/* Tooltip arrow (small triangle pointing down) */
+.tooltip-arrow {
+  position: absolute;
+  bottom: -0.25rem;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: var(--cb-panel-surface);
+  border-right: 1px solid var(--cb-panel-border);
+  border-bottom: 1px solid var(--cb-panel-border);
+}
+
 /* Catppuccin theme variations */
 .theme--catppuccin-latte {
   --cb-panel-bg: #eff1f5;
@@ -654,6 +741,11 @@
   .update-item {
     padding: 1rem;
   }
+
+  /* Hide footer on mobile */
+  .panel-footer {
+    display: none;
+  }
 }
 
 /* Reduced motion support */
@@ -661,7 +753,9 @@
   .panel,
   .backdrop,
   .close-button,
-  .update-item {
+  .update-item,
+  .powered-by-link,
+  .powered-by-tooltip {
     transition: none;
     animation: none;
   }
