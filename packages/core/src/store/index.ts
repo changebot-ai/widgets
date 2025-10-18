@@ -160,7 +160,7 @@ export function createScopedStore() {
       try {
         let apiUrl: string;
         if (slug) {
-          apiUrl = `https://app.changebot.ai/api/v1/widgets/${slug}/updates`;
+          apiUrl = `https://api.changebot.ai/v1/widgets/${slug}/updates`;
         } else if (url) {
           apiUrl = url;
         } else {
@@ -277,7 +277,7 @@ export const actions: StoreActions & { loadUpdates: (slug?: string, url?: string
     try {
       let apiUrl: string;
       if (slug) {
-        apiUrl = `https://app.changebot.ai/api/v1/widgets/${slug}/updates`;
+        apiUrl = `https://api.changebot.ai/v1/widgets/${slug}/updates`;
       } else if (url) {
         apiUrl = url;
       } else {

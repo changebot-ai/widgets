@@ -285,7 +285,7 @@ describe('changebot-provider', () => {
 
       // Verify fetch was called with the correct URL
       expect(fetchMock).toHaveBeenCalledWith(
-        'https://app.changebot.ai/api/v1/widgets/test-team/updates',
+        'https://api.changebot.ai/v1/widgets/test-team/updates',
         expect.objectContaining({
           method: 'GET',
           headers: { 'Accept': 'application/json' }
