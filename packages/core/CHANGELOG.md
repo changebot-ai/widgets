@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3](https://github.com/changebot-ai/widgets/compare/core-v0.0.2...core-v0.0.3) (2025-10-18)
+
+
+### Bug Fixes
+
+* Add component exports to @changebot/core package ([2ce0550](https://github.com/changebot-ai/widgets/commit/2ce0550a23bd272421442e2ad724a382e2fc489a))
+
 ## [0.0.2](https://github.com/changebot-ai/widgets/compare/core-v0.0.1...core-v0.0.2) (2025-10-17)
 
 
