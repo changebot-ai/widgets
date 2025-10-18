@@ -42,7 +42,7 @@ importers:
   packages/react:
     dependencies:
       '@changebot/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
       '@stencil/react-output-target':
         specifier: ^1.2.0
@@ -67,7 +67,7 @@ importers:
   packages/vue:
     dependencies:
       '@changebot/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
       '@stencil/vue-output-target':
         specifier: ^0.11.8
