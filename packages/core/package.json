@@ -13,6 +13,30 @@
       "import": "./dist/widgets/widgets.esm.js",
       "require": "./dist/widgets/widgets.cjs.js"
     },
+    "./dist/components/changebot-badge.js": {
+      "import": "./dist/components/changebot-badge.js",
+      "types": "./dist/components/changebot-badge.d.ts"
+    },
+    "./dist/components/changebot-banner.js": {
+      "import": "./dist/components/changebot-banner.js",
+      "types": "./dist/components/changebot-banner.d.ts"
+    },
+    "./dist/components/changebot-panel.js": {
+      "import": "./dist/components/changebot-panel.js",
+      "types": "./dist/components/changebot-panel.d.ts"
+    },
+    "./dist/components/changebot-provider.js": {
+      "import": "./dist/components/changebot-provider.js",
+      "types": "./dist/components/changebot-provider.d.ts"
+    },
+    "./dist/components/changebot-toast.js": {
+      "import": "./dist/components/changebot-toast.js",
+      "types": "./dist/components/changebot-toast.d.ts"
+    },
+    "./dist/components/my-component.js": {
+      "import": "./dist/components/my-component.js",
+      "types": "./dist/components/my-component.d.ts"
+    },
     "./my-component": {
       "import": "./dist/components/my-component.js",
       "types": "./dist/components/my-component.d.ts"
