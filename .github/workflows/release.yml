@@ -94,8 +94,8 @@ jobs:
 
           echo "Deploying version ${VERSION} to CDN..."
 
-          # Deploy versioned release
-          aws s3 sync packages/core/dist/ "s3://${BUCKET}/v${VERSION}/dist/" \
+          # Deploy versioned release - only ESM modules needed for lazy loading
+          aws s3 sync packages/core/dist/esm/ "s3://${BUCKET}/v${VERSION}/dist/esm/" \
             --endpoint-url "${ENDPOINT}" \
             --region auto \
             --acl public-read \
@@ -110,7 +110,7 @@ jobs:
             --exclude "*.map"
 
           # Update 'latest' symlink
-          aws s3 sync packages/core/dist/ "s3://${BUCKET}/latest/dist/" \
+          aws s3 sync packages/core/dist/esm/ "s3://${BUCKET}/latest/dist/esm/" \
             --endpoint-url "${ENDPOINT}" \
             --region auto \
             --acl public-read \
