@@ -732,3 +732,87 @@ npm test
 # Generate new component
 npm run generate
 ```
+
+## Release Process
+
+This monorepo contains three packages that should be kept in sync:
+- `@changebot/core` (packages/core)
+- `@changebot/widgets-react` (packages/react)
+- `@changebot/widgets-vue` (packages/vue)
+
+### Tagging and Releasing
+
+Follow these steps to create a new release:
+
+#### 1. Bump Package Versions
+
+Update the version in all three package.json files to keep them in sync:
+
+```bash
+# Edit packages/core/package.json
+# Edit packages/react/package.json
+# Edit packages/vue/package.json
+```
+
+#### 2. Commit the Version Bumps
+
+**IMPORTANT**: You must commit the version changes BEFORE creating tags.
+
+```bash
+git add packages/*/package.json
+git commit -m "chore: Bump all packages to vX.X.X"
+```
+
+#### 3. Create Tags on the New Commit
+
+After committing, create tags for all three packages:
+
+```bash
+git tag core-vX.X.X
+git tag widgets-react-vX.X.X
+git tag widgets-vue-vX.X.X
+```
+
+**Note**: Tags must be created AFTER the commit so they point to the correct SHA with updated package.json files.
+
+#### 4. Push Commit and Tags
+
+Push both the commit and tags to origin:
+
+```bash
+git push origin main
+git push origin core-vX.X.X widgets-react-vX.X.X widgets-vue-vX.X.X
+```
+
+#### 5. Create GitHub Releases
+
+Create GitHub releases for each tag using the `gh` CLI:
+
+```bash
+gh release create core-vX.X.X \
+  --title "core vX.X.X" \
+  --notes "Release of @changebot/core vX.X.X"
+
+gh release create widgets-react-vX.X.X \
+  --title "widgets-react vX.X.X" \
+  --notes "Release of @changebot/widgets-react vX.X.X"
+
+gh release create widgets-vue-vX.X.X \
+  --title "widgets-vue vX.X.X" \
+  --notes "Release of @changebot/widgets-vue vX.X.X"
+```
+
+### Common Mistakes to Avoid
+
+- **Creating tags before committing**: Tags must point to the commit with updated package.json files
+- **Forgetting to bump all packages**: Keep versions in sync across core, react, and vue packages
+- **Not pushing the commit**: Both the commit and tags need to be pushed to trigger CI/CD
+
+### Verifying the Release
+
+After pushing tags, GitHub Actions workflows will automatically:
+1. Build the packages
+2. Publish to npm
+3. Update the CDN
+
+Check the Actions tab in GitHub to monitor the deployment progress.
