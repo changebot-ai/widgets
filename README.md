@@ -14,29 +14,50 @@ Web components for displaying product updates from Changebot.
 
 ## Installation
 
-```bash
-npm install @changebot/widgets
-```
+### Option 1: CDN (Recommended for quick setup)
 
-## Basic Usage
+Load directly from CDN - no build step required:
 
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-  <script type="module" src="path/to/widgets.esm.js"></script>
-</head>
-<body>
-  <!-- Provider manages state -->
-  <changebot-provider slug="your-team"></changebot-provider>
+  <head>
+    <title>My App</title>
+    <!-- Module scripts are deferred by default and won't block rendering -->
+    <script type="module" src="https://widgets.changebot.ai/widgets/latest/loader/index.js"></script>
+  </head>
+  <body>
+    <changebot-provider slug="your-slug" />
 
-  <!-- Badge shows update count -->
-  <changebot-badge></changebot-badge>
+    <!-- Your app content -->
 
-  <!-- Drawer displays updates (hidden until opened) -->
-  <changebot-panel mode="drawer-right"></changebot-panel>
-</body>
+    <!-- Badge shows update count -->
+    <changebot-badge />
+
+    <!-- Drawer displays updates (hidden until opened) -->
+    <changebot-panel mode="drawer-right" />
+  </body>
 </html>
+```
+
+For production, pin to a specific version:
+
+```html
+<script type="module" src="https://widgets.changebot.ai/widgets/latest/loader/index.js"></script>
+```
+
+### Option 2: npm (For bundled apps)
+
+```bash
+npm install @changebot/core
+```
+
+Then import in your JavaScript:
+
+```javascript
+import { defineCustomElements } from '@changebot/core/loader';
+
+defineCustomElements();
 ```
 
 ## Components
@@ -46,16 +67,14 @@ npm install @changebot/widgets
 Required component that manages state and API calls.
 
 **Props:**
+
 - `slug` (string, optional) - Your Changebot product slug (either `slug` or `url` required)
 - `url` (string, optional) - Custom API URL (either `slug` or `url` required)
 - `scope` (string, default: "default") - Scope for multiple providers
 - `poll-interval` (number, optional) - Polling interval in seconds
 
 ```html
-<changebot-provider
-  slug="your-team"
-  poll-interval="60">
-</changebot-provider>
+<changebot-provider slug="your-team" poll-interval="60"> </changebot-provider>
 ```
 
 ### changebot-badge
@@ -63,6 +82,7 @@ Required component that manages state and API calls.
 Badge that displays the count of new updates.
 
 **Props:**
+
 - `scope` (string, default: "default") - Connect to matching provider
 - `theme` (string, optional) - Theme name (see themes below)
 - `light` (string, optional) - Theme for light mode
@@ -75,10 +95,7 @@ Badge that displays the count of new updates.
 <changebot-badge theme="cyberpunk"></changebot-badge>
 
 <!-- Auto light/dark switching -->
-<changebot-badge
-  light="catppuccin-latte"
-  dark="catppuccin-mocha">
-</changebot-badge>
+<changebot-badge light="catppuccin-latte" dark="catppuccin-mocha"> </changebot-badge>
 ```
 
 ### changebot-panel
@@ -86,6 +103,7 @@ Badge that displays the count of new updates.
 Drawer/modal that displays the list of updates.
 
 **Props:**
+
 - `scope` (string, default: "default") - Connect to matching provider
 - `theme` (string, optional) - Theme name
 - `light` (string, optional) - Theme for light mode
@@ -96,15 +114,13 @@ Drawer/modal that displays the list of updates.
   - `modal` - Centered overlay
 
 **Methods:**
+
 - `open()` - Open the drawer
 - `close()` - Close the drawer
 - `setUpdates(updates)` - Set updates manually
 
 ```html
-<changebot-panel
-  mode="drawer-right"
-  theme="nord">
-</changebot-panel>
+<changebot-panel mode="drawer-right" theme="nord"> </changebot-panel>
 ```
 
 ## Opening the Drawer from Custom Elements
@@ -120,7 +136,7 @@ You can trigger the drawer from **any element** on your page by dispatching a cu
     const event = new CustomEvent('changebot:action', {
       detail: {
         type: 'openDisplay',
-        scope: 'default',  // Match your provider scope
+        scope: 'default', // Match your provider scope
       },
       bubbles: true,
       composed: true,
@@ -133,16 +149,19 @@ You can trigger the drawer from **any element** on your page by dispatching a cu
 Or inline:
 
 ```html
-<button onclick="document.dispatchEvent(new CustomEvent('changebot:action', {
+<button
+  onclick="document.dispatchEvent(new CustomEvent('changebot:action', {
   detail: { type: 'openDisplay', scope: 'default' },
   bubbles: true,
   composed: true
-}))">
+}))"
+>
   What's New
 </button>
 ```
 
 You can trigger it from anywhere:
+
 - Custom buttons or links
 - Keyboard shortcuts
 - Navigation menu items
@@ -154,16 +173,19 @@ You can trigger it from anywhere:
 ### Built-in Themes
 
 **Catppuccin:**
+
 - `catppuccin-latte` (light)
 - `catppuccin-frappe` (dark)
 - `catppuccin-macchiato` (dark)
 - `catppuccin-mocha` (dark)
 
 **Gruvbox:**
+
 - `gruvbox-light`
 - `gruvbox-dark`
 
 **Other:**
+
 - `dracula`
 - `nord`
 - `solarized-light`
@@ -235,18 +257,15 @@ await drawer.setUpdates([
     description: 'Description here',
     date: new Date().toISOString(),
     timestamp: Date.now(),
-    tags: [{ text: 'Feature', color: '#3b82f6' }]
-  }
+    tags: [{ text: 'Feature', color: '#3b82f6' }],
+  },
 ]);
 ```
 
 ### Custom API Endpoint
 
 ```html
-<changebot-provider
-  url="https://your-api.com/updates"
-  poll-interval="30">
-</changebot-provider>
+<changebot-provider url="https://your-api.com/updates" poll-interval="30"> </changebot-provider>
 ```
 
 ## Development
