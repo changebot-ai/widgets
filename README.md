@@ -71,10 +71,9 @@ Required component that manages state and API calls.
 - `slug` (string, optional) - Your Changebot product slug (either `slug` or `url` required)
 - `url` (string, optional) - Custom API URL (either `slug` or `url` required)
 - `scope` (string, default: "default") - Scope for multiple providers
-- `poll-interval` (number, optional) - Polling interval in seconds
 
 ```html
-<changebot-provider slug="your-team" poll-interval="60"> </changebot-provider>
+<changebot-provider slug="your-team" />
 ```
 
 ### changebot-badge
@@ -92,10 +91,10 @@ Badge that displays the count of new updates.
 
 ```html
 <!-- Fixed theme -->
-<changebot-badge theme="cyberpunk"></changebot-badge>
+<changebot-badge theme="cyberpunk" />
 
 <!-- Auto light/dark switching -->
-<changebot-badge light="catppuccin-latte" dark="catppuccin-mocha"> </changebot-badge>
+<changebot-badge light="catppuccin-latte" dark="catppuccin-mocha" />
 ```
 
 ### changebot-panel
@@ -120,7 +119,72 @@ Drawer/modal that displays the list of updates.
 - `setUpdates(updates)` - Set updates manually
 
 ```html
-<changebot-panel mode="drawer-right" theme="nord"> </changebot-panel>
+<changebot-panel mode="drawer-right" theme="nord" />
+```
+
+### changebot-banner
+
+Top banner notification for highlighting important updates. Automatically displays updates marked with `highlight_target="banner"`.
+
+**Props:**
+
+- `scope` (string, default: "default") - Connect to matching provider
+- `theme` (string, optional) - Theme name
+- `light` (string, optional) - Theme for light mode
+- `dark` (string, optional) - Theme for dark mode
+
+**Methods:**
+
+- `show(update)` - Show the banner with a specific update
+- `dismiss()` - Dismiss the banner
+- `toggle()` - Toggle expanded state
+
+**Behavior:**
+
+- Automatically shows for updates with `highlight_target="banner"`
+- Click to expand and read full content
+- Dismiss button marks update as viewed
+- Shows first sentence by default, expands to show full content
+
+```html
+<changebot-banner theme="nord" />
+```
+
+### changebot-toast
+
+Toast notification for highlighting updates. Automatically displays updates marked with `highlight_target="toast"`.
+
+**Props:**
+
+- `scope` (string, default: "default") - Connect to matching provider
+- `theme` (string, optional) - Theme name
+- `light` (string, optional) - Theme for light mode
+- `dark` (string, optional) - Theme for dark mode
+- `position` (string, default: "bottom-right") - Position on screen:
+  - `top-left`
+  - `top-right`
+  - `bottom-left`
+  - `bottom-right`
+- `auto-dismiss` (number, optional) - Auto-dismiss after N seconds
+
+**Methods:**
+
+- `show(update)` - Show the toast with a specific update
+- `dismiss()` - Dismiss the toast
+
+**Behavior:**
+
+- Automatically shows for updates with `highlight_target="toast"`
+- Optional auto-dismiss after specified seconds
+- Can be manually dismissed with close button
+- Marks update as viewed when dismissed
+
+```html
+<!-- Basic toast -->
+<changebot-toast />
+
+<!-- Positioned toast with auto-dismiss -->
+<changebot-toast position="top-right" auto-dismiss="5" theme="dracula" />
 ```
 
 ## Opening the Drawer from Custom Elements
@@ -265,7 +329,7 @@ await drawer.setUpdates([
 ### Custom API Endpoint
 
 ```html
-<changebot-provider url="https://your-api.com/updates" poll-interval="30"> </changebot-provider>
+<changebot-provider url="https://your-api.com/updates" />
 ```
 
 ### Using with React
@@ -279,7 +343,13 @@ npm install @changebot/widgets-react
 Then use the components in your React app:
 
 ```tsx
-import { ChangebotProvider, ChangebotBadge, ChangebotPanel } from '@changebot/widgets-react';
+import {
+  ChangebotProvider,
+  ChangebotBadge,
+  ChangebotPanel,
+  ChangebotBanner,
+  ChangebotToast,
+} from '@changebot/widgets-react';
 
 function App() {
   return (
@@ -292,6 +362,8 @@ function App() {
       </header>
 
       <ChangebotPanel mode="drawer-right" light="catppuccin-latte" dark="catppuccin-mocha" />
+      <ChangebotBanner theme="nord" />
+      <ChangebotToast position="bottom-right" autoDismiss={5} />
     </div>
   );
 }
@@ -310,7 +382,7 @@ Then use the components in your Vue app:
 ```vue
 <template>
   <div>
-    <changebot-provider slug="your-slug" :poll-interval="60" />
+    <changebot-provider slug="your-slug" />
 
     <header>
       <h1>My App</h1>
@@ -318,11 +390,19 @@ Then use the components in your Vue app:
     </header>
 
     <changebot-panel mode="drawer-right" light="catppuccin-latte" dark="catppuccin-mocha" />
+    <changebot-banner theme="nord" />
+    <changebot-toast position="bottom-right" :auto-dismiss="5" />
   </div>
 </template>
 
 <script setup>
-import { ChangebotProvider, ChangebotBadge, ChangebotPanel } from '@changebot/widgets-vue';
+import {
+  ChangebotProvider,
+  ChangebotBadge,
+  ChangebotPanel,
+  ChangebotBanner,
+  ChangebotToast,
+} from '@changebot/widgets-vue';
 </script>
 ```
 
@@ -332,12 +412,11 @@ import { ChangebotProvider, ChangebotBadge, ChangebotPanel } from '@changebot/wi
 
 Required component that manages state and API calls.
 
-| Prop            | Type   | Default     | Description                                                   |
-| --------------- | ------ | ----------- | ------------------------------------------------------------- |
-| `slug`          | string | -           | Your Changebot product slug (either `slug` or `url` required) |
-| `url`           | string | -           | Custom API URL (either `slug` or `url` required)              |
-| `scope`         | string | `"default"` | Scope for multiple providers                                  |
-| `poll-interval` | number | -           | Polling interval in seconds (minimum 1)                       |
+| Prop    | Type   | Default     | Description                                                   |
+| ------- | ------ | ----------- | ------------------------------------------------------------- |
+| `slug`  | string | -           | Your Changebot product slug (either `slug` or `url` required) |
+| `url`   | string | -           | Custom API URL (either `slug` or `url` required)              |
+| `scope` | string | `"default"` | Scope for multiple providers                                  |
 
 **Events:**
 
@@ -404,6 +483,66 @@ Drawer/modal that displays the list of updates.
 - Supports keyboard navigation (Escape to close, Tab for focus trap in modal mode)
 - Clicking backdrop closes the panel
 - Displays widget metadata (title, subheading) from API
+
+### changebot-banner
+
+Top banner notification for highlighting important updates.
+
+| Prop    | Type   | Default     | Description                      |
+| ------- | ------ | ----------- | -------------------------------- |
+| `scope` | string | `"default"` | Connect to matching provider     |
+| `theme` | string | -           | Fixed theme name                 |
+| `light` | string | -           | Theme for light mode             |
+| `dark`  | string | -           | Theme for dark mode              |
+
+**Methods:**
+
+- `show(update)` - Show the banner with a specific update
+- `dismiss()` - Dismiss the banner
+- `toggle()` - Toggle expanded state
+
+**Events:**
+
+- Dispatches `changebot:context-request` - Requests services from provider
+
+**Behavior:**
+
+- Automatically displays updates with `highlight_target="banner"`
+- Shows first sentence by default, click to expand for full content
+- Dismiss button marks update as viewed in localStorage
+- Only expandable (click expands, but doesn't collapse)
+- Supports keyboard navigation (Enter/Space to expand)
+
+### changebot-toast
+
+Toast notification for highlighting updates.
+
+| Prop           | Type   | Default          | Description                                                                  |
+| -------------- | ------ | ---------------- | ---------------------------------------------------------------------------- |
+| `scope`        | string | `"default"`      | Connect to matching provider                                                 |
+| `theme`        | string | -                | Fixed theme name                                                             |
+| `light`        | string | -                | Theme for light mode                                                         |
+| `dark`         | string | -                | Theme for dark mode                                                          |
+| `position`     | string | `"bottom-right"` | Position: `top-left`, `top-right`, `bottom-left`, or `bottom-right`          |
+| `auto-dismiss` | number | -                | Auto-dismiss after N seconds (automatically hides toast after this duration) |
+
+**Methods:**
+
+- `show(update)` - Show the toast with a specific update
+- `dismiss()` - Dismiss the toast
+
+**Events:**
+
+- Dispatches `changebot:context-request` - Requests services from provider
+
+**Behavior:**
+
+- Automatically displays updates with `highlight_target="toast"`
+- Shows full content in toast notification
+- Dismiss button marks update as viewed in localStorage
+- Optional auto-dismiss clears toast after specified seconds
+- Supports keyboard navigation (Enter/Space to dismiss)
+- Manual dismiss clears auto-dismiss timer if active
 
 ## CSS Customization
 
@@ -521,6 +660,8 @@ The widgets are built with accessibility in mind:
   - Close with Escape key
   - Focus trap in modal mode (Tab cycles through focusable elements)
   - Auto-focus on first element when opened
+- **Banner**: Click or Enter/Space to expand content
+- **Toast**: Enter/Space to dismiss notification
 
 ### Screen Reader Support
 
@@ -534,6 +675,15 @@ The widgets are built with accessibility in mind:
   - `aria-label` for panel title
   - Live region announces update count when opened
   - Visually hidden text for screen reader announcements
+
+- **Banner**:
+  - `role="banner"` with `aria-live="polite"` for announcements
+  - Dynamic `aria-expanded` state
+  - Proper button semantics for interactive areas
+
+- **Toast**:
+  - `role="alert"` with `aria-live="polite"` for important announcements
+  - Dismissible with clear labeling
 
 ### Focus Management
 
