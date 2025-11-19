@@ -9,6 +9,7 @@
 
 | Property       | Attribute       | Description | Type     | Default     |
 | -------------- | --------------- | ----------- | -------- | ----------- |
+| `mockData`     | `mock-data`     |             | `string` | `undefined` |
 | `pollInterval` | `poll-interval` |             | `number` | `undefined` |
 | `scope`        | `scope`         |             | `string` | `'default'` |
 | `slug`         | `slug`          |             | `string` | `undefined` |

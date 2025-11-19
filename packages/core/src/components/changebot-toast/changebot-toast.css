@@ -18,12 +18,12 @@
   --toast-spacing: 16px;
 
   display: block;
-  position: fixed;
-  z-index: 9999;
   pointer-events: none;
 }
 
 .toast {
+  position: fixed;
+  z-index: 9999;
   background-color: var(--cb-toast-bg);
   color: var(--cb-toast-text);
   border: 1px solid var(--cb-toast-border);
@@ -39,25 +39,21 @@
 
 /* Positioning */
 .toast--top-left {
-  position: fixed;
   top: var(--toast-spacing);
   left: var(--toast-spacing);
 }
 
 .toast--top-right {
-  position: fixed;
   top: var(--toast-spacing);
   right: var(--toast-spacing);
 }
 
 .toast--bottom-left {
-  position: fixed;
   bottom: var(--toast-spacing);
   left: var(--toast-spacing);
 }
 
 .toast--bottom-right {
-  position: fixed;
   bottom: var(--toast-spacing);
   right: var(--toast-spacing);
 }
