@@ -573,24 +573,26 @@ export class ChangebotPanel {
           </div>
 
           {/* Footer with Powered by Changebot */}
-          <div class="panel-footer">
-            <a
-              href="https://www.changebot.ai/?utm_source=powered_by&utm_medium=widget&utm_campaign=customer_widget"
-              class="powered-by-link"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Powered by Changebot - Create your own changelog"
-            >
-              <span class="powered-by-text">Powered by</span>
-              <span class="powered-by-brand">Changebot</span>
+          {this.widget?.branded !== false && (
+            <div class="panel-footer">
+              <a
+                href="https://www.changebot.ai/?utm_source=powered_by&utm_medium=widget&utm_campaign=customer_widget"
+                class="powered-by-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Powered by Changebot - Create your own changelog"
+              >
+                <span class="powered-by-text">Powered by</span>
+                <span class="powered-by-brand">Changebot</span>
 
-              {/* Hover tooltip */}
-              <span class="powered-by-tooltip" aria-hidden="true">
-                <span class="tooltip-text">Create yours!</span>
-                <span class="tooltip-arrow"></span>
-              </span>
-            </a>
-          </div>
+                {/* Hover tooltip */}
+                <span class="powered-by-tooltip" aria-hidden="true">
+                  <span class="tooltip-text">Create yours!</span>
+                  <span class="tooltip-arrow"></span>
+                </span>
+              </a>
+            </div>
+          )}
 
           {/* ARIA live region for announcements */}
           <div class="visually-hidden" aria-live="polite" aria-atomic="true">

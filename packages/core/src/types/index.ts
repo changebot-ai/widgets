@@ -20,6 +20,7 @@ export interface Widget {
   title: string;
   subheading: string | null;
   slug: string;
+  branded: boolean;
 }
 
 export interface StoreState {

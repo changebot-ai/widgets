@@ -206,7 +206,8 @@ export function createScopedStore() {
           store.state.widget = {
             title: data.widget.title || 'Updates',
             subheading: data.widget.subheading || null,
-            slug: data.widget.slug || ''
+            slug: data.widget.slug || '',
+            branded: data.widget.branded !== false // Default to true if not provided
           };
         }
 
@@ -255,7 +256,8 @@ export function createScopedStore() {
           store.state.widget = {
             title: data.widget.title || 'Updates',
             subheading: data.widget.subheading || null,
-            slug: data.widget.slug || ''
+            slug: data.widget.slug || '',
+            branded: data.widget.branded !== false // Default to true if not provided
           };
         }
 
@@ -431,7 +433,8 @@ export const actions: StoreActions & { loadUpdates: (slug?: string, url?: string
         updatesStore.state.widget = {
           title: data.widget.title || 'Updates',
           subheading: data.widget.subheading || null,
-          slug: data.widget.slug || ''
+          slug: data.widget.slug || '',
+          branded: data.widget.branded !== false // Default to true if not provided
         };
       }
 
