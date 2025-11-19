@@ -632,9 +632,22 @@
       document.dispatchEvent(event);
     }
 
-    // Show toast notification (no longer needed - toasts show automatically)
-    function showToast() {
-      alert('Toast notifications now show automatically based on highlight_target="toast"');
+    // Show toast notification - trigger a test toast
+    async function showToast() {
+      const toastElement = document.querySelector('changebot-toast');
+      if (toastElement) {
+        await toastElement.show({
+          id: 999,
+          title: 'Test Toast Notification',
+          content: '<p>This is a test toast notification triggered manually for demo purposes!</p>',
+          display_date: new Date().toISOString().split('T')[0],
+          published_at: new Date().toISOString(),
+          expires_on: null,
+          highlight_target: 'toast',
+          hosted_url: null,
+          tags: [{ id: 999, name: 'Test', color: '#667eea' }]
+        });
+      }
     }
 
     // Show banner (no longer needed - banners show automatically)
