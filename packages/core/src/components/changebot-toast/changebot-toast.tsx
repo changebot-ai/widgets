@@ -21,11 +21,20 @@ export class ChangebotToast {
   @State() currentUpdate?: Update;
   @State() activeTheme?: Theme;
 
+  @Watch('isVisible')
+  onVisibilityChange() {
+    if (this.isVisible) {
+      // Update container bounds when toast becomes visible
+      this.updateContainerBounds();
+    }
+  }
+
   private services: any;
   private unsubscribeUpdates?: () => void;
   private mediaQuery?: MediaQueryList;
   private mediaQueryListener?: (e: MediaQueryListEvent) => void;
   private autoDismissTimer?: NodeJS.Timeout;
+  private resizeObserver?: ResizeObserver;
 
   @Watch('theme')
   @Watch('light')
@@ -67,6 +76,12 @@ export class ChangebotToast {
     );
   }
 
+  componentDidLoad() {
+    // Set up container bounds tracking
+    this.updateContainerBounds();
+    this.setupContainerTracking();
+  }
+
   disconnectedCallback() {
     if (this.unsubscribeUpdates) {
       this.unsubscribeUpdates();
@@ -77,6 +92,12 @@ export class ChangebotToast {
     if (this.autoDismissTimer) {
       clearTimeout(this.autoDismissTimer);
     }
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+    // Clean up window event listeners
+    window.removeEventListener('resize', this.updateContainerBounds);
+    window.removeEventListener('scroll', this.updateContainerBounds);
   }
 
   private setupTheme() {
@@ -257,6 +278,43 @@ export class ChangebotToast {
       default:
         return 'toast--bottom-right';
     }
+  }
+
+  private updateContainerBounds = () => {
+    // Get the parent element (container) of the toast component
+    const container = this.el.parentElement;
+    if (!container) return;
+
+    // Get the bounding rect of the container
+    const rect = container.getBoundingClientRect();
+
+    // Calculate offsets more clearly
+    const leftOffset = rect.left;
+    const rightOffset = window.innerWidth - rect.right;
+    const topOffset = rect.top;
+
+    // Set CSS custom properties on the host element
+    // These will be inherited by the shadow DOM and can be used in CSS
+    (this.el as HTMLElement).style.setProperty('--toast-container-left', `${leftOffset}px`);
+    (this.el as HTMLElement).style.setProperty('--toast-container-right-offset', `${rightOffset}px`);
+    (this.el as HTMLElement).style.setProperty('--toast-container-top', `${topOffset}px`);
+  };
+
+  private setupContainerTracking() {
+    // Get the parent element (container) of the toast component
+    const container = this.el.parentElement;
+    if (!container) return;
+
+    // Use ResizeObserver to track container size changes
+    this.resizeObserver = new ResizeObserver(() => {
+      this.updateContainerBounds();
+    });
+
+    this.resizeObserver.observe(container);
+
+    // Also update on window resize (for viewport changes)
+    window.addEventListener('resize', this.updateContainerBounds);
+    window.addEventListener('scroll', this.updateContainerBounds);
   }
 
   render() {

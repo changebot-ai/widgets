@@ -37,25 +37,25 @@
   animation: toast-slide-in var(--toast-animation-duration) cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Positioning */
+/* Positioning - uses custom properties set by JS for container-aware positioning */
 .toast--top-left {
-  top: var(--toast-spacing);
-  left: var(--toast-spacing);
+  top: calc(var(--toast-container-top, 0px) + var(--toast-spacing));
+  left: calc(var(--toast-container-left, 0px) + var(--toast-spacing));
 }
 
 .toast--top-right {
-  top: var(--toast-spacing);
-  right: var(--toast-spacing);
+  top: calc(var(--toast-container-top, 0px) + var(--toast-spacing));
+  right: calc(var(--toast-container-right-offset, 0px) + var(--toast-spacing));
 }
 
 .toast--bottom-left {
   bottom: var(--toast-spacing);
-  left: var(--toast-spacing);
+  left: calc(var(--toast-container-left, 0px) + var(--toast-spacing));
 }
 
 .toast--bottom-right {
   bottom: var(--toast-spacing);
-  right: var(--toast-spacing);
+  right: calc(var(--toast-container-right-offset, 0px) + var(--toast-spacing));
 }
 
 /* Animations */
