@@ -13,6 +13,7 @@ export class ChangebotProvider {
   @Prop() slug?: string;
   @Prop() scope: string = 'default';
   @Prop() pollInterval?: number;
+  @Prop() mockData?: string;
 
   pollTimer?: NodeJS.Timeout;  // Made public for testing
 
@@ -40,8 +41,10 @@ export class ChangebotProvider {
       pollInterval: this.pollInterval,
     };
 
-    // Load initial data if url or slug provided
-    if (this.url || this.slug) {
+    // Load initial data from mockData (for testing/demos) or from API
+    if (this.mockData) {
+      this.loadMockData();
+    } else if (this.url || this.slug) {
       this.loadUpdates();
 
       // Setup polling if interval provided (in seconds, minimum 1 second)
@@ -116,6 +119,15 @@ export class ChangebotProvider {
     } catch (error) {
       console.error('🔌 Provider: Failed to load updates:', error);
       // Store error is already handled in the action
+    }
+  }
+
+  private loadMockData() {
+    try {
+      const data = JSON.parse(this.mockData);
+      this.scopedStore.actions.loadMockUpdates(data);
+    } catch (error) {
+      console.error('🔌 Provider: Failed to parse mock data:', error);
     }
   }
 

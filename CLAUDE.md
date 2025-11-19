@@ -66,5 +66,6 @@ The following props are for internal testing purposes only and should **not** be
 
 - `pollInterval` (changebot-provider) - Used for testing automatic polling behavior
 - `url` (changebot-provider) - Custom API endpoint URL for testing purposes
+- `mockData` (changebot-provider) - JSON string for loading mock data directly (for demos and testing when API is unavailable)
 
 These props should be omitted from all customer-facing documentation.

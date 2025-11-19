@@ -225,6 +225,53 @@ export function createScopedStore() {
       }
     },
 
+    loadMockUpdates(data: any) {
+      store.state.isLoading = true;
+      store.state.error = null;
+
+      try {
+        // API returns {widget: {...}, publications: [...]}
+        let updates = [];
+        if (data.publications && Array.isArray(data.publications)) {
+          // Transform publications to match our Update type
+          updates = data.publications.map((pub: any) => ({
+            ...pub,
+            // Transform tags from string array to object array if needed
+            tags: Array.isArray(pub.tags)
+              ? pub.tags.map((tag: any) =>
+                  typeof tag === 'string'
+                    ? { id: 0, name: tag, color: '#667eea' }
+                    : tag
+                )
+              : []
+          }));
+        } else if (Array.isArray(data)) {
+          // Fallback: if API returns array directly
+          updates = data;
+        }
+
+        // Extract widget metadata
+        if (data.widget) {
+          store.state.widget = {
+            title: data.widget.title || 'Updates',
+            subheading: data.widget.subheading || null,
+            slug: data.widget.slug || ''
+          };
+        }
+
+        store.state.updates = updates;
+        store.state.isLoading = false;
+        store.state.newUpdatesCount = calculateNewUpdatesCount(store.state.updates, store.state.lastViewed);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to load mock updates';
+        store.state.error = errorMessage;
+        store.state.isLoading = false;
+        console.warn('⚠️ Changebot widget: Could not load mock updates.', {
+          error: errorMessage
+        });
+      }
+    },
+
     markViewed(timestamp?: string) {
       const now = timestamp ? new Date(timestamp).getTime() : Date.now();
       store.state.lastViewed = now;

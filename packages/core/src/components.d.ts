@@ -62,6 +62,7 @@ export namespace Components {
         "theme"?: Theme;
     }
     interface ChangebotProvider {
+        "mockData"?: string;
         "pollInterval"?: number;
         /**
           * @default 'default'
@@ -195,6 +196,7 @@ declare namespace LocalJSX {
         "theme"?: Theme;
     }
     interface ChangebotProvider {
+        "mockData"?: string;
         "pollInterval"?: number;
         /**
           * @default 'default'

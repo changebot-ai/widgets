@@ -42,7 +42,8 @@ export const ChangebotProvider: StencilVueComponent<JSX.ChangebotProvider> = /*@
   'url',
   'slug',
   'scope',
-  'pollInterval'
+  'pollInterval',
+  'mockData'
 ]);
 
 
