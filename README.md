@@ -4,7 +4,7 @@ Web components for displaying product updates from Changebot.
 
 ## Features
 
-- 🎨 **15 Built-in Themes** - Catppuccin, Gruvbox, Dracula, Nord, Solarized, Everforest, Tokyo Night, Cyberpunk, Baremetrics, and more
+- 🎨 **15 Built-in Themes** - Catppuccin, Gruvbox, Dracula, Nord, Solarized, Everforest, Tokyo Night, Cyberpunk, Frost, and more
 - 🌓 **Light/Dark Mode** - Automatic theme switching based on system preferences
 - 🎯 **Multiple Display Modes** - Drawer (left/right) or modal
 - 📱 **Fully Responsive** - Works on all screen sizes
@@ -258,7 +258,7 @@ You can trigger it from anywhere:
 - `everforest-dark`
 - `tokyo-night`
 - `cyberpunk`
-- `baremetrics`
+- `frost`
 
 ### Custom Themes
 

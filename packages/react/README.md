@@ -263,7 +263,7 @@ Changebot widgets include 15 beautiful pre-built themes:
 - **Popular**: `dracula`, `nord`, `tokyo-night`, `cyberpunk`
 - **Solarized**: `solarized-light`, `solarized-dark`
 - **Everforest**: `everforest-light`, `everforest-dark`
-- **Modern**: `baremetrics` (clean, professional light theme)
+- **Modern**: `frost` (clean, minimal light theme)
 
 ### Using Themes
 

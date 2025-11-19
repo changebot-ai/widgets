@@ -1,6 +1,6 @@
 /**
  * Color theme palettes
- * Supports: Catppuccin, Gruvbox, Dracula, Nord, Solarized, Everforest, Tokyo Night, Cyberpunk, Baremetrics
+ * Supports: Catppuccin, Gruvbox, Dracula, Nord, Solarized, Everforest, Tokyo Night, Cyberpunk, Frost
  */
 
 // Generic theme palette interface
@@ -297,8 +297,8 @@ export const cyberpunk: ThemePalette = {
   backdrop: 'rgba(10, 0, 20, 0.9)'
 };
 
-// Baremetrics
-export const baremetrics: ThemePalette = {
+// Frost
+export const frost: ThemePalette = {
   bg: '#ffffff',          // clean white
   bgAlt: '#f5f7fa',       // very light gray
   surface: '#ffffff',     // white surface
@@ -337,7 +337,7 @@ export const themes = {
   'everforest-light': everforestLight,
   'tokyo-night': tokyoNight,
   'cyberpunk': cyberpunk,
-  'baremetrics': baremetrics
+  'frost': frost
 } as const;
 
 export type Theme = keyof typeof themes;
