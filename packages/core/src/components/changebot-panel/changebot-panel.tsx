@@ -538,7 +538,7 @@ export class ChangebotPanel {
           aria-hidden={!this.isOpen ? 'true' : 'false'}
         >
           {/* Header */}
-          <div class="panel-header">
+          <div class={`panel-header${!this.widget?.subheading ? ' no-subheading' : ''}`}>
             <div class="panel-header-content">
               <h2 class="panel-title">{this.widget?.title || "What's New"}</h2>
               {this.widget?.subheading && (
