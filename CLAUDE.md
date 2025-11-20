@@ -25,6 +25,27 @@ The project uses `stencil.config.ts` with multiple output targets:
 - `docs-readme` - Auto-generated component documentation
 - `www` - Development server output
 
+### Adding Demo Pages
+
+Demo pages showcase component usage and are served by the development server. To add a new demo page:
+
+1. **Create the HTML file** in `packages/core/src/` (e.g., `my-demo.html`)
+2. **Add to copy configuration** in `packages/core/stencil.config.ts`:
+   ```typescript
+   {
+     type: 'www',
+     copy: [
+       { src: 'dashboard.html' },
+       { src: 'my-demo.html' },  // Add your new file here
+       // ... other files
+     ],
+   }
+   ```
+3. **Link from index.html** by adding a link in `packages/core/src/index.html`
+4. **Restart dev server** - Stop and restart `npm start` to copy the new file to `www/`
+
+Demo pages are copied from `src/` to `www/` during build. The dev server watches `src/` for changes to existing files but requires a restart to detect new files.
+
 ### Component Structure
 
 Components live in `src/components/[component-name]/`:
