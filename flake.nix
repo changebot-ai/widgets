@@ -22,6 +22,7 @@
             nodejs
             nodePackages.pnpm
             chromium
+            awscli2
           ];
 
           shellHook = ''
