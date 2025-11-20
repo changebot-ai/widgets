@@ -64,6 +64,7 @@ jobs:
             --region auto \
             --acl public-read \
             --cache-control "public, max-age=31536000, immutable" \
+            --content-type "application/javascript" \
             --exclude "*.map"
 
           aws s3 sync packages/core/loader/ "s3://${BUCKET}/v${VERSION}/loader/" \
@@ -71,6 +72,7 @@ jobs:
             --region auto \
             --acl public-read \
             --cache-control "public, max-age=31536000, immutable" \
+            --content-type "application/javascript" \
             --exclude "*.map"
 
           # Copy loader to shorter URL: /v{version}.js
@@ -87,6 +89,7 @@ jobs:
             --region auto \
             --acl public-read \
             --cache-control "public, max-age=300" \
+            --content-type "application/javascript" \
             --delete \
             --exclude "*.map"
 
@@ -95,6 +98,7 @@ jobs:
             --region auto \
             --acl public-read \
             --cache-control "public, max-age=300" \
+            --content-type "application/javascript" \
             --delete \
             --exclude "*.map"
 
