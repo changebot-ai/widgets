@@ -19,7 +19,6 @@ export class ChangebotBadge {
   @Prop() count?: number; // For testing and external control
 
   @State() newUpdatesCount: number = 0;
-  @State() isVisible: boolean = false;
   @State() activeTheme?: Theme;
   @State() prefersDark: boolean = false;
 
@@ -32,7 +31,6 @@ export class ChangebotBadge {
   onCountChange(newCount: number) {
     if (newCount !== undefined) {
       this.newUpdatesCount = newCount;
-      this.isVisible = newCount > 0;
     }
   }
 
@@ -54,7 +52,6 @@ export class ChangebotBadge {
     // If count prop is provided, use it directly (for testing)
     if (this.count !== undefined) {
       this.newUpdatesCount = this.count;
-      this.isVisible = this.count > 0;
       return;
     }
 
@@ -165,7 +162,6 @@ export class ChangebotBadge {
         : state.updates.filter(update => new Date(update.published_at).getTime() > lastViewed);
 
     this.newUpdatesCount = newUpdates.length;
-    this.isVisible = this.newUpdatesCount > 0;
 
     console.log(
       `📛 Badge calculated: ${this.newUpdatesCount} new updates (lastViewed: ${lastViewed === 0 ? 'never' : new Date(lastViewed).toLocaleTimeString()}, total updates: ${state.updates.length})`,
@@ -175,7 +171,6 @@ export class ChangebotBadge {
   // Public method to set count for testing
   public setNewUpdatesCount(count: number) {
     this.newUpdatesCount = count;
-    this.isVisible = count > 0;
   }
 
   private getLastViewedTime(): number {
@@ -199,7 +194,6 @@ export class ChangebotBadge {
       } else {
         // If no store (standalone mode or using count prop), just clear the badge
         this.newUpdatesCount = 0;
-        this.isVisible = false;
       }
     }
   }
@@ -214,7 +208,6 @@ export class ChangebotBadge {
 
       // Clear badge immediately
       this.newUpdatesCount = 0;
-      this.isVisible = false;
     }
 
     // Dispatch open action
@@ -251,7 +244,7 @@ export class ChangebotBadge {
   render() {
     const classes = {
       'badge': true,
-      'badge--hidden': !this.isVisible || this.newUpdatesCount === 0,
+      'badge--hidden': this.newUpdatesCount === 0,
       [`theme--${this.activeTheme}`]: !!this.activeTheme,
     };
 
