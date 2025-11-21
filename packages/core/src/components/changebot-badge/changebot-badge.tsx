@@ -64,12 +64,12 @@ export class ChangebotBadge {
         console.log('📛 Badge: Received services from provider', {
           hasStore: !!services?.store,
           hasActions: !!services?.actions,
-          storeState: services?.store?.state
+          storeState: services?.store?.state,
         });
         this.services = services;
         this.subscribeToStore();
       },
-      scope: this.scope || 'default'  // Ensure we always have a scope
+      scope: this.scope || 'default', // Ensure we always have a scope
     };
 
     console.log('📛 Badge: Requesting context with scope:', detail.scope);
@@ -78,8 +78,8 @@ export class ChangebotBadge {
       new CustomEvent('changebot:context-request', {
         bubbles: true,
         composed: true,
-        detail
-      })
+        detail,
+      }),
     );
   }
 
@@ -159,14 +159,17 @@ export class ChangebotBadge {
     const lastViewed = this.getLastViewedTime();
 
     // If no lastViewed (returns 0), ALL updates are new
-    const newUpdates = lastViewed === 0
-      ? state.updates  // All updates are new
-      : state.updates.filter(update => new Date(update.published_at).getTime() > lastViewed);
+    const newUpdates =
+      lastViewed === 0
+        ? state.updates // All updates are new
+        : state.updates.filter(update => new Date(update.published_at).getTime() > lastViewed);
 
     this.newUpdatesCount = newUpdates.length;
     this.isVisible = this.newUpdatesCount > 0;
 
-    console.log(`📛 Badge calculated: ${this.newUpdatesCount} new updates (lastViewed: ${lastViewed === 0 ? 'never' : new Date(lastViewed).toLocaleTimeString()}, total updates: ${state.updates.length})`);
+    console.log(
+      `📛 Badge calculated: ${this.newUpdatesCount} new updates (lastViewed: ${lastViewed === 0 ? 'never' : new Date(lastViewed).toLocaleTimeString()}, total updates: ${state.updates.length})`,
+    );
   }
 
   // Public method to set count for testing
@@ -249,25 +252,16 @@ export class ChangebotBadge {
     const classes = {
       'badge': true,
       'badge--hidden': !this.isVisible || this.newUpdatesCount === 0,
-      [`theme--${this.activeTheme}`]: !!this.activeTheme
+      [`theme--${this.activeTheme}`]: !!this.activeTheme,
     };
 
     const countClasses = {
       'badge__count': true,
-      'badge__count--hidden': !this.showCount && this.newUpdatesCount > 0
+      'badge__count--hidden': !this.showCount && this.newUpdatesCount > 0,
     };
 
     return (
-      <button
-        class={classes}
-        type="button"
-        role="status"
-        aria-label={this.ariaLabel}
-        aria-live="polite"
-        tabindex={0}
-        onClick={this.handleClick}
-        onKeyDown={this.handleKeyDown}
-      >
+      <button class={classes} type="button" role="status" aria-label={this.ariaLabel} aria-live="polite" tabindex={0} onClick={this.handleClick} onKeyDown={this.handleKeyDown}>
         <span class={countClasses}>{this.displayCount}</span>
       </button>
     );
