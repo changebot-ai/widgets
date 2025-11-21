@@ -37,6 +37,7 @@ export const config: Config = {
         { src: 'custom-theme.html' },
         { src: 'toast.html' },
         { src: 'production-demo.html' },
+        { src: 'unpkg-demo.html' },
         { src: 'react-demo.html' },
         { src: 'vue-demo.html' },
       ],
