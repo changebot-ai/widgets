@@ -1,242 +1,234 @@
 <!doctype html>
 <html dir="ltr" lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
-    <title>Production Demo - Badge & Panel</title>
 
-    <!-- Production widget script -->
-    <script type="module" src="https://widgets.changebot.ai/latest/dist/index.js"></script>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+  <title>Production Demo - Badge & Panel</title>
 
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+  <script type="module" src="https://widgets.changebot.ai/latest/widgets.esm.js"></script>
 
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-      }
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-      .container {
-        max-width: 800px;
-        width: 100%;
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        overflow: hidden;
-      }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
 
-      .header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 40px;
-        text-align: center;
-      }
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
 
-      .header h1 {
-        font-size: 32px;
-        font-weight: 700;
-        margin-bottom: 8px;
-      }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
+      text-align: center;
+    }
 
-      .header p {
-        font-size: 16px;
-        opacity: 0.95;
-      }
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
 
-      .content {
-        padding: 40px;
-      }
+    .header p {
+      font-size: 16px;
+      opacity: 0.95;
+    }
 
-      .info-box {
-        background: #e7f3ff;
-        border-left: 4px solid #2196f3;
-        border-radius: 4px;
-        padding: 16px;
-        margin-bottom: 30px;
-      }
+    .content {
+      padding: 40px;
+    }
 
-      .info-box p {
-        margin: 0;
-        color: #1976d2;
-        line-height: 1.6;
-        font-size: 14px;
-      }
+    .info-box {
+      background: #e7f3ff;
+      border-left: 4px solid #2196f3;
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 30px;
+    }
 
-      .demo-section {
-        margin-bottom: 32px;
-      }
+    .info-box p {
+      margin: 0;
+      color: #1976d2;
+      line-height: 1.6;
+      font-size: 14px;
+    }
 
-      .demo-section h2 {
-        font-size: 20px;
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 16px;
-      }
+    .demo-section {
+      margin-bottom: 32px;
+    }
 
-      .demo-section p {
-        color: #666;
-        line-height: 1.6;
-        margin-bottom: 16px;
-      }
+    .demo-section h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 16px;
+    }
 
-      .badge-container {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        padding: 20px;
-        background: #f8f9fa;
-        border-radius: 8px;
-        margin-bottom: 16px;
-      }
+    .demo-section p {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
 
-      .badge-container span {
-        font-size: 16px;
-        color: #333;
-        font-weight: 500;
-      }
+    .badge-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
 
-      .button-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 12px;
-        margin-top: 20px;
-      }
+    .badge-container span {
+      font-size: 16px;
+      color: #333;
+      font-weight: 500;
+    }
 
-      .demo-button {
-        padding: 12px 20px;
-        background: #667eea;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-        transition: all 0.2s;
-      }
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
 
-      .demo-button:hover {
-        background: #5568d3;
-        transform: translateY(-1px);
-      }
+    .demo-button {
+      padding: 12px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
 
-      .demo-button.secondary {
-        background: #48bb78;
-      }
+    .demo-button:hover {
+      background: #5568d3;
+      transform: translateY(-1px);
+    }
 
-      .demo-button.secondary:hover {
-        background: #38a169;
-      }
+    .demo-button.secondary {
+      background: #48bb78;
+    }
 
-      .code-block {
-        background: #1e1e1e;
-        color: #d4d4d4;
-        padding: 16px;
-        border-radius: 8px;
-        font-family: 'Courier New', monospace;
-        font-size: 13px;
-        overflow-x: auto;
-        margin-top: 16px;
-      }
+    .demo-button.secondary:hover {
+      background: #38a169;
+    }
 
-      .back-link {
-        display: inline-block;
-        margin-top: 24px;
-        padding: 8px 16px;
-        color: #667eea;
-        text-decoration: none;
-        border: 2px solid #667eea;
-        border-radius: 8px;
-        transition: all 0.2s;
-        font-weight: 500;
-      }
+    .code-block {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      overflow-x: auto;
+      margin-top: 16px;
+    }
 
-      .back-link:hover {
-        background: #667eea;
-        color: white;
-      }
-    </style>
-  </head>
+    .back-link {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 8px 16px;
+      color: #667eea;
+      text-decoration: none;
+      border: 2px solid #667eea;
+      border-radius: 8px;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
 
-  <body>
-    <!-- Provider with your project ID - Replace 'demo' with your actual project slug -->
-    <changebot-provider project-id="demo"></changebot-provider>
+    .back-link:hover {
+      background: #667eea;
+      color: white;
+    }
+  </style>
+</head>
 
-    <div class="container">
-      <div class="header">
-        <h1>Production Demo</h1>
-        <p>Badge & Panel from CDN</p>
-      </div>
+<body>
+  <!-- Provider with mock data for demo purposes -->
+  <changebot-provider
+    mock-data='{"widget":{"title":"Product Updates","subheading":"Latest features and improvements","slug":"production-demo","branded":false},"publications":[{"id":1,"title":"New Dashboard Features","content":"<p>We have launched several new dashboard features to help you track your metrics more effectively.</p>","display_date":"2025-01-15","published_at":"2025-01-15T10:00:00Z","expires_on":null,"highlight_target":null,"hosted_url":null,"tags":[{"id":1,"name":"Feature","color":"#10b981"}]},{"id":2,"title":"Performance Updates","content":"<p>Loading times improved by 40% through optimization and caching improvements.</p>","display_date":"2025-01-12","published_at":"2025-01-12T14:30:00Z","expires_on":null,"highlight_target":null,"hosted_url":null,"tags":[{"id":2,"name":"Performance","color":"#3b82f6"}]},{"id":3,"title":"Bug Fixes","content":"<p>Fixed several reported issues including form validation and mobile rendering bugs.</p>","display_date":"2025-01-10","published_at":"2025-01-10T09:15:00Z","expires_on":null,"highlight_target":null,"hosted_url":null,"tags":[{"id":3,"name":"Bug Fix","color":"#ef4444"}]}]}'></changebot-provider>
 
-      <div class="content">
-        <div class="info-box">
-          <p><strong>This page loads widgets from production:</strong> https://widgets.changebot.ai/latest.js</p>
-        </div>
-
-        <div class="demo-section">
-          <h2>Badge Component</h2>
-          <p>The badge shows the count of unread updates. Click it to open the panel:</p>
-
-          <div class="badge-container">
-            <span>What's New:</span>
-            <changebot-badge show-count="true"></changebot-badge>
-          </div>
-        </div>
-
-        <div class="demo-section">
-          <h2>Panel Component</h2>
-          <p>The panel displays all your updates in a drawer. Click the button below or the badge above to open it:</p>
-
-          <div class="button-grid">
-            <button class="demo-button" onclick="openPanel()">Open Updates Panel</button>
-            <button class="demo-button secondary" onclick="resetBadge()">Reset Badge Count</button>
-          </div>
-        </div>
-
-        <div class="demo-section">
-          <h2>Implementation</h2>
-          <p>To use these components in your application, add this script tag and the components:</p>
-
-          <div class="code-block">
-            &lt;script type="module" src="https://widgets.changebot.ai/latest.js"&gt;&lt;/script&gt; &lt;changebot-provider
-            project-id="your-project-id"&gt;&lt;/changebot-provider&gt; &lt;changebot-badge show-count="true"&gt;&lt;/changebot-badge&gt; &lt;changebot-panel
-            mode="drawer-right"&gt;&lt;/changebot-panel&gt;
-          </div>
-        </div>
-
-        <a href="/index.html" class="back-link">← Back to Component Demos</a>
-      </div>
+  <div class="container">
+    <div class="header">
+      <h1>Production Demo</h1>
+      <p>Badge & Panel from CDN</p>
     </div>
 
-    <!-- Panel Component -->
-    <changebot-panel mode="drawer-right"></changebot-panel>
+    <div class="content">
+      <div class="info-box">
+        <p><strong>This page loads widgets from production:</strong> https://widgets.changebot.ai/latest.js with mock
+          data for demo purposes.</p>
+      </div>
 
-    <script>
-      // Open panel function
-      function openPanel() {
-        const event = new CustomEvent('changebot:action', {
-          detail: {
-            type: 'openDisplay',
-          },
-          bubbles: true,
-          composed: true,
-        });
-        document.dispatchEvent(event);
-      }
+      <div class="demo-section">
+        <h2>Badge Component</h2>
+        <p>The badge shows the count of unread updates. Click it to open the panel:</p>
 
-      // Reset badge - clear last viewed time so badge appears again
-      function resetBadge() {
-        localStorage.removeItem('changebot:lastViewed:default');
-        location.reload();
-      }
-    </script>
-  </body>
+        <div class="badge-container">
+          <span>What's New:</span>
+          <changebot-badge show-count="true"></changebot-badge>
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h2>Panel Component</h2>
+        <p>The panel displays all your updates in a drawer. Click the button below or the badge above to open it:</p>
+
+        <div class="button-grid">
+          <button class="demo-button" onclick="openPanel()">Open Updates Panel</button>
+          <button class="demo-button secondary" onclick="resetBadge()">Reset Badge Count</button>
+        </div>
+      </div>
+
+      <a href="/index.html" class="back-link">← Back to Component Demos</a>
+    </div>
+  </div>
+
+  <!-- Panel Component -->
+  <changebot-panel mode="drawer-right"></changebot-panel>
+
+  <script>
+    // Open panel function
+    function openPanel() {
+      const event = new CustomEvent('changebot:action', {
+        detail: {
+          type: 'openDisplay',
+        },
+        bubbles: true,
+        composed: true,
+      });
+      document.dispatchEvent(event);
+    }
+
+    // Reset badge - clear last viewed time so badge appears again
+    function resetBadge() {
+      localStorage.removeItem('changebot:lastViewed:default');
+      location.reload();
+    }
+  </script>
+</body>
+
 </html>
