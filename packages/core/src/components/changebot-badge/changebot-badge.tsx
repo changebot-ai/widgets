@@ -54,7 +54,10 @@ export class ChangebotBadge {
     }
 
     // If count prop is provided, use it directly (for testing)
-    this.setCount(this.count);
+    if (this.count !== undefined) {
+      this.setCount(this.count);
+      return;
+    }
 
     // Request context from provider
     const detail = {
