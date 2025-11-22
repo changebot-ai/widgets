@@ -29,8 +29,12 @@ export class ChangebotBadge {
 
   @Watch('count')
   onCountChange(newCount: number) {
-    if (newCount !== undefined) {
-      this.newUpdatesCount = newCount;
+    this.setCount(newCount);
+  }
+
+  private setCount(count: number) {
+    if (count !== undefined) {
+      this.newUpdatesCount = Math.max(0, count);
     }
   }
 
@@ -50,10 +54,7 @@ export class ChangebotBadge {
     }
 
     // If count prop is provided, use it directly (for testing)
-    if (this.count !== undefined) {
-      this.newUpdatesCount = this.count;
-      return;
-    }
+    this.setCount(this.count);
 
     // Request context from provider
     const detail = {
@@ -148,7 +149,7 @@ export class ChangebotBadge {
 
   public calculateNewUpdatesCount(state: StoreState) {
     if (!state.updates) {
-      this.newUpdatesCount = 0;
+      this.setCount(0);
       console.log('📛 Badge: No updates in state yet');
       return;
     }
@@ -161,7 +162,7 @@ export class ChangebotBadge {
         ? state.updates // All updates are new
         : state.updates.filter(update => new Date(update.published_at).getTime() > lastViewed);
 
-    this.newUpdatesCount = newUpdates.length;
+    this.setCount(newUpdates.length);
 
     console.log(
       `📛 Badge calculated: ${this.newUpdatesCount} new updates (lastViewed: ${lastViewed === 0 ? 'never' : new Date(lastViewed).toLocaleTimeString()}, total updates: ${state.updates.length})`,
@@ -193,7 +194,7 @@ export class ChangebotBadge {
         this.calculateNewUpdatesCount(this.services.store.state);
       } else {
         // If no store (standalone mode or using count prop), just clear the badge
-        this.newUpdatesCount = 0;
+        this.setCount(0);
       }
     }
   }
@@ -207,7 +208,7 @@ export class ChangebotBadge {
       localStorage.setItem(key, Date.now().toString());
 
       // Clear badge immediately
-      this.newUpdatesCount = 0;
+      this.setCount(0);
     }
 
     // Dispatch open action
