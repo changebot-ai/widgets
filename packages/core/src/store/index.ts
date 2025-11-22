@@ -47,7 +47,6 @@ export function createWidgetStore(config: StoreConfig) {
     widget: null,
     lastViewed: config.persistLastViewed ? getLastViewed() : null,
     isOpen: false,
-    mode: config.mode || 'drawer-right',
     newUpdatesCount: 0,
     isLoading: false,
     error: null
@@ -104,12 +103,6 @@ export function createWidgetStore(config: StoreConfig) {
       state.isOpen = !state.isOpen;
     },
 
-    setMode(mode: 'modal' | 'drawer-left' | 'drawer-right') {
-      state.mode = mode;
-      // Close any open displays when switching modes
-      state.isOpen = false;
-    },
-
     calculateNewCount() {
       state.newUpdatesCount = calculateNewUpdatesCount(state.updates, state.lastViewed);
     }
@@ -130,7 +123,6 @@ const defaultStore = createStore<StoreState>({
   widget: null,
   lastViewed: getLastViewed(),
   isOpen: false,
-  mode: 'drawer-right',
   newUpdatesCount: 0,
   isLoading: false,
   error: null
@@ -146,7 +138,6 @@ export function createScopedStore() {
     widget: null,
     lastViewed: null,
     isOpen: false,
-    mode: 'drawer-right',
     newUpdatesCount: 0,
     isLoading: false,
     error: null
@@ -190,10 +181,10 @@ export function createScopedStore() {
             // Transform tags from string array to object array if needed
             tags: Array.isArray(pub.tags)
               ? pub.tags.map((tag: any) =>
-                  typeof tag === 'string'
-                    ? { id: 0, name: tag, color: '#667eea' }
-                    : tag
-                )
+                typeof tag === 'string'
+                  ? { id: 0, name: tag, color: '#667eea' }
+                  : tag
+              )
               : []
           }));
         } else if (Array.isArray(data)) {
@@ -240,10 +231,10 @@ export function createScopedStore() {
             // Transform tags from string array to object array if needed
             tags: Array.isArray(pub.tags)
               ? pub.tags.map((tag: any) =>
-                  typeof tag === 'string'
-                    ? { id: 0, name: tag, color: '#667eea' }
-                    : tag
-                )
+                typeof tag === 'string'
+                  ? { id: 0, name: tag, color: '#667eea' }
+                  : tag
+              )
               : []
           }));
         } else if (Array.isArray(data)) {
@@ -296,11 +287,6 @@ export function createScopedStore() {
 
     toggleDisplay() {
       store.state.isOpen = !store.state.isOpen;
-    },
-
-    setMode(mode: 'modal' | 'drawer-left' | 'drawer-right') {
-      store.state.mode = mode;
-      store.state.isOpen = false;
     },
 
     calculateNewCount() {
@@ -417,10 +403,10 @@ export const actions: StoreActions & { loadUpdates: (slug?: string, url?: string
           // Transform tags from string array to object array if needed
           tags: Array.isArray(pub.tags)
             ? pub.tags.map((tag: any) =>
-                typeof tag === 'string'
-                  ? { id: 0, name: tag, color: '#667eea' }
-                  : tag
-              )
+              typeof tag === 'string'
+                ? { id: 0, name: tag, color: '#667eea' }
+                : tag
+            )
             : []
         }));
       } else if (Array.isArray(data)) {
@@ -483,12 +469,6 @@ export const actions: StoreActions & { loadUpdates: (slug?: string, url?: string
 
   toggleDisplay() {
     updatesStore.state.isOpen = !updatesStore.state.isOpen;
-  },
-
-  setMode(mode: 'modal' | 'drawer-left' | 'drawer-right') {
-    updatesStore.state.mode = mode;
-    // Close any open displays when switching modes
-    updatesStore.state.isOpen = false;
   },
 
   calculateNewCount() {

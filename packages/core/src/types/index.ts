@@ -28,7 +28,6 @@ export interface StoreState {
   widget: Widget | null;
   lastViewed: number | null;
   isOpen: boolean;
-  mode: 'modal' | 'drawer-left' | 'drawer-right';
   newUpdatesCount: number;
   isLoading: boolean;
   error: string | null;
@@ -39,7 +38,6 @@ export interface StoreConfig {
   scope?: string;
   fetchOnInit?: boolean;
   persistLastViewed?: boolean;
-  mode?: 'modal' | 'drawer-left' | 'drawer-right';
 }
 
 export interface StoreActions {
@@ -48,7 +46,6 @@ export interface StoreActions {
   openDisplay: () => void;
   closeDisplay: () => void;
   toggleDisplay: () => void;
-  setMode: (mode: 'modal' | 'drawer-left' | 'drawer-right') => void;
   calculateNewCount: () => void;
 }
 
