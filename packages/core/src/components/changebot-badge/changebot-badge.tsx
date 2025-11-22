@@ -269,7 +269,6 @@ declare global {
     theme?: Theme;
     light?: Theme;
     dark?: Theme;
-    position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
     showCount: boolean;
     newUpdatesCount: number;
   }
