@@ -209,11 +209,7 @@ export class ChangebotPanel {
    */
   @Method()
   async open() {
-    this.isOpen = true;
-    this.markAsViewed();
-    if (this.isOpen) {
-      setTimeout(() => this.focusFirstElement(), 100);
-    }
+    dispatchAction(this.el, 'openDisplay', undefined, this.scope);
   }
 
   /**
@@ -221,7 +217,7 @@ export class ChangebotPanel {
    */
   @Method()
   async close() {
-    this.isOpen = false;
+    dispatchAction(this.el, 'closeDisplay', undefined, this.scope);
   }
 
   /**
