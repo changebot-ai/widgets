@@ -54,7 +54,6 @@ export namespace Components {
     }
     interface ChangebotProvider {
         "mockData"?: string;
-        "pollInterval"?: number;
         /**
           * @default 'default'
          */
@@ -172,7 +171,6 @@ declare namespace LocalJSX {
     }
     interface ChangebotProvider {
         "mockData"?: string;
-        "pollInterval"?: number;
         /**
           * @default 'default'
          */

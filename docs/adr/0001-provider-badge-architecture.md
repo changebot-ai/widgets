@@ -1,15 +1,17 @@
 # ADR-0001: Provider-Badge Architecture for Changebot Widgets
 
-**Status:** Accepted
+**Status:** Accepted (partially superseded by ADR-0003)
 **Date:** 2025-09-29
 **Deciders:** Development team
+
+> **Note:** The polling feature described in section 5 has been removed. See ADR-0003 for details.
 
 ## Context
 
 We need to build a widget system that shows users how many new updates are available from a Changebot API. The widget needs to:
 - Be embeddable on any website
 - Track what users have already seen
-- Poll for new updates periodically
+- ~~Poll for new updates periodically~~ (removed - see ADR-0003)
 - Handle multiple independent instances
 - Work without a backend session
 
@@ -86,6 +88,8 @@ if (event.detail.scope === this.scope) {
 - Limited to same origin
 
 #### 5. Pull-based Updates with Optional Polling
+> **⚠️ SUPERSEDED:** This decision has been superseded by ADR-0003. The polling feature has been removed.
+
 **Decision:** Fetch on load, with opt-in polling via `poll-interval` prop
 
 **Rationale:**

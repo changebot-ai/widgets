@@ -1,8 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Basic Usage Example - Changebot Widgets</title>
   <style>
     body {
@@ -11,6 +12,7 @@
       padding: 20px;
       background: #f5f5f5;
     }
+
     .container {
       max-width: 1200px;
       margin: 0 auto;
@@ -19,15 +21,18 @@
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
+
     h1 {
       color: #333;
       margin-top: 0;
     }
+
     .description {
       color: #666;
       line-height: 1.6;
       margin-bottom: 30px;
     }
+
     .demo-area {
       min-height: 300px;
       padding: 20px;
@@ -35,6 +40,7 @@
       border-radius: 4px;
       position: relative;
     }
+
     .header {
       display: flex;
       justify-content: space-between;
@@ -45,6 +51,7 @@
       border-radius: 4px;
       margin-bottom: 20px;
     }
+
     .code-block {
       background: #1e1e1e;
       color: #d4d4d4;
@@ -53,6 +60,7 @@
       overflow-x: auto;
       margin: 20px 0;
     }
+
     code {
       font-family: 'Courier New', monospace;
       font-size: 14px;
@@ -62,13 +70,10 @@
   <!-- Load Changebot Widgets -->
   <script type="module" src="../dist/widgets/widgets.esm.js"></script>
 </head>
+
 <body>
   <!-- Provider manages state for all widgets -->
-  <changebot-provider
-    slug="demo-team"
-    scope="default"
-    poll-interval="60">
-
+  <changebot-provider slug="demo-team" scope="default">
     <div class="container">
       <h1>🎯 Basic Usage Example</h1>
 
@@ -83,10 +88,9 @@
       </div>
 
       <div class="code-block">
-        <code>&lt;changebot-provider slug="demo-team" scope="default"&gt;
-  &lt;changebot-badge scope="default"&gt;&lt;/changebot-badge&gt;
-  &lt;changebot-panel scope="default" mode="drawer-right"&gt;&lt;/changebot-panel&gt;
-&lt;/changebot-provider&gt;</code>
+        <code>&lt;changebot-provider slug="demo-team" scope="default"&gt; &lt;changebot-badge
+          scope="default"&gt;&lt;/changebot-badge&gt; &lt;changebot-panel scope="default"
+          mode="drawer-right"&gt;&lt;/changebot-panel&gt; &lt;/changebot-provider&gt;</code>
       </div>
 
       <div class="demo-area">
@@ -101,12 +105,8 @@
       </div>
 
       <!-- Drawer component (hidden until opened) -->
-      <changebot-panel
-        scope="default"
-        mode="drawer-right">
-      </changebot-panel>
+      <changebot-panel scope="default" mode="drawer-right"> </changebot-panel>
     </div>
-
   </changebot-provider>
 
   <script>
@@ -120,22 +120,18 @@
             {
               id: '1',
               title: 'New Feature: Dark Mode',
-              description: 'We\'ve added a beautiful dark mode to improve your viewing experience.',
+              description: "We've added a beautiful dark mode to improve your viewing experience.",
               date: new Date().toISOString(),
               timestamp: Date.now(),
-              tags: [
-                { text: 'Feature', color: '#667eea' }
-              ]
+              tags: [{text: 'Feature', color: '#667eea'}],
             },
             {
               id: '2',
               title: 'Bug Fix: Login Issue',
-              description: 'Fixed an issue where some users couldn\'t log in.',
+              description: "Fixed an issue where some users couldn't log in.",
               date: new Date(Date.now() - 86400000).toISOString(),
               timestamp: Date.now() - 86400000,
-              tags: [
-                { text: 'Bug Fix', color: '#f56565' }
-              ]
+              tags: [{text: 'Bug Fix', color: '#f56565'}],
             },
             {
               id: '3',
@@ -143,14 +139,13 @@
               description: 'The app now loads 50% faster!',
               date: new Date(Date.now() - 172800000).toISOString(),
               timestamp: Date.now() - 172800000,
-              tags: [
-                { text: 'Performance', color: '#48bb78' }
-              ]
-            }
-          ]
+              tags: [{text: 'Performance', color: '#48bb78'}],
+            },
+          ],
         };
       }
     }, 1000);
   </script>
 </body>
+
 </html>

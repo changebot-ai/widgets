@@ -1,5 +1,6 @@
-<!DOCTYPE html>
+<!doctype html>
 <html dir="ltr" lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
@@ -178,8 +179,10 @@
 
     changebot-badge {
       /* Badge color customization - BRIGHT ORANGE! */
-      --cb-badge-bg: #ff6600;           /* Bright orange background */
-      --cb-badge-text: #ffffff;         /* White text */
+      --cb-badge-bg: #ff6600;
+      /* Bright orange background */
+      --cb-badge-text: #ffffff;
+      /* White text */
       --cb-badge-shadow: rgba(255, 102, 0, 0.5);
       --cb-badge-pulse: rgba(255, 102, 0, 0.8);
       --cb-badge-hover-mix: #000000;
@@ -188,23 +191,34 @@
 
     changebot-panel {
       /* Drawer background colors - WILD CYBERPUNK THEME! */
-      --cb-panel-bg: #0a0014;          /* Deep purple-black background */
-      --cb-panel-surface: #1a0033;     /* Purple surface */
-      --cb-panel-border: #ff00ff;      /* Magenta border */
+      --cb-panel-bg: #0a0014;
+      /* Deep purple-black background */
+      --cb-panel-surface: #1a0033;
+      /* Purple surface */
+      --cb-panel-border: #ff00ff;
+      /* Magenta border */
 
       /* Text colors */
-      --cb-panel-text: #00ffff;        /* Cyan text */
-      --cb-panel-text-muted: #ff66ff;  /* Pink muted text */
+      --cb-panel-text: #00ffff;
+      /* Cyan text */
+      --cb-panel-text-muted: #ff66ff;
+      /* Pink muted text */
 
       /* Interactive colors */
-      --cb-panel-hover: #330066;       /* Purple hover */
-      --cb-panel-link: #00ff00;        /* Lime green links */
-      --cb-panel-focus: #ffff00;       /* Yellow focus */
+      --cb-panel-hover: #330066;
+      /* Purple hover */
+      --cb-panel-link: #00ff00;
+      /* Lime green links */
+      --cb-panel-focus: #ffff00;
+      /* Yellow focus */
 
       /* Accent colors */
-      --cb-panel-accent: #ff6600;      /* Bright orange titles (matches badge!) */
-      --cb-panel-meta: #00ffff;        /* Cyan metadata */
-      --cb-panel-subtle: #00ff00;      /* Lime green subtle */
+      --cb-panel-accent: #ff6600;
+      /* Bright orange titles (matches badge!) */
+      --cb-panel-meta: #00ffff;
+      /* Cyan metadata */
+      --cb-panel-subtle: #00ff00;
+      /* Lime green subtle */
 
       /* Effects */
       --cb-panel-shadow: rgba(255, 0, 255, 0.5);
@@ -212,9 +226,10 @@
     }
   </style>
 </head>
+
 <body>
   <!-- Provider manages state -->
-  <changebot-provider slug="changebot" scope="custom-theme" poll-interval="60"></changebot-provider>
+  <changebot-provider slug="changebot" scope="custom-theme"></changebot-provider>
 
   <!-- Drawer component -->
   <changebot-panel id="custom-drawer" scope="custom-theme" display-mode="drawer-right"></changebot-panel>
@@ -226,12 +241,16 @@
       <h1>🎨 Custom Theme Override</h1>
 
       <div class="info-box">
-        <strong>What is this?</strong> This page demonstrates how to completely override the built-in theme system
-        with your own custom colors using CSS variables. No theme attributes needed!
+        <strong>What is this?</strong> This page demonstrates how to completely override the built-in theme system with
+        your own custom colors using CSS variables. No theme
+        attributes needed!
       </div>
 
-      <p>Instead of using the built-in themes like <code>catppuccin-mocha</code> or <code>dracula</code>,
-      you can define your own color scheme by setting CSS variables directly in your stylesheet.</p>
+      <p>
+        Instead of using the built-in themes like <code>catppuccin-mocha</code> or <code>dracula</code>, you can define
+        your own color scheme by setting CSS variables directly in
+        your stylesheet.
+      </p>
 
       <ul>
         <li>✨ Complete control over all colors</li>
@@ -243,10 +262,14 @@
       <h2>See It In Action</h2>
       <div class="demo-area">
         <div class="header">
-          <h2 style="margin: 0;">Your App Header</h2>
+          <h2 style="margin: 0">Your App Header</h2>
           <changebot-badge scope="custom-theme"></changebot-badge>
         </div>
-        <p>Click the badge above to see the custom themed drawer! Notice the <strong>bright orange badge</strong> and the <strong>wild cyberpunk drawer</strong> with cyan text, orange titles, magenta borders, and lime green links. This is definitely NOT a built-in theme! 🎨</p>
+        <p>
+          Click the badge above to see the custom themed drawer! Notice the <strong>bright orange badge</strong> and the
+          <strong>wild cyberpunk drawer</strong> with cyan text,
+          orange titles, magenta borders, and lime green links. This is definitely NOT a built-in theme! 🎨
+        </p>
         <button onclick="populateUpdates()">Load Demo Updates</button>
         <button onclick="openDrawer()">Open Drawer</button>
       </div>
@@ -255,34 +278,35 @@
     <section>
       <h2>How It Works</h2>
 
-      <p>Simply add a <code>&lt;style&gt;</code> tag (or use your existing CSS) to define CSS variables on the component elements:</p>
+      <p>Simply add a <code>&lt;style&gt;</code> tag (or use your existing CSS) to define CSS variables on the component
+        elements:</p>
 
       <pre><code>&lt;style&gt;
-  /* Customize the badge - BRIGHT ORANGE! */
-  changebot-badge {
-    --cb-badge-bg: #ff6600;           /* Bright orange background */
-    --cb-badge-text: #ffffff;         /* White text */
-    --cb-badge-shadow: rgba(255, 102, 0, 0.5);
-    --cb-badge-pulse: rgba(255, 102, 0, 0.8);
-  }
+          /* Customize the badge - BRIGHT ORANGE! */
+          changebot-badge {
+          --cb-badge-bg: #ff6600; /* Bright orange background */
+          --cb-badge-text: #ffffff; /* White text */
+          --cb-badge-shadow: rgba(255, 102, 0, 0.5);
+          --cb-badge-pulse: rgba(255, 102, 0, 0.8);
+          }
 
-  /* Customize the drawer - CYBERPUNK THEME! */
-  changebot-panel {
-    --cb-panel-bg: #0a0014;          /* Deep purple-black background */
-    --cb-panel-surface: #1a0033;     /* Purple card backgrounds */
-    --cb-panel-text: #00ffff;        /* Cyan text */
-    --cb-panel-accent: #ff6600;      /* Bright orange titles */
-    --cb-panel-link: #00ff00;        /* Lime green links */
-    --cb-panel-meta: #00ffff;        /* Cyan dates */
-    --cb-panel-border: #ff00ff;      /* Magenta borders */
-    /* ... and more! */
-  }
-&lt;/style&gt;
+          /* Customize the drawer - CYBERPUNK THEME! */
+          changebot-panel {
+          --cb-panel-bg: #0a0014; /* Deep purple-black background */
+          --cb-panel-surface: #1a0033; /* Purple card backgrounds */
+          --cb-panel-text: #00ffff; /* Cyan text */
+          --cb-panel-accent: #ff6600; /* Bright orange titles */
+          --cb-panel-link: #00ff00; /* Lime green links */
+          --cb-panel-meta: #00ffff; /* Cyan dates */
+          --cb-panel-border: #ff00ff; /* Magenta borders */
+          /* ... and more! */
+          }
+          &lt;/style&gt;
 
-&lt;!-- Then use components WITHOUT theme attributes --&gt;
-&lt;changebot-provider slug="your-team"&gt;&lt;/changebot-provider&gt;
-&lt;changebot-badge&gt;&lt;/changebot-badge&gt;
-&lt;changebot-panel display-mode="drawer-right"&gt;&lt;/changebot-panel&gt;</code></pre>
+          &lt;!-- Then use components WITHOUT theme attributes --&gt;
+          &lt;changebot-provider slug="your-team"&gt;&lt;/changebot-provider&gt;
+          &lt;changebot-badge&gt;&lt;/changebot-badge&gt;
+          &lt;changebot-panel display-mode="drawer-right"&gt;&lt;/changebot-panel&gt;</code></pre>
     </section>
 
     <section>
@@ -323,46 +347,46 @@
       <p>Use media queries to automatically switch between light and dark themes:</p>
 
       <pre><code>@media (prefers-color-scheme: light) {
-  changebot-panel {
-    --cb-panel-bg: #ffffff;
-    --cb-panel-text: #1a1d29;
-    /* ... your light theme colors ... */
-  }
-}
+          changebot-panel {
+          --cb-panel-bg: #ffffff;
+          --cb-panel-text: #1a1d29;
+          /* ... your light theme colors ... */
+          }
+          }
 
-@media (prefers-color-scheme: dark) {
-  changebot-panel {
-    --cb-panel-bg: #1a1d29;
-    --cb-panel-text: #e8eaed;
-    /* ... your dark theme colors ... */
-  }
-}</code></pre>
+          @media (prefers-color-scheme: dark) {
+          changebot-panel {
+          --cb-panel-bg: #1a1d29;
+          --cb-panel-text: #e8eaed;
+          /* ... your dark theme colors ... */
+          }
+          }</code></pre>
 
       <h3>Match Your Brand</h3>
       <p>Set colors to match your brand's design system:</p>
 
       <pre><code>changebot-badge {
-  --cb-badge-bg: var(--your-brand-primary);
-  --cb-badge-text: var(--your-brand-text);
-}
+          --cb-badge-bg: var(--your-brand-primary);
+          --cb-badge-text: var(--your-brand-text);
+          }
 
-changebot-panel {
-  --cb-panel-accent: var(--your-brand-primary);
-  --cb-panel-link: var(--your-brand-link);
-}</code></pre>
+          changebot-panel {
+          --cb-panel-accent: var(--your-brand-primary);
+          --cb-panel-link: var(--your-brand-link);
+          }</code></pre>
 
       <h3>Scope-Specific Themes</h3>
       <p>Apply different themes to different scopes using attribute selectors:</p>
 
       <pre><code>/* Admin scope - red theme */
-changebot-badge[scope="admin"] {
-  --cb-badge-bg: #dc2626;
-}
+          changebot-badge[scope="admin"] {
+          --cb-badge-bg: #dc2626;
+          }
 
-/* User scope - blue theme */
-changebot-badge[scope="user"] {
-  --cb-badge-bg: #2563eb;
-}</code></pre>
+          /* User scope - blue theme */
+          changebot-badge[scope="user"] {
+          --cb-badge-bg: #2563eb;
+          }</code></pre>
     </section>
 
     <section>
@@ -370,36 +394,36 @@ changebot-badge[scope="user"] {
       <p>Here's a full working example you can copy and paste:</p>
 
       <pre><code>&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-  &lt;script type="module" src="path/to/widgets.esm.js"&gt;&lt;/script&gt;
+          &lt;html&gt;
+          &lt;head&gt;
+          &lt;script type="module" src="path/to/widgets.esm.js"&gt;&lt;/script&gt;
 
-  &lt;style&gt;
-    changebot-badge {
-      --cb-badge-bg: #ff6600;      /* Bright orange */
-      --cb-badge-text: #ffffff;    /* White */
-    }
+          &lt;style&gt;
+          changebot-badge {
+          --cb-badge-bg: #ff6600; /* Bright orange */
+          --cb-badge-text: #ffffff; /* White */
+          }
 
-    changebot-panel {
-      --cb-panel-bg: #0a0014;     /* Deep purple-black */
-      --cb-panel-surface: #1a0033;/* Purple */
-      --cb-panel-text: #00ffff;   /* Cyan */
-      --cb-panel-accent: #ff6600; /* Bright orange */
-      --cb-panel-link: #00ff00;   /* Lime green */
-      --cb-panel-border: #ff00ff; /* Magenta */
-    }
-  &lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-  &lt;changebot-provider slug="your-team"&gt;&lt;/changebot-provider&gt;
+          changebot-panel {
+          --cb-panel-bg: #0a0014; /* Deep purple-black */
+          --cb-panel-surface: #1a0033;/* Purple */
+          --cb-panel-text: #00ffff; /* Cyan */
+          --cb-panel-accent: #ff6600; /* Bright orange */
+          --cb-panel-link: #00ff00; /* Lime green */
+          --cb-panel-border: #ff00ff; /* Magenta */
+          }
+          &lt;/style&gt;
+          &lt;/head&gt;
+          &lt;body&gt;
+          &lt;changebot-provider slug="your-team"&gt;&lt;/changebot-provider&gt;
 
-  &lt;!-- In your header --&gt;
-  &lt;changebot-badge&gt;&lt;/changebot-badge&gt;
+          &lt;!-- In your header --&gt;
+          &lt;changebot-badge&gt;&lt;/changebot-badge&gt;
 
-  &lt;!-- Drawer (hidden until badge is clicked) --&gt;
-  &lt;changebot-panel display-mode="drawer-right"&gt;&lt;/changebot-panel&gt;
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
+          &lt;!-- Drawer (hidden until badge is clicked) --&gt;
+          &lt;changebot-panel display-mode="drawer-right"&gt;&lt;/changebot-panel&gt;
+          &lt;/body&gt;
+          &lt;/html&gt;</code></pre>
     </section>
 
     <section>
@@ -428,13 +452,14 @@ changebot-badge[scope="user"] {
             {
               id: '1',
               title: 'Custom Theme System',
-              description: 'You can now completely customize the widget colors using CSS variables! No need to rely on built-in themes - just define your own colors and the components will use them.',
+              description:
+                'You can now completely customize the widget colors using CSS variables! No need to rely on built-in themes - just define your own colors and the components will use them.',
               date: new Date().toISOString(),
               timestamp: Date.now(),
               tags: [
-                { text: 'Feature', color: '#34d399' },
-                { text: 'Customization', color: '#a78bfa' }
-              ]
+                {text: 'Feature', color: '#34d399'},
+                {text: 'Customization', color: '#a78bfa'},
+              ],
             },
             {
               id: '2',
@@ -442,9 +467,7 @@ changebot-badge[scope="user"] {
               description: 'Choose from three different display modes: drawer-right (slides in from right), drawer-left (slides in from left), or modal (centered overlay).',
               date: new Date(Date.now() - 86400000).toISOString(),
               timestamp: Date.now() - 86400000,
-              tags: [
-                { text: 'Enhancement', color: '#5eb3f6' }
-              ]
+              tags: [{text: 'Enhancement', color: '#5eb3f6'}],
             },
             {
               id: '3',
@@ -452,9 +475,7 @@ changebot-badge[scope="user"] {
               description: 'Faster load times, smoother animations, and better rendering performance across all themes and display modes.',
               date: new Date(Date.now() - 172800000).toISOString(),
               timestamp: Date.now() - 172800000,
-              tags: [
-                { text: 'Performance', color: '#a78bfa' }
-              ]
+              tags: [{text: 'Performance', color: '#a78bfa'}],
             },
             {
               id: '4',
@@ -462,11 +483,9 @@ changebot-badge[scope="user"] {
               description: 'Easily integrate with your existing design system by using CSS custom properties that reference your brand colors.',
               date: new Date(Date.now() - 259200000).toISOString(),
               timestamp: Date.now() - 259200000,
-              tags: [
-                { text: 'Documentation', color: '#fbbf24' }
-              ]
-            }
-          ]
+              tags: [{text: 'Documentation', color: '#fbbf24'}],
+            },
+          ],
         };
         console.log('✅ Loaded demo updates');
       }
@@ -482,4 +501,5 @@ changebot-badge[scope="user"] {
     });
   </script>
 </body>
+
 </html>

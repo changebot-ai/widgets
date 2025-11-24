@@ -12,10 +12,7 @@ export class ChangebotProvider {
   @Prop() url?: string;
   @Prop() slug?: string;
   @Prop() scope: string = 'default';
-  @Prop() pollInterval?: number;
   @Prop() mockData?: string;
-
-  pollTimer?: NodeJS.Timeout;  // Made public for testing
 
   // Create a dedicated store instance for this provider's scope
   private scopedStore = createScopedStore();
@@ -28,7 +25,6 @@ export class ChangebotProvider {
       url: this.url,
       slug: this.slug,
       scope: this.scope || 'default',
-      pollInterval: this.pollInterval,
     },
   };
 
@@ -38,7 +34,6 @@ export class ChangebotProvider {
       url: this.url,
       slug: this.slug,
       scope: this.scope,
-      pollInterval: this.pollInterval,
     };
 
     this.hydrateLastViewed();
@@ -48,23 +43,6 @@ export class ChangebotProvider {
       this.loadMockData();
     } else if (this.url || this.slug) {
       this.loadUpdates();
-
-      // Setup polling if interval provided (in seconds, minimum 1 second)
-      if (this.pollInterval) {
-        const intervalMs = Math.max(this.pollInterval, 1) * 1000; // Convert to ms, minimum 1 second
-        console.log(`🔌 Provider: Setting up polling every ${Math.max(this.pollInterval, 1)} seconds`);
-        this.pollTimer = setInterval(() => {
-          this.loadUpdates();
-        }, intervalMs);
-      }
-    }
-  }
-
-  disconnectedCallback() {
-    // Clear polling timer
-    if (this.pollTimer) {
-      clearInterval(this.pollTimer);
-      this.pollTimer = undefined;
     }
   }
 

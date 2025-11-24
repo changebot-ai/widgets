@@ -30,10 +30,7 @@ function App() {
           <changebot-badge scope="default" />
         </header>
 
-        <changebot-panel
-          scope="default"
-          display-mode="drawer-right"
-        />
+        <changebot-panel scope="default" display-mode="drawer-right" />
       </changebot-provider>
     </div>
   );
@@ -52,23 +49,31 @@ import type { ChangebotBadge, ChangebotPanel, ChangebotProvider } from '@changeb
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      'changebot-provider': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
-        slug?: string;
-        url?: string;
-        scope?: string;
-        'poll-interval'?: number;
-      }, HTMLElement>;
-      'changebot-badge': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
-        scope?: string;
-        theme?: 'light' | 'dark';
-        'show-count'?: boolean;
-        count?: number;
-      }, HTMLElement>;
-      'changebot-panel': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
-        scope?: string;
-        theme?: 'light' | 'dark';
-        'display-mode'?: 'drawer-left' | 'drawer-right' | 'modal';
-      }, HTMLElement>;
+      'changebot-provider': React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement> & {
+          slug?: string;
+          url?: string;
+          scope?: string;
+        },
+        HTMLElement
+      >;
+      'changebot-badge': React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement> & {
+          'scope'?: string;
+          'theme'?: 'light' | 'dark';
+          'show-count'?: boolean;
+          'count'?: number;
+        },
+        HTMLElement
+      >;
+      'changebot-panel': React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement> & {
+          'scope'?: string;
+          'theme'?: 'light' | 'dark';
+          'display-mode'?: 'drawer-left' | 'drawer-right' | 'modal';
+        },
+        HTMLElement
+      >;
     }
   }
 }
@@ -81,10 +86,7 @@ function App() {
         <changebot-badge scope="default" />
       </header>
 
-      <changebot-panel
-        scope="default"
-        display-mode="drawer-right"
-      />
+      <changebot-panel scope="default" display-mode="drawer-right" />
     </changebot-provider>
   );
 }
@@ -148,10 +150,7 @@ app.mount('#app');
         <changebot-badge scope="default" />
       </header>
 
-      <changebot-panel
-        scope="default"
-        display-mode="drawer-right"
-      />
+      <changebot-panel scope="default" display-mode="drawer-right" />
     </changebot-provider>
   </div>
 </template>
@@ -169,10 +168,7 @@ app.mount('#app');
     <button @click="openDrawer">Open Updates</button>
     <button @click="closeDrawer">Close Updates</button>
 
-    <changebot-panel
-      ref="drawerRef"
-      display-mode="modal"
-    />
+    <changebot-panel ref="drawerRef" display-mode="modal" />
   </div>
 </template>
 
@@ -205,11 +201,11 @@ export default defineConfig({
       template: {
         compilerOptions: {
           // Treat all tags starting with 'changebot-' as custom elements
-          isCustomElement: tag => tag.startsWith('changebot-')
-        }
-      }
-    })
-  ]
+          isCustomElement: tag => tag.startsWith('changebot-'),
+        },
+      },
+    }),
+  ],
 });
 ```
 
@@ -231,9 +227,9 @@ defineCustomElements();
   declarations: [AppComponent],
   imports: [BrowserModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // Required for web components
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
 ```
 
 ### 2. Using in Components
@@ -250,12 +246,9 @@ import { Component } from '@angular/core';
         <changebot-badge scope="default"></changebot-badge>
       </header>
 
-      <changebot-panel
-        scope="default"
-        [attr.display-mode]="'drawer-right'"
-      ></changebot-panel>
+      <changebot-panel scope="default" [attr.display-mode]="'drawer-right'"></changebot-panel>
     </changebot-provider>
-  `
+  `,
 })
 export class AppComponent {
   title = 'my-angular-app';
@@ -274,12 +267,9 @@ import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
       <button (click)="openDrawer()">Open Updates</button>
       <button (click)="closeDrawer()">Close Updates</button>
 
-      <changebot-panel
-        #drawer
-        [attr.display-mode]="'modal'"
-      ></changebot-panel>
+      <changebot-panel #drawer [attr.display-mode]="'modal'"></changebot-panel>
     </div>
-  `
+  `,
 })
 export class AppComponent implements AfterViewInit {
   @ViewChild('drawer', { static: false }) drawer?: ElementRef<HTMLChangebotPanelElement>;
@@ -323,26 +313,26 @@ interface HTMLChangebotPanelElement extends HTMLElement {
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Changebot Widgets</title>
-  <script type="module" src="https://unpkg.com/@changebot/widgets/dist/widgets/widgets.esm.js"></script>
-</head>
-<body>
-  <changebot-provider slug="your-team" scope="default">
-    <changebot-badge scope="default"></changebot-badge>
-    <changebot-panel scope="default" display-mode="drawer-right"></changebot-panel>
-  </changebot-provider>
+  <head>
+    <title>Changebot Widgets</title>
+    <script type="module" src="https://unpkg.com/@changebot/widgets/dist/widgets/widgets.esm.js"></script>
+  </head>
+  <body>
+    <changebot-provider slug="your-team" scope="default">
+      <changebot-badge scope="default"></changebot-badge>
+      <changebot-panel scope="default" display-mode="drawer-right"></changebot-panel>
+    </changebot-provider>
 
-  <script>
-    // Access drawer programmatically
-    const drawer = document.querySelector('changebot-panel');
+    <script>
+      // Access drawer programmatically
+      const drawer = document.querySelector('changebot-panel');
 
-    // Use methods
-    setTimeout(async () => {
-      await drawer.open();
-    }, 2000);
-  </script>
-</body>
+      // Use methods
+      setTimeout(async () => {
+        await drawer.open();
+      }, 2000);
+    </script>
+  </body>
 </html>
 ```
 
@@ -392,8 +382,8 @@ await drawer.setUpdates([
     title: 'New Feature',
     description: 'Check out our new feature!',
     date: new Date().toISOString(),
-    timestamp: Date.now()
-  }
+    timestamp: Date.now(),
+  },
 ]);
 ```
 

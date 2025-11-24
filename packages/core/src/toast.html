@@ -179,7 +179,7 @@
   </head>
   <body>
     <!-- Provider Component - Fetches updates from Changebot API -->
-    <changebot-provider slug="changebot" poll-interval="30"></changebot-provider>
+    <changebot-provider slug="changebot"></changebot-provider>
 
     <!-- Toast Components - Different positions and themes -->
     <changebot-toast id="toast-automatic" position="bottom-right"></changebot-toast>
@@ -195,7 +195,6 @@
 
       <div class="info-box">
         <p><strong>Live Demo:</strong> The automatic toast is connected to the real Changebot API and will appear when new updates are available.</p>
-        <p><strong>Polling:</strong> Checks for new updates every 30 seconds.</p>
         <p><strong>Auto-Display:</strong> The toast appears automatically when new updates are published that you haven't seen yet.</p>
         <p><strong>Configuration:</strong> Use the controls below to change the theme and position of the automatic toast.</p>
       </div>
@@ -291,7 +290,7 @@
 
       <h3>Basic Setup</h3>
       <pre><code>&lt;!-- Add provider once per page --&gt;
-&lt;changebot-provider slug="your-slug" poll-interval="30"&gt;&lt;/changebot-provider&gt;
+&lt;changebot-provider slug="your-slug" &gt;&lt;/changebot-provider&gt;
 
 &lt;!-- Add toast with default position (bottom-right) --&gt;
 &lt;changebot-toast&gt;&lt;/changebot-toast&gt;</code></pre>
@@ -584,7 +583,6 @@
       window.addEventListener('load', () => {
         console.log('✅ Changebot toast demo loaded');
         console.log('🍞 Toast will automatically show new updates');
-        console.log('🔄 Polling for updates every 30 seconds');
         console.log('💡 Use the buttons above to test different positions');
 
         // Apply saved preferences (theme and position)
