@@ -1,6 +1,5 @@
-import { Component, Element, Prop, State, Watch, Listen, h } from '@stencil/core';
+import { Component, Element, Prop, State, Watch, h } from '@stencil/core';
 import { dispatchAction } from '../../utils/context';
-import { StoreState } from '../../types';
 import { Theme } from '../../utils/themes';
 
 @Component({
@@ -140,81 +139,22 @@ export class ChangebotBadge {
 
     console.log('📛 Badge: Subscribing to store, current state:', store.state);
 
-    // Calculate initial count
-    this.calculateNewUpdatesCount(store.state);
+    // Set initial count from store
+    this.setCount(store.state.newUpdatesCount);
 
-    // Subscribe to updates changes
-    this.unsubscribe = store.onChange('updates', () => {
-      console.log('📛 Badge: Updates changed, recalculating...');
-      this.calculateNewUpdatesCount(store.state);
+    // Subscribe to newUpdatesCount changes
+    this.unsubscribe = store.onChange('newUpdatesCount', () => {
+      console.log('📛 Badge: newUpdatesCount changed to', store.state.newUpdatesCount);
+      this.setCount(store.state.newUpdatesCount);
     });
   }
 
-  public calculateNewUpdatesCount(state: StoreState) {
-    if (!state.updates) {
-      this.setCount(0);
-      console.log('📛 Badge: No updates in state yet');
-      return;
-    }
-
-    const lastViewed = this.getLastViewedTime();
-
-    // If no lastViewed (returns 0), ALL updates are new
-    const newUpdates =
-      lastViewed === 0
-        ? state.updates // All updates are new
-        : state.updates.filter(update => new Date(update.published_at).getTime() > lastViewed);
-
-    this.setCount(newUpdates.length);
-
-    console.log(
-      `📛 Badge calculated: ${this.newUpdatesCount} new updates (lastViewed: ${lastViewed === 0 ? 'never' : new Date(lastViewed).toLocaleTimeString()}, total updates: ${state.updates.length})`,
-    );
-  }
-
-  // Public method to set count for testing
   public setNewUpdatesCount(count: number) {
     this.newUpdatesCount = count;
   }
 
-  private getLastViewedTime(): number {
-    const key = `changebot:lastViewed:${this.scope || 'default'}`;
-    const stored = localStorage.getItem(key);
-    return stored ? parseInt(stored, 10) : 0;
-  }
-
-  @Listen('changebot:lastViewed', { target: 'document' })
-  handleLastViewedChange(event: CustomEvent) {
-    const eventScope = event.detail?.scope || 'default';
-    const badgeScope = this.scope || 'default';
-
-    // Only respond to events for our scope
-    if (eventScope === badgeScope) {
-      console.log('📛 Badge: Received lastViewed change event, recalculating count');
-
-      // Recalculate badge count based on new lastViewed time
-      if (this.services?.store) {
-        this.calculateNewUpdatesCount(this.services.store.state);
-      } else {
-        // If no store (standalone mode or using count prop), just clear the badge
-        this.setCount(0);
-      }
-    }
-  }
-
   private handleClick = () => {
-    // Only clear badge and mark as viewed if connected to a provider
-    // Standalone badges with count prop shouldn't be cleared on click
-    if (this.services) {
-      // Mark as viewed
-      const key = `changebot:lastViewed:${this.scope || 'default'}`;
-      localStorage.setItem(key, Date.now().toString());
-
-      // Clear badge immediately
-      this.setCount(0);
-    }
-
-    // Dispatch open action
+    // this.setCount(0);
     dispatchAction(this.el, 'openDisplay', undefined, this.scope);
   };
 

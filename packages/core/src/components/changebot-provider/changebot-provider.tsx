@@ -1,5 +1,5 @@
 import { Component, h, Prop, Listen, Element } from '@stencil/core';
-import { createScopedStore } from '../../store';
+import { createScopedStore, getStorageKey } from '../../store';
 
 @Component({
   tag: 'changebot-provider',
@@ -40,6 +40,8 @@ export class ChangebotProvider {
       scope: this.scope,
       pollInterval: this.pollInterval,
     };
+
+    this.hydrateLastViewed();
 
     // Load initial data from mockData (for testing/demos) or from API
     if (this.mockData) {
@@ -96,7 +98,6 @@ export class ChangebotProvider {
     if (actionScope === this.scope) {
       const { type, payload } = event.detail;
 
-      // Dispatch action to store using scoped actions
       if (type in this.scopedStore.actions) {
         try {
           if (payload !== undefined) {
@@ -104,12 +105,39 @@ export class ChangebotProvider {
           } else {
             this.scopedStore.actions[type]();
           }
+
+          if (type === 'openDisplay') {
+            this.markAsViewed();
+          }
         } catch (error) {
           console.error(`Error executing action ${type}:`, error);
         }
       } else {
         console.warn('Unknown action type:', type);
       }
+    }
+  }
+
+  private markAsViewed() {
+    console.log('🔌 Provider: Marking as viewed for scope', this.scope);
+
+    const timestamp = Date.now();
+    this.scopedStore.store.state.lastViewed = timestamp;
+
+    const key = getStorageKey(this.scope, 'lastViewed');
+    localStorage.setItem(key, timestamp.toString());
+
+    this.scopedStore.actions.calculateNewCount();
+  }
+
+  private hydrateLastViewed() {
+    const key = getStorageKey(this.scope, 'lastViewed');
+    const stored = localStorage.getItem(key);
+
+    if (stored) {
+      const timestamp = parseInt(stored, 10);
+      this.scopedStore.store.state.lastViewed = timestamp;
+      console.log('🔌 Provider: Hydrated lastViewed from localStorage:', new Date(timestamp).toLocaleString());
     }
   }
 

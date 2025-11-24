@@ -145,7 +145,7 @@ describe('changebot-badge', () => {
     component.services = { store: mockStore };
     component.subscribeToStore();
 
-    expect(mockStore.onChange).toHaveBeenCalledWith('updates', expect.any(Function));
+    expect(mockStore.onChange).toHaveBeenCalledWith('newUpdatesCount', expect.any(Function));
   });
 
   it('dispatches openDisplay action on click', async () => {

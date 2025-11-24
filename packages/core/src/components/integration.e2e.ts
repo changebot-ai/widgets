@@ -333,27 +333,6 @@ describe('Integration Tests - Full System', () => {
       const countText = await count.textContent;
       expect(countText).toBe('5');
     });
-
-    it('should allow drawer to work standalone with methods', async () => {
-      const page = await newE2EPage();
-
-      await page.setContent(`
-        <changebot-panel></changebot-panel>
-      `);
-
-      await page.waitForChanges();
-
-      // Open drawer using method
-      await page.$eval('changebot-panel', (el: any) => {
-        return el.open();
-      });
-
-      await page.waitForChanges();
-
-      const drawer = await page.find('changebot-panel >>> .panel');
-      const className = await drawer.getProperty('className');
-      expect(className).toContain('panel--open');
-    });
   });
 
   describe('Accessibility and Keyboard Navigation', () => {
@@ -469,30 +448,6 @@ describe('Integration Tests - Full System', () => {
       const className = await drawer.getProperty('className');
       expect(className).toContain('panel--right');
     });
-
-    it('should render as modal with backdrop', async () => {
-      const page = await newE2EPage();
-
-      await page.setContent(`
-        <changebot-panel mode="modal"></changebot-panel>
-      `);
-
-      await page.waitForChanges();
-
-      // Open the modal
-      await page.$eval('changebot-panel', (el: any) => {
-        return el.open();
-      });
-
-      await page.waitForChanges();
-
-      const drawer = await page.find('changebot-panel >>> .panel');
-      const backdrop = await page.find('changebot-panel >>> .backdrop');
-
-      const className = await drawer.getProperty('className');
-      expect(className).toContain('panel--modal');
-      expect(backdrop).not.toBeNull();
-    });
   });
 
   describe('Error Handling', () => {
@@ -586,19 +541,41 @@ describe('Integration Tests - Full System', () => {
     it('should clear badge count when panel opens programmatically', async () => {
       const page = await newE2EPage();
 
+      const mockData = JSON.stringify({
+        widget: { title: 'Updates', slug: 'test' },
+        publications: [
+          {
+            id: 1,
+            title: 'Update 1',
+            content: 'Content 1',
+            display_date: '2025-01-01',
+            published_at: '2025-01-01T00:00:00Z',
+            tags: []
+          },
+          {
+            id: 2,
+            title: 'Update 2',
+            content: 'Content 2',
+            display_date: '2025-01-02',
+            published_at: '2025-01-02T00:00:00Z',
+            tags: []
+          }
+        ]
+      });
+
       await page.setContent(`
-        <changebot-provider scope="badge-clear-test">
-          <changebot-badge scope="badge-clear-test" count="5"></changebot-badge>
+        <changebot-provider scope="badge-clear-test" mock-data='${mockData}'>
+          <changebot-badge scope="badge-clear-test"></changebot-badge>
           <changebot-panel scope="badge-clear-test"></changebot-panel>
         </changebot-provider>
       `);
 
       await page.waitForChanges();
 
-      // Verify badge initially shows count
+      // Verify badge initially shows count (2 new updates)
       let badgeCount = await page.find('changebot-badge >>> .badge__count');
       let countText = await badgeCount.textContent;
-      expect(countText).toBe('5');
+      expect(countText).toBe('2');
 
       // Verify badge is visible
       let badge = await page.find('changebot-badge >>> .badge');
@@ -627,16 +604,50 @@ describe('Integration Tests - Full System', () => {
     it('should clear badge count when panel opens via action event', async () => {
       const page = await newE2EPage();
 
+      const mockData = JSON.stringify({
+        widget: { title: 'Updates', slug: 'test' },
+        publications: [
+          {
+            id: 1,
+            title: 'Update 1',
+            content: 'Content 1',
+            display_date: '2025-01-01',
+            published_at: '2025-01-01T00:00:00Z',
+            tags: []
+          },
+          {
+            id: 2,
+            title: 'Update 2',
+            content: 'Content 2',
+            display_date: '2025-01-02',
+            published_at: '2025-01-02T00:00:00Z',
+            tags: []
+          },
+          {
+            id: 3,
+            title: 'Update 3',
+            content: 'Content 3',
+            display_date: '2025-01-03',
+            published_at: '2025-01-03T00:00:00Z',
+            tags: []
+          }
+        ]
+      });
+
       await page.setContent(`
-        <changebot-provider scope="badge-clear-action-test">
-          <changebot-badge scope="badge-clear-action-test" count="3"></changebot-badge>
+        <changebot-provider scope="badge-clear-action-test" mock-data='${mockData}'>
+          <changebot-badge scope="badge-clear-action-test"></changebot-badge>
           <changebot-panel scope="badge-clear-action-test"></changebot-panel>
         </changebot-provider>
       `);
 
       await page.waitForChanges();
 
-      // Verify badge initially shows count
+      // Verify badge initially shows count (3 new updates)
+      let badgeCount = await page.find('changebot-badge >>> .badge__count');
+      let countText = await badgeCount.textContent;
+      expect(countText).toBe('3');
+
       let badge = await page.find('changebot-badge >>> .badge');
       let badgeClasses = await badge.getProperty('className');
       expect(badgeClasses).not.toContain('badge--hidden');

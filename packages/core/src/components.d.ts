@@ -40,9 +40,6 @@ export namespace Components {
         "toggle": () => Promise<void>;
     }
     interface ChangebotPanel {
-        /**
-          * Close the panel
-         */
         "close": () => Promise<void>;
         "dark"?: Theme;
         "light"?: Theme;
@@ -50,14 +47,8 @@ export namespace Components {
           * @default 'drawer-right'
          */
         "mode": 'modal' | 'drawer-left' | 'drawer-right';
-        /**
-          * Open the panel
-         */
         "open": () => Promise<void>;
         "scope"?: string;
-        /**
-          * Set the updates to display
-         */
         "setUpdates": (updates: Update[]) => Promise<void>;
         "theme"?: Theme;
     }
@@ -105,10 +96,6 @@ export namespace Components {
         "middle": string;
     }
 }
-export interface ChangebotPanelCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLChangebotPanelElement;
-}
 declare global {
     interface HTMLChangebotBadgeElement extends Components.ChangebotBadge, HTMLStencilElement {
     }
@@ -122,18 +109,7 @@ declare global {
         prototype: HTMLChangebotBannerElement;
         new (): HTMLChangebotBannerElement;
     };
-    interface HTMLChangebotPanelElementEventMap {
-        "changebot-last-viewed": { scope: string };
-    }
     interface HTMLChangebotPanelElement extends Components.ChangebotPanel, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLChangebotPanelElementEventMap>(type: K, listener: (this: HTMLChangebotPanelElement, ev: ChangebotPanelCustomEvent<HTMLChangebotPanelElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLChangebotPanelElementEventMap>(type: K, listener: (this: HTMLChangebotPanelElement, ev: ChangebotPanelCustomEvent<HTMLChangebotPanelElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLChangebotPanelElement: {
         prototype: HTMLChangebotPanelElement;
@@ -191,7 +167,6 @@ declare namespace LocalJSX {
           * @default 'drawer-right'
          */
         "mode"?: 'modal' | 'drawer-left' | 'drawer-right';
-        "onChangebot-last-viewed"?: (event: ChangebotPanelCustomEvent<{ scope: string }>) => void;
         "scope"?: string;
         "theme"?: Theme;
     }

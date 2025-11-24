@@ -13,7 +13,7 @@ import { ChangebotPanel as ChangebotPanelElement, defineCustomElement as defineC
 import { ChangebotProvider as ChangebotProviderElement, defineCustomElement as defineChangebotProvider } from "@changebot/core/dist/components/changebot-provider.js";
 import { ChangebotToast as ChangebotToastElement, defineCustomElement as defineChangebotToast } from "@changebot/core/dist/components/changebot-toast.js";
 import { MyComponent as MyComponentElement, defineCustomElement as defineMyComponent } from "@changebot/core/dist/components/my-component.js";
-import type { EventName, StencilReactComponent } from '@stencil/react-output-target/runtime';
+import type { StencilReactComponent } from '@stencil/react-output-target/runtime';
 import { createComponent } from '@stencil/react-output-target/runtime';
 import React from 'react';
 
@@ -39,14 +39,14 @@ export const ChangebotBanner: StencilReactComponent<ChangebotBannerElement, Chan
     defineCustomElement: defineChangebotBanner
 });
 
-export type ChangebotPanelEvents = { onChangebotLastViewed: EventName<CustomEvent<{ scope: string }>> };
+export type ChangebotPanelEvents = NonNullable<unknown>;
 
 export const ChangebotPanel: StencilReactComponent<ChangebotPanelElement, ChangebotPanelEvents> = /*@__PURE__*/ createComponent<ChangebotPanelElement, ChangebotPanelEvents>({
     tagName: 'changebot-panel',
     elementClass: ChangebotPanelElement,
     // @ts-ignore - ignore potential React type mismatches between the Stencil Output Target and your project.
     react: React,
-    events: { onChangebotLastViewed: 'changebot-last-viewed' } as ChangebotPanelEvents,
+    events: {} as ChangebotPanelEvents,
     defineCustomElement: defineChangebotPanel
 });
 

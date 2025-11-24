@@ -1,4 +1,4 @@
-import { Component, Element, Prop, State, Method, Watch, Listen, Event, EventEmitter, h, Host } from '@stencil/core';
+import { Component, Element, Prop, State, Method, Watch, Listen, h, Host } from '@stencil/core';
 import { dispatchAction } from '../../utils/context';
 import { Update, Widget } from '../../types';
 import { Theme } from '../../utils/themes';
@@ -22,8 +22,6 @@ export class ChangebotPanel {
   @State() widget: Widget | null = null;
   @State() activeTheme?: Theme;
   @State() prefersDark: boolean = false;
-
-  @Event({ eventName: 'changebot-last-viewed' }) changebotLastViewed: EventEmitter<{ scope: string }>;
 
   private services: any;
   private unsubscribeIsOpen?: () => void;
@@ -59,7 +57,7 @@ export class ChangebotPanel {
             console.log('📂 Panel: Received services from provider', {
               hasStore: !!services?.store,
               hasActions: !!services?.actions,
-              storeState: services?.store?.state
+              storeState: services?.store?.state,
             });
             this.services = services;
             this.subscribeToStore();
@@ -68,7 +66,7 @@ export class ChangebotPanel {
             console.warn('Panel: Failed to setup provider connection, using standalone mode:', error);
           }
         },
-        scope: this.scope || 'default'
+        scope: this.scope || 'default',
       };
 
       console.log('📂 Panel: Requesting context with scope:', detail.scope);
@@ -77,8 +75,8 @@ export class ChangebotPanel {
         new CustomEvent('changebot:context-request', {
           bubbles: true,
           composed: true,
-          detail
-        })
+          detail,
+        }),
       );
     } catch (error) {
       // If provider request fails, continue in standalone mode
@@ -157,7 +155,6 @@ export class ChangebotPanel {
 
       console.log('📂 Panel: Subscribing to store, current state:', store.state);
 
-      // Subscribe to isOpen changes
       this.unsubscribeIsOpen = store.onChange('isOpen', () => {
         try {
           console.log('📂 Panel: isOpen changed to', store.state.isOpen);
@@ -165,9 +162,6 @@ export class ChangebotPanel {
           this.isOpen = store.state.isOpen;
 
           if (this.isOpen && !wasOpen) {
-            // Mark as viewed when opening
-            this.markAsViewed();
-            // Focus first element when opening
             setTimeout(() => this.focusFirstElement(), 100);
           }
         } catch (error) {
@@ -175,7 +169,6 @@ export class ChangebotPanel {
         }
       });
 
-      // Subscribe to updates changes
       this.unsubscribeUpdates = store.onChange('updates', () => {
         try {
           console.log('📂 Panel: Updates changed, count:', store.state.updates?.length);
@@ -185,7 +178,6 @@ export class ChangebotPanel {
         }
       });
 
-      // Subscribe to widget metadata changes
       this.unsubscribeWidget = store.onChange('widget', () => {
         try {
           console.log('📂 Panel: Widget metadata changed:', store.state.widget);
@@ -195,7 +187,6 @@ export class ChangebotPanel {
         }
       });
 
-      // Initialize state safely
       this.isOpen = store.state.isOpen || false;
       this.updates = store.state.updates || [];
       this.widget = store.state.widget || null;
@@ -204,25 +195,16 @@ export class ChangebotPanel {
     }
   }
 
-  /**
-   * Open the panel
-   */
   @Method()
   async open() {
     dispatchAction(this.el, 'openDisplay', undefined, this.scope);
   }
 
-  /**
-   * Close the panel
-   */
   @Method()
   async close() {
     dispatchAction(this.el, 'closeDisplay', undefined, this.scope);
   }
 
-  /**
-   * Set the updates to display
-   */
   @Method()
   async setUpdates(updates: Update[]) {
     this.updates = updates;
@@ -231,33 +213,12 @@ export class ChangebotPanel {
   private setupFocusTrap() {
     if (!this.panelElement) return;
 
-    const focusableElements = this.panelElement.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
+    const focusableElements = this.panelElement.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
 
     if (focusableElements.length > 0) {
       this.firstFocusableElement = focusableElements[0] as HTMLElement;
       this.lastFocusableElement = focusableElements[focusableElements.length - 1] as HTMLElement;
     }
-  }
-
-  private markAsViewed() {
-    // Set the last viewed timestamp in localStorage
-    const key = `changebot:lastViewed:${this.scope || 'default'}`;
-    localStorage.setItem(key, Date.now().toString());
-    console.log('📂 Panel: Marked as viewed at', new Date().toLocaleTimeString());
-
-    // Dispatch event to document so badge can listen for it
-    document.dispatchEvent(
-      new CustomEvent('changebot:lastViewed', {
-        detail: { scope: this.scope || 'default' },
-        bubbles: true,
-        composed: true
-      })
-    );
-
-    // Also emit the Stencil event for backward compatibility
-    this.changebotLastViewed.emit({ scope: this.scope || 'default' });
   }
 
   private focusFirstElement() {
@@ -337,7 +298,7 @@ export class ChangebotPanel {
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   }
 
@@ -443,12 +404,7 @@ export class ChangebotPanel {
 
   private renderUpdateItem(update: Update) {
     const titleContent = update.hosted_url ? (
-      <a
-        href={update.hosted_url}
-        class="update-title-link"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
+      <a href={update.hosted_url} class="update-title-link" target="_blank" rel="noopener noreferrer">
         {update.title}
       </a>
     ) : (
@@ -463,9 +419,7 @@ export class ChangebotPanel {
             {this.formatDate(update.display_date)}
           </time>
         </div>
-        {update.content && (
-          <div class="update-description" innerHTML={this.transformHtmlUrls(update.content)}></div>
-        )}
+        {update.content && <div class="update-description" innerHTML={this.transformHtmlUrls(update.content)}></div>}
         {update.tags && update.tags.length > 0 && (
           <div class="update-tags">
             {update.tags.map(tag => (
@@ -474,7 +428,7 @@ export class ChangebotPanel {
                 key={tag.id}
                 style={{
                   backgroundColor: tag.color,
-                  color: this.getContrastColor(tag.color)
+                  color: this.getContrastColor(tag.color),
                 }}
               >
                 {tag.name}
@@ -495,11 +449,7 @@ export class ChangebotPanel {
       );
     }
 
-    return (
-      <div class="updates-list">
-        {this.updates.map(update => this.renderUpdateItem(update))}
-      </div>
-    );
+    return <div class="updates-list">{this.updates.map(update => this.renderUpdateItem(update))}</div>;
   }
 
   render() {
@@ -508,7 +458,7 @@ export class ChangebotPanel {
       'panel--closed': !this.isOpen,
       'panel--open': this.isOpen,
       [`theme--${this.activeTheme}`]: !!this.activeTheme,
-      [this.getModeClass()]: true
+      [this.getModeClass()]: true,
     };
 
     const isModal = this.mode === 'modal';
@@ -516,17 +466,11 @@ export class ChangebotPanel {
     return (
       <Host>
         {/* Backdrop */}
-        {this.isOpen && (
-          <div
-            class="backdrop"
-            onClick={this.handleBackdropClick}
-            aria-hidden="true"
-          ></div>
-        )}
+        {this.isOpen && <div class="backdrop" onClick={this.handleBackdropClick} aria-hidden="true"></div>}
 
         {/* Main panel container */}
         <div
-          ref={el => this.panelElement = el}
+          ref={el => (this.panelElement = el)}
           class={classes}
           role="dialog"
           aria-modal={isModal ? 'true' : 'false'}
@@ -537,26 +481,10 @@ export class ChangebotPanel {
           <div class={`panel-header${!this.widget?.subheading ? ' no-subheading' : ''}`}>
             <div class="panel-header-content">
               <h2 class="panel-title">{this.widget?.title || "What's New"}</h2>
-              {this.widget?.subheading && (
-                <p class="panel-subheading">{this.widget.subheading}</p>
-              )}
+              {this.widget?.subheading && <p class="panel-subheading">{this.widget.subheading}</p>}
             </div>
-            <button
-              class="close-button"
-              type="button"
-              onClick={this.handleClose}
-              aria-label="Close updates"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
+            <button class="close-button" type="button" onClick={this.handleClose} aria-label="Close updates">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
@@ -564,9 +492,7 @@ export class ChangebotPanel {
           </div>
 
           {/* Content */}
-          <div class="panel-content">
-            {this.renderContent()}
-          </div>
+          <div class="panel-content">{this.renderContent()}</div>
 
           {/* Footer with Powered by Changebot */}
           {this.widget?.branded !== false && (

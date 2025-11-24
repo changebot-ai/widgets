@@ -16,18 +16,11 @@
 | `theme`  | `theme`   |             | `"catppuccin-frappe" \| "catppuccin-latte" \| "catppuccin-macchiato" \| "catppuccin-mocha" \| "cyberpunk" \| "dracula" \| "everforest-dark" \| "everforest-light" \| "frost" \| "gruvbox-dark" \| "gruvbox-light" \| "nord" \| "solarized-dark" \| "solarized-light" \| "tokyo-night"` | `undefined`      |
 
 
-## Events
-
-| Event                   | Description | Type                              |
-| ----------------------- | ----------- | --------------------------------- |
-| `changebot-last-viewed` |             | `CustomEvent<{ scope: string; }>` |
-
-
 ## Methods
 
 ### `close() => Promise<void>`
 
-Close the panel
+
 
 #### Returns
 
@@ -37,7 +30,7 @@ Type: `Promise<void>`
 
 ### `open() => Promise<void>`
 
-Open the panel
+
 
 #### Returns
 
@@ -47,7 +40,7 @@ Type: `Promise<void>`
 
 ### `setUpdates(updates: Update[]) => Promise<void>`
 
-Set the updates to display
+
 
 #### Parameters
 

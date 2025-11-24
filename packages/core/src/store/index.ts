@@ -1,9 +1,10 @@
 import { createStore } from '@stencil/store';
 import { StoreState, Update } from '../types';
 
-/**
- * Calculate the number of new updates since lastViewed
- */
+export function getStorageKey(scope: string, property: string): string {
+  return `changebot:${property}:${scope}`;
+}
+
 function calculateNewUpdatesCount(updates: Update[], lastViewed: number | null): number {
   if (!lastViewed) return updates.length;
 
@@ -13,10 +14,6 @@ function calculateNewUpdatesCount(updates: Update[], lastViewed: number | null):
   }).length;
 }
 
-/**
- * Create a scoped store instance for multi-provider setups
- * This ensures each provider has its own isolated state
- */
 export function createScopedStore() {
   const store = createStore<StoreState>({
     updates: [],
