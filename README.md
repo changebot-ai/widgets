@@ -293,12 +293,12 @@ Use multiple providers for different update feeds:
 
 ```html
 <!-- Admin updates -->
-<changebot-provider slug="admin-updates" scope="admin"></changebot-provider>
+<changebot-provider slug="admin-updates" scope="admin" />
 <changebot-badge scope="admin"></changebot-badge>
 <changebot-panel scope="admin"></changebot-panel>
 
 <!-- User updates -->
-<changebot-provider slug="user-updates" scope="user"></changebot-provider>
+<changebot-provider slug="user-updates" scope="user" />
 <changebot-badge scope="user"></changebot-badge>
 <changebot-panel scope="user"></changebot-panel>
 ```
@@ -343,13 +343,7 @@ npm install @changebot/widgets-react
 Then use the components in your React app:
 
 ```tsx
-import {
-  ChangebotProvider,
-  ChangebotBadge,
-  ChangebotPanel,
-  ChangebotBanner,
-  ChangebotToast,
-} from '@changebot/widgets-react';
+import { ChangebotProvider, ChangebotBadge, ChangebotPanel, ChangebotBanner, ChangebotToast } from '@changebot/widgets-react';
 
 function App() {
   return (
@@ -396,13 +390,7 @@ Then use the components in your Vue app:
 </template>
 
 <script setup>
-import {
-  ChangebotProvider,
-  ChangebotBadge,
-  ChangebotPanel,
-  ChangebotBanner,
-  ChangebotToast,
-} from '@changebot/widgets-vue';
+import { ChangebotProvider, ChangebotBadge, ChangebotPanel, ChangebotBanner, ChangebotToast } from '@changebot/widgets-vue';
 </script>
 ```
 
@@ -488,12 +476,12 @@ Drawer/modal that displays the list of updates.
 
 Top banner notification for highlighting important updates.
 
-| Prop    | Type   | Default     | Description                      |
-| ------- | ------ | ----------- | -------------------------------- |
-| `scope` | string | `"default"` | Connect to matching provider     |
-| `theme` | string | -           | Fixed theme name                 |
-| `light` | string | -           | Theme for light mode             |
-| `dark`  | string | -           | Theme for dark mode              |
+| Prop    | Type   | Default     | Description                  |
+| ------- | ------ | ----------- | ---------------------------- |
+| `scope` | string | `"default"` | Connect to matching provider |
+| `theme` | string | -           | Fixed theme name             |
+| `light` | string | -           | Theme for light mode         |
+| `dark`  | string | -           | Theme for dark mode          |
 
 **Methods:**
 
@@ -736,6 +724,7 @@ npm run generate
 ## Release Process
 
 This monorepo contains three packages that should be kept in sync:
+
 - `@changebot/core` (packages/core)
 - `@changebot/widgets-react` (packages/react)
 - `@changebot/widgets-vue` (packages/vue)
@@ -811,6 +800,7 @@ gh release create widgets-vue-vX.X.X \
 ### Verifying the Release
 
 After pushing tags, GitHub Actions workflows will automatically:
+
 1. Build the packages
 2. Publish to npm
 3. Update the CDN

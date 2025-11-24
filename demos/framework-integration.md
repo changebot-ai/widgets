@@ -24,14 +24,14 @@ function App() {
 
   return (
     <div>
-      <changebot-provider slug="your-team" scope="default">
-        <header>
-          <h1>My React App</h1>
-          <changebot-badge scope="default" />
-        </header>
+      <changebot-provider slug="your-team" />
 
-        <changebot-panel scope="default" display-mode="drawer-right" />
-      </changebot-provider>
+      <header>
+        <h1>My React App</h1>
+        <changebot-badge scope="default" />
+      </header>
+
+      <changebot-panel scope="default" display-mode="drawer-right" />
     </div>
   );
 }
@@ -80,14 +80,16 @@ declare global {
 
 function App() {
   return (
-    <changebot-provider slug="your-team" scope="default">
+    <>
+      <changebot-provider slug="your-team" />
+
       <header>
         <h1>My React App</h1>
         <changebot-badge scope="default" />
       </header>
 
       <changebot-panel scope="default" display-mode="drawer-right" />
-    </changebot-provider>
+    </>
   );
 }
 ```
@@ -144,14 +146,14 @@ app.mount('#app');
 ```vue
 <template>
   <div>
-    <changebot-provider slug="your-team" scope="default">
-      <header>
-        <h1>My Vue App</h1>
-        <changebot-badge scope="default" />
-      </header>
+    <changebot-provider slug="your-team" />
 
-      <changebot-panel scope="default" display-mode="drawer-right" />
-    </changebot-provider>
+    <header>
+      <h1>My Vue App</h1>
+      <changebot-badge scope="default" />
+    </header>
+
+    <changebot-panel scope="default" display-mode="drawer-right" />
   </div>
 </template>
 
@@ -240,14 +242,14 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-root',
   template: `
-    <changebot-provider slug="your-team" scope="default">
-      <header>
-        <h1>My Angular App</h1>
-        <changebot-badge scope="default"></changebot-badge>
-      </header>
+    <changebot-provider slug="your-team" />
 
-      <changebot-panel scope="default" [attr.display-mode]="'drawer-right'"></changebot-panel>
-    </changebot-provider>
+    <header>
+      <h1>My Angular App</h1>
+      <changebot-badge scope="default"></changebot-badge>
+    </header>
+
+    <changebot-panel scope="default" [attr.display-mode]="'drawer-right'"></changebot-panel>
   `,
 })
 export class AppComponent {
@@ -318,10 +320,10 @@ interface HTMLChangebotPanelElement extends HTMLElement {
     <script type="module" src="https://unpkg.com/@changebot/widgets/dist/widgets/widgets.esm.js"></script>
   </head>
   <body>
-    <changebot-provider slug="your-team" scope="default">
-      <changebot-badge scope="default"></changebot-badge>
-      <changebot-panel scope="default" display-mode="drawer-right"></changebot-panel>
-    </changebot-provider>
+    <changebot-provider slug="your-team" />
+
+    <changebot-badge scope="default"></changebot-badge>
+    <changebot-panel scope="default" display-mode="drawer-right"></changebot-panel>
 
     <script>
       // Access drawer programmatically
@@ -343,15 +345,13 @@ interface HTMLChangebotPanelElement extends HTMLElement {
 ```jsx
 // React example
 <>
-  <changebot-provider slug="product-team" scope="product">
-    <changebot-badge scope="product" />
-    <changebot-panel scope="product" />
-  </changebot-provider>
+  <changebot-provider slug="product-team" scope="product" />
+  <changebot-badge scope="product" />
+  <changebot-panel scope="product" />
 
-  <changebot-provider slug="admin-team" scope="admin">
-    <changebot-badge scope="admin" />
-    <changebot-panel scope="admin" display-mode="modal" />
-  </changebot-provider>
+  <changebot-provider slug="admin-team" scope="admin" />
+  <changebot-badge scope="admin" />
+  <changebot-panel scope="admin" display-mode="modal" />
 </>
 ```
 

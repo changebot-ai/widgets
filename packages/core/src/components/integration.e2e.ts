@@ -7,10 +7,9 @@ describe('Integration Tests - Full System', () => {
 
       // Setup: Create a complete system with all three components
       await page.setContent(`
-        <changebot-provider scope="test">
-          <changebot-badge scope="test"></changebot-badge>
-          <changebot-panel scope="test"></changebot-panel>
-        </changebot-provider>
+        <changebot-provider scope="test" />
+        <changebot-badge scope="test" />
+        <changebot-panel scope="test" />
       `);
 
       await page.waitForChanges();
@@ -29,10 +28,9 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-provider scope="test">
-          <changebot-badge scope="test"></changebot-badge>
-          <changebot-panel scope="test"></changebot-panel>
-        </changebot-provider>
+        <changebot-provider scope="test" />
+        <changebot-badge scope="test" />
+        <changebot-panel scope="test" />
       `);
 
       await page.waitForChanges();
@@ -42,10 +40,10 @@ describe('Integration Tests - Full System', () => {
         const event = new CustomEvent('changebot:action', {
           detail: {
             type: 'openDisplay',
-            scope: 'test'
+            scope: 'test',
           },
           bubbles: true,
-          composed: true
+          composed: true,
         });
         document.dispatchEvent(event);
       });
@@ -62,10 +60,9 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-provider scope="test">
-          <changebot-badge scope="test" count="3"></changebot-badge>
-          <changebot-panel scope="test"></changebot-panel>
-        </changebot-provider>
+        <changebot-provider scope="test" />
+        <changebot-badge scope="test" count="3" />
+        <changebot-panel scope="test" />
       `);
 
       await page.waitForChanges();
@@ -89,28 +86,27 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-provider scope="discovery-test">
-          <changebot-badge scope="discovery-test"></changebot-badge>
-        </changebot-provider>
+        <changebot-provider scope="discovery-test" />
+        <changebot-badge scope="discovery-test" />
       `);
 
       await page.waitForChanges();
 
       // Test that badge successfully requested and received context
       const contextReceived = await page.evaluate(() => {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
           let receivedContext = false;
 
           const event = new CustomEvent('changebot:context-request', {
             detail: {
-              callback: (services) => {
+              callback: services => {
                 receivedContext = !!(services && services.store && services.actions);
                 resolve(receivedContext);
               },
-              scope: 'discovery-test'
+              scope: 'discovery-test',
             },
             bubbles: true,
-            composed: true
+            composed: true,
           });
 
           document.querySelector('changebot-badge').dispatchEvent(event);
@@ -124,32 +120,30 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-provider scope="scope-a">
-          <changebot-badge scope="scope-a"></changebot-badge>
-        </changebot-provider>
-        <changebot-provider scope="scope-b">
-          <changebot-badge scope="scope-b"></changebot-badge>
-        </changebot-provider>
+        <changebot-provider scope="scope-a" />
+        <changebot-badge scope="scope-a" />
+        <changebot-provider scope="scope-b" />
+        <changebot-badge scope="scope-b" />
       `);
 
       await page.waitForChanges();
 
       // Request context from scope-a, verify scope-b provider doesn't respond
       const scopeIsolation = await page.evaluate(() => {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
           let callbackCount = 0;
           let receivedScope = null;
 
           const event = new CustomEvent('changebot:context-request', {
             detail: {
-              callback: (services) => {
+              callback: services => {
                 callbackCount++;
                 receivedScope = services?.config?.scope;
               },
-              scope: 'scope-a'
+              scope: 'scope-a',
             },
             bubbles: true,
-            composed: true
+            composed: true,
           });
 
           document.dispatchEvent(event);
@@ -163,7 +157,7 @@ describe('Integration Tests - Full System', () => {
 
       expect(scopeIsolation).toEqual({
         callbackCount: 1,
-        receivedScope: 'scope-a'
+        receivedScope: 'scope-a',
       });
     });
   });
@@ -173,10 +167,9 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-provider scope="sync-test">
-          <changebot-badge scope="sync-test"></changebot-badge>
-          <changebot-panel scope="sync-test"></changebot-panel>
-        </changebot-provider>
+        <changebot-provider scope="sync-test" />
+        <changebot-badge scope="sync-test" />
+        <changebot-panel scope="sync-test" />
       `);
 
       await page.waitForChanges();
@@ -186,10 +179,10 @@ describe('Integration Tests - Full System', () => {
         const event = new CustomEvent('changebot:action', {
           detail: {
             type: 'openDisplay',
-            scope: 'sync-test'
+            scope: 'sync-test',
           },
           bubbles: true,
-          composed: true
+          composed: true,
         });
         document.dispatchEvent(event);
       });
@@ -206,10 +199,10 @@ describe('Integration Tests - Full System', () => {
         const event = new CustomEvent('changebot:action', {
           detail: {
             type: 'closeDisplay',
-            scope: 'sync-test'
+            scope: 'sync-test',
           },
           bubbles: true,
-          composed: true
+          composed: true,
         });
         document.dispatchEvent(event);
       });
@@ -228,45 +221,42 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-provider scope="app1">
-          <changebot-badge scope="app1"></changebot-badge>
-        </changebot-provider>
-
-        <changebot-provider scope="app2">
-          <changebot-badge scope="app2"></changebot-badge>
-        </changebot-provider>
+        <changebot-provider scope="app1" />
+        <changebot-badge scope="app1" />
+        <changebot-provider scope="app2" />
+        <changebot-badge scope="app2" />
       `);
 
       await page.waitForChanges();
 
       // Verify both systems are independent
       const app1Result = await page.evaluate(() => {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
           const event = new CustomEvent('changebot:context-request', {
             detail: {
-              callback: (services) => {
+              callback: services => {
                 resolve(services?.config?.scope);
               },
-              scope: 'app1'
+              scope: 'app1',
             },
             bubbles: true,
-            composed: true
+            composed: true,
           });
           document.dispatchEvent(event);
         });
       });
 
       const app2Result = await page.evaluate(() => {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
           const event = new CustomEvent('changebot:context-request', {
             detail: {
-              callback: (services) => {
+              callback: services => {
                 resolve(services?.config?.scope);
               },
-              scope: 'app2'
+              scope: 'app2',
             },
             bubbles: true,
-            composed: true
+            composed: true,
           });
           document.dispatchEvent(event);
         });
@@ -280,13 +270,11 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-provider scope="app1">
-          <changebot-panel scope="app1"></changebot-panel>
-        </changebot-provider>
+        <changebot-provider scope="app1" />
+        <changebot-panel scope="app1" />
 
-        <changebot-provider scope="app2">
-          <changebot-panel scope="app2"></changebot-panel>
-        </changebot-provider>
+        <changebot-provider scope="app2" />
+        <changebot-panel scope="app2" />
       `);
 
       await page.waitForChanges();
@@ -296,10 +284,10 @@ describe('Integration Tests - Full System', () => {
         const event = new CustomEvent('changebot:action', {
           detail: {
             type: 'openDisplay',
-            scope: 'app1'
+            scope: 'app1',
           },
           bubbles: true,
-          composed: true
+          composed: true,
         });
         document.dispatchEvent(event);
       });
@@ -340,9 +328,8 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-provider scope="a11y-test">
-          <changebot-panel scope="a11y-test"></changebot-panel>
-        </changebot-provider>
+        <changebot-provider scope="a11y-test" />
+        <changebot-panel scope="a11y-test" />
       `);
 
       await page.waitForChanges();
@@ -352,10 +339,10 @@ describe('Integration Tests - Full System', () => {
         const event = new CustomEvent('changebot:action', {
           detail: {
             type: 'openDisplay',
-            scope: 'a11y-test'
+            scope: 'a11y-test',
           },
           bubbles: true,
-          composed: true
+          composed: true,
         });
         document.dispatchEvent(event);
       });
@@ -376,10 +363,9 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-provider scope="kbd-test">
-          <changebot-badge scope="kbd-test" count="3"></changebot-badge>
-          <changebot-panel scope="kbd-test"></changebot-panel>
-        </changebot-provider>
+        <changebot-provider scope="kbd-test" />
+        <changebot-badge scope="kbd-test" count="3" />
+        <changebot-panel scope="kbd-test" />
       `);
 
       await page.waitForChanges();
@@ -472,7 +458,7 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-provider scope="error-test"></changebot-provider>
+        <changebot-provider scope="error-test" />
       `);
 
       await page.waitForChanges();
@@ -491,10 +477,10 @@ describe('Integration Tests - Full System', () => {
         const event = new CustomEvent('changebot:action', {
           detail: {
             type: 'invalidAction',
-            scope: 'error-test'
+            scope: 'error-test',
           },
           bubbles: true,
-          composed: true
+          composed: true,
         });
         document.dispatchEvent(event);
       });
@@ -550,7 +536,7 @@ describe('Integration Tests - Full System', () => {
             content: 'Content 1',
             display_date: '2025-01-01',
             published_at: '2025-01-01T00:00:00Z',
-            tags: []
+            tags: [],
           },
           {
             id: 2,
@@ -558,16 +544,15 @@ describe('Integration Tests - Full System', () => {
             content: 'Content 2',
             display_date: '2025-01-02',
             published_at: '2025-01-02T00:00:00Z',
-            tags: []
-          }
-        ]
+            tags: [],
+          },
+        ],
       });
 
       await page.setContent(`
-        <changebot-provider scope="badge-clear-test" mock-data='${mockData}'>
-          <changebot-badge scope="badge-clear-test"></changebot-badge>
-          <changebot-panel scope="badge-clear-test"></changebot-panel>
-        </changebot-provider>
+        <changebot-provider scope="badge-clear-test" mock-data='${mockData}' />
+        <changebot-badge scope="badge-clear-test" />
+        <changebot-panel scope="badge-clear-test" />
       `);
 
       await page.waitForChanges();
@@ -613,7 +598,7 @@ describe('Integration Tests - Full System', () => {
             content: 'Content 1',
             display_date: '2025-01-01',
             published_at: '2025-01-01T00:00:00Z',
-            tags: []
+            tags: [],
           },
           {
             id: 2,
@@ -621,7 +606,7 @@ describe('Integration Tests - Full System', () => {
             content: 'Content 2',
             display_date: '2025-01-02',
             published_at: '2025-01-02T00:00:00Z',
-            tags: []
+            tags: [],
           },
           {
             id: 3,
@@ -629,16 +614,15 @@ describe('Integration Tests - Full System', () => {
             content: 'Content 3',
             display_date: '2025-01-03',
             published_at: '2025-01-03T00:00:00Z',
-            tags: []
-          }
-        ]
+            tags: [],
+          },
+        ],
       });
 
       await page.setContent(`
-        <changebot-provider scope="badge-clear-action-test" mock-data='${mockData}'>
-          <changebot-badge scope="badge-clear-action-test"></changebot-badge>
-          <changebot-panel scope="badge-clear-action-test"></changebot-panel>
-        </changebot-provider>
+        <changebot-provider scope="badge-clear-action-test" mock-data='${mockData}' />
+        <changebot-badge scope="badge-clear-action-test" />
+        <changebot-panel scope="badge-clear-action-test" />
       `);
 
       await page.waitForChanges();
@@ -657,10 +641,10 @@ describe('Integration Tests - Full System', () => {
         const event = new CustomEvent('changebot:action', {
           detail: {
             type: 'openDisplay',
-            scope: 'badge-clear-action-test'
+            scope: 'badge-clear-action-test',
           },
           bubbles: true,
-          composed: true
+          composed: true,
         });
         document.dispatchEvent(event);
       });
@@ -683,12 +667,10 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-provider scope="badge-scope">
-          <changebot-badge scope="badge-scope" count="5"></changebot-badge>
-        </changebot-provider>
-        <changebot-provider scope="panel-scope">
-          <changebot-panel scope="panel-scope"></changebot-panel>
-        </changebot-provider>
+        <changebot-provider scope="badge-scope" />
+        <changebot-badge scope="badge-scope" count="5" />
+        <changebot-provider scope="panel-scope" />
+        <changebot-panel scope="panel-scope" />
       `);
 
       await page.waitForChanges();

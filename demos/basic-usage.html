@@ -73,41 +73,40 @@
 
 <body>
   <!-- Provider manages state for all widgets -->
-  <changebot-provider slug="demo-team" scope="default">
-    <div class="container">
-      <h1>🎯 Basic Usage Example</h1>
+  <changebot-provider slug="demo-team" />
 
-      <div class="description">
-        <p>This example demonstrates the most basic setup for Changebot Widgets:</p>
-        <ul>
-          <li>One provider component that manages state</li>
-          <li>One badge component to show update counts</li>
-          <li>One drawer component to display updates</li>
-        </ul>
-        <p>The components communicate automatically through the provider using custom events.</p>
-      </div>
+  <div class="container">
+    <h1>🎯 Basic Usage Example</h1>
 
-      <div class="code-block">
-        <code>&lt;changebot-provider slug="demo-team" scope="default"&gt; &lt;changebot-badge
-          scope="default"&gt;&lt;/changebot-badge&gt; &lt;changebot-panel scope="default"
-          mode="drawer-right"&gt;&lt;/changebot-panel&gt; &lt;/changebot-provider&gt;</code>
-      </div>
-
-      <div class="demo-area">
-        <div class="header">
-          <h2>Your App Header</h2>
-          <!-- Badge appears in the header -->
-          <changebot-badge scope="default"></changebot-badge>
-        </div>
-
-        <p>Click the badge above to see product updates!</p>
-        <p>The drawer will slide in from the right with all updates.</p>
-      </div>
-
-      <!-- Drawer component (hidden until opened) -->
-      <changebot-panel scope="default" mode="drawer-right"> </changebot-panel>
+    <div class="description">
+      <p>This example demonstrates the most basic setup for Changebot Widgets:</p>
+      <ul>
+        <li>One provider component that manages state</li>
+        <li>One badge component to show update counts</li>
+        <li>One drawer component to display updates</li>
+      </ul>
+      <p>The components communicate automatically through the provider using custom events.</p>
     </div>
-  </changebot-provider>
+
+    <div class="code-block">
+      <code>&lt;changebot-provider slug="demo-team" /&gt; &lt;changebot-badge /&gt; &lt;changebot-panel
+        mode="drawer-right" /&gt;</code>
+    </div>
+
+    <div class="demo-area">
+      <div class="header">
+        <h2>Your App Header</h2>
+        <!-- Badge appears in the header -->
+        <changebot-badge />
+      </div>
+
+      <p>Click the badge above to see product updates!</p>
+      <p>The drawer will slide in from the right with all updates.</p>
+    </div>
+
+    <!-- Drawer component (hidden until opened) -->
+    <changebot-panel mode="drawer-right" />
+  </div>
 
   <script>
     // Simulate some updates for demo purposes

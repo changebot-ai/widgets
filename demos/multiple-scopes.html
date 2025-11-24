@@ -1,8 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Multiple Scopes Example - Changebot Widgets</title>
   <style>
     body {
@@ -11,14 +12,17 @@
       padding: 20px;
       background: #f5f5f5;
     }
+
     .container {
       max-width: 1200px;
       margin: 0 auto;
     }
+
     h1 {
       color: #333;
       text-align: center;
     }
+
     .description {
       color: #666;
       line-height: 1.6;
@@ -27,6 +31,7 @@
       max-width: 800px;
       margin: 0 auto 40px;
     }
+
     .app-section {
       background: white;
       padding: 30px;
@@ -34,6 +39,7 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
     }
+
     .app-header {
       display: flex;
       justify-content: space-between;
@@ -43,12 +49,15 @@
       margin-bottom: 20px;
       color: white;
     }
+
     .app-1 .app-header {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
+
     .app-2 .app-header {
       background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     }
+
     .code-block {
       background: #1e1e1e;
       color: #d4d4d4;
@@ -58,6 +67,7 @@
       margin: 20px auto 40px;
       max-width: 800px;
     }
+
     code {
       font-family: 'Courier New', monospace;
       font-size: 13px;
@@ -67,62 +77,51 @@
   <!-- Load Changebot Widgets -->
   <script type="module" src="../dist/widgets/widgets.esm.js"></script>
 </head>
+
 <body>
   <div class="container">
     <h1>🎨 Multiple Scopes Example</h1>
 
     <div class="description">
-      <p>This example shows how multiple independent widget systems can coexist on the same page using different scopes.</p>
+      <p>This example shows how multiple independent widget systems can coexist on the same page using different scopes.
+      </p>
       <p>Each scope has its own provider, badge, and drawer that work independently.</p>
     </div>
 
     <div class="code-block">
-      <code>&lt;!-- App 1 --&gt;
-&lt;changebot-provider scope="app1"&gt;
-  &lt;changebot-badge scope="app1"&gt;&lt;/changebot-badge&gt;
-  &lt;changebot-panel scope="app1"&gt;&lt;/changebot-panel&gt;
-&lt;/changebot-provider&gt;
-
-&lt;!-- App 2 --&gt;
-&lt;changebot-provider scope="app2"&gt;
-  &lt;changebot-badge scope="app2"&gt;&lt;/changebot-badge&gt;
-  &lt;changebot-panel scope="app2"&gt;&lt;/changebot-panel&gt;
-&lt;/changebot-provider&gt;</code>
+      <code>&lt;!-- App 1 --&gt; &lt;changebot-provider scope="app1" /&gt; &lt;changebot-badge scope="app1" /&gt;
+        &lt;changebot-panel scope="app1" /&gt; &lt;!-- App 2 --&gt;
+        &lt;changebot-provider scope="app2" /&gt; &lt;changebot-badge scope="app2" /&gt; &lt;changebot-panel
+        scope="app2" /&gt;</code>
     </div>
 
     <!-- First Application Scope -->
-    <changebot-provider scope="app1">
-      <div class="app-section app-1">
-        <div class="app-header">
-          <h2>📱 Application 1 - Main Product</h2>
-          <changebot-badge scope="app1"></changebot-badge>
-        </div>
-        <p>This is Application 1 with its own set of updates.</p>
-        <p>Click the badge to see updates specific to this application.</p>
-      </div>
+    <changebot-provider scope="app1" />
 
-      <changebot-panel
-        scope="app1"
-        mode="drawer-right">
-      </changebot-panel>
-    </changebot-provider>
+    <div class="app-section app-1">
+      <div class="app-header">
+        <h2>📱 Application 1 - Main Product</h2>
+        <changebot-badge scope="app1"></changebot-badge>
+      </div>
+      <p>This is Application 1 with its own set of updates.</p>
+      <p>Click the badge to see updates specific to this application.</p>
+    </div>
+
+    <changebot-panel scope="app1" mode="drawer-right"> </changebot-panel>
 
     <!-- Second Application Scope -->
-    <changebot-provider scope="app2">
-      <div class="app-section app-2">
-        <div class="app-header">
-          <h2>🚀 Application 2 - Admin Dashboard</h2>
-          <changebot-badge scope="app2"></changebot-badge>
-        </div>
-        <p>This is Application 2 with completely independent updates.</p>
-        <p>Notice how the badge and updates are separate from Application 1.</p>
-      </div>
+    <changebot-provider scope="app2" />
 
-      <changebot-panel
-        scope="app2"
-        mode="drawer-left">
-      </changebot-panel>
-    </changebot-provider>
+    <div class="app-section app-2">
+      <div class="app-header">
+        <h2>🚀 Application 2 - Admin Dashboard</h2>
+        <changebot-badge scope="app2"></changebot-badge>
+      </div>
+      <p>This is Application 2 with completely independent updates.</p>
+      <p>Notice how the badge and updates are separate from Application 1.</p>
+    </div>
+
+    <changebot-panel scope="app2" mode="drawer-left"> </changebot-panel>
   </div>
 
   <script>
@@ -136,10 +135,10 @@
             {
               id: 'app1-1',
               title: 'Main App: New Dashboard',
-              description: 'We\'ve redesigned the main dashboard with better analytics.',
+              description: "We've redesigned the main dashboard with better analytics.",
               date: new Date().toISOString(),
               timestamp: Date.now(),
-              tags: [{ text: 'Feature', color: '#667eea' }]
+              tags: [{text: 'Feature', color: '#667eea'}],
             },
             {
               id: 'app1-2',
@@ -147,9 +146,9 @@
               description: 'You can now export your data to CSV and PDF.',
               date: new Date(Date.now() - 86400000).toISOString(),
               timestamp: Date.now() - 86400000,
-              tags: [{ text: 'Feature', color: '#667eea' }]
-            }
-          ]
+              tags: [{text: 'Feature', color: '#667eea'}],
+            },
+          ],
         };
       }
     }, 1000);
@@ -167,7 +166,7 @@
               description: 'Enhanced user management with bulk actions.',
               date: new Date().toISOString(),
               timestamp: Date.now(),
-              tags: [{ text: 'Admin', color: '#f5576c' }]
+              tags: [{text: 'Admin', color: '#f5576c'}],
             },
             {
               id: 'app2-2',
@@ -175,7 +174,7 @@
               description: 'Applied latest security updates to admin panel.',
               date: new Date(Date.now() - 43200000).toISOString(),
               timestamp: Date.now() - 43200000,
-              tags: [{ text: 'Security', color: '#f56565' }]
+              tags: [{text: 'Security', color: '#f56565'}],
             },
             {
               id: 'app2-3',
@@ -183,12 +182,13 @@
               description: 'New audit log viewer for tracking admin actions.',
               date: new Date(Date.now() - 172800000).toISOString(),
               timestamp: Date.now() - 172800000,
-              tags: [{ text: 'Feature', color: '#f5576c' }]
-            }
-          ]
+              tags: [{text: 'Feature', color: '#f5576c'}],
+            },
+          ],
         };
       }
     }, 1000);
   </script>
 </body>
+
 </html>

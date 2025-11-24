@@ -202,7 +202,7 @@
 
 <body>
   <!-- Provider Component - Fetches updates from Changebot API -->
-  <changebot-provider slug="changebot"></changebot-provider>
+  <changebot-provider slug="changebot" />
 
   <!-- Banner Component - Displays at top of page -->
   <changebot-banner id="banner-automatic"></changebot-banner>
@@ -286,7 +286,7 @@
 
     <h3>Basic Setup</h3>
     <pre><code>&lt;!-- Provider Component --&gt;
-        &lt;changebot-provider slug="your-slug" &gt;&lt;/changebot-provider&gt;
+        &lt;changebot-provider slug="your-slug" /&gt;
 
         &lt;!-- Banner Component --&gt;
         &lt;changebot-banner&gt;&lt;/changebot-banner&gt;</code></pre>
@@ -303,10 +303,10 @@
 
     <h3>With Custom Scope</h3>
     <pre><code>&lt;!-- Multiple independent banners --&gt;
-        &lt;changebot-provider slug="product-updates" scope="product"&gt;&lt;/changebot-provider&gt;
+        &lt;changebot-provider slug="product-updates" scope="product" /&gt;
         &lt;changebot-banner scope="product"&gt;&lt;/changebot-banner&gt;
 
-        &lt;changebot-provider slug="blog-posts" scope="blog"&gt;&lt;/changebot-provider&gt;
+        &lt;changebot-provider slug="blog-posts" scope="blog" /&gt;
         &lt;changebot-banner scope="blog"&gt;&lt;/changebot-banner&gt;</code></pre>
 
     <h2>Props</h2>
@@ -375,7 +375,8 @@
 
     <h2>Available Themes</h2>
     <ul>
-      <li>Catppuccin: <code>catppuccin-latte</code>, <code>catppuccin-frappe</code>, <code>catppuccin-macchiato</code>,
+      <li>
+        Catppuccin: <code>catppuccin-latte</code>, <code>catppuccin-frappe</code>, <code>catppuccin-macchiato</code>,
         <code>catppuccin-mocha</code>
       </li>
       <li>Gruvbox: <code>gruvbox-light</code>, <code>gruvbox-dark</code></li>

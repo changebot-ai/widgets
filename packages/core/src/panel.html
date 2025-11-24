@@ -221,7 +221,7 @@
 
 <body>
   <!-- Provider Component - Fetches updates from Changebot API -->
-  <changebot-provider slug="changebot"></changebot-provider>
+  <changebot-provider slug="changebot" />
 
   <!-- Panel Component - Opens when badge is clicked -->
   <changebot-panel id="panel-demo" display-mode="drawer-right"></changebot-panel>
@@ -333,7 +333,7 @@
 
     <h3>Basic Setup</h3>
     <pre><code>&lt;!-- Provider Component --&gt;
-        &lt;changebot-provider slug="your-slug" &gt;&lt;/changebot-provider&gt;
+        &lt;changebot-provider slug="your-slug" /&gt;
 
         &lt;!-- Badge in header --&gt;
         &lt;changebot-badge&gt;&lt;/changebot-badge&gt;
@@ -399,11 +399,11 @@
 
     <h3>With Custom Scope</h3>
     <pre><code>&lt;!-- Multiple independent systems --&gt;
-        &lt;changebot-provider slug="product-updates" scope="product"&gt;&lt;/changebot-provider&gt;
+        &lt;changebot-provider slug="product-updates" scope="product" /&gt;
         &lt;changebot-badge scope="product"&gt;&lt;/changebot-badge&gt;
         &lt;changebot-panel scope="product"&gt;&lt;/changebot-panel&gt;
 
-        &lt;changebot-provider slug="blog-posts" scope="blog"&gt;&lt;/changebot-provider&gt;
+        &lt;changebot-provider slug="blog-posts" scope="blog" /&gt;&lt;
         &lt;changebot-badge scope="blog"&gt;&lt;/changebot-badge&gt;
         &lt;changebot-panel scope="blog" display-mode="modal"&gt;&lt;/changebot-panel&gt;</code></pre>
 

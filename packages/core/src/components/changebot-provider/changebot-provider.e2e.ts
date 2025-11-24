@@ -3,7 +3,7 @@ import { newE2EPage } from '@stencil/core/testing';
 describe('changebot-provider', () => {
   it('renders', async () => {
     const page = await newE2EPage();
-    await page.setContent('<changebot-provider></changebot-provider>');
+    await page.setContent('<changebot-provider />');
 
     const element = await page.find('changebot-provider');
     expect(element).toHaveClass('hydrated');
@@ -11,7 +11,7 @@ describe('changebot-provider', () => {
 
   it('renders with url prop', async () => {
     const page = await newE2EPage();
-    await page.setContent('<changebot-provider url="https://api.example.com/updates"></changebot-provider>');
+    await page.setContent('<changebot-provider url="https://api.example.com/updates" />');
 
     const element = await page.find('changebot-provider');
     expect(element).toHaveClass('hydrated');
@@ -20,7 +20,7 @@ describe('changebot-provider', () => {
 
   it('renders with slug prop', async () => {
     const page = await newE2EPage();
-    await page.setContent('<changebot-provider slug="test-team"></changebot-provider>');
+    await page.setContent('<changebot-provider slug="test-team" />');
 
     const element = await page.find('changebot-provider');
     expect(element).toHaveClass('hydrated');
@@ -29,7 +29,7 @@ describe('changebot-provider', () => {
 
   it('renders with scope prop', async () => {
     const page = await newE2EPage();
-    await page.setContent('<changebot-provider scope="custom-scope"></changebot-provider>');
+    await page.setContent('<changebot-provider scope="custom-scope" />');
 
     const element = await page.find('changebot-provider');
     expect(element).toHaveClass('hydrated');
@@ -38,7 +38,7 @@ describe('changebot-provider', () => {
 
   it('renders with default scope when not provided', async () => {
     const page = await newE2EPage();
-    await page.setContent('<changebot-provider></changebot-provider>');
+    await page.setContent('<changebot-provider />');
 
     const element = await page.find('changebot-provider');
     expect(await element.getProperty('scope')).toBe('default');
@@ -47,7 +47,7 @@ describe('changebot-provider', () => {
   describe('context request event handling', () => {
     it('responds to context request events', async () => {
       const page = await newE2EPage();
-      await page.setContent('<changebot-provider></changebot-provider>');
+      await page.setContent('<changebot-provider />');
 
       // Set up listener for the response
       const contextReceived = await page.evaluateHandle(() => {
@@ -78,7 +78,7 @@ describe('changebot-provider', () => {
 
     it('ignores context requests with different scope', async () => {
       const page = await newE2EPage();
-      await page.setContent('<changebot-provider scope="scope-a"></changebot-provider>');
+      await page.setContent('<changebot-provider scope="scope-a" />');
 
       const contextReceived = await page.evaluate(() => {
         return new Promise((resolve) => {
@@ -111,7 +111,7 @@ describe('changebot-provider', () => {
   describe('action event handling', () => {
     it('handles action events', async () => {
       const page = await newE2EPage();
-      await page.setContent('<changebot-provider></changebot-provider>');
+      await page.setContent('<changebot-provider />');
 
       // Spy on console to verify action handling
       const consoleMessages = [];
@@ -139,7 +139,7 @@ describe('changebot-provider', () => {
 
     it('ignores actions with different scope', async () => {
       const page = await newE2EPage();
-      await page.setContent('<changebot-provider scope="scope-a"></changebot-provider>');
+      await page.setContent('<changebot-provider scope="scope-a" />');
 
       const actionProcessed = await page.evaluate(() => {
         return new Promise((resolve) => {
@@ -172,8 +172,8 @@ describe('changebot-provider', () => {
     it('allows multiple providers to coexist with different scopes', async () => {
       const page = await newE2EPage();
       await page.setContent(`
-        <changebot-provider scope="scope-a"></changebot-provider>
-        <changebot-provider scope="scope-b"></changebot-provider>
+        <changebot-provider scope="scope-a" />
+        <changebot-provider scope="scope-b" />
       `);
 
       const providers = await page.findAll('changebot-provider');
@@ -229,9 +229,8 @@ describe('changebot-provider', () => {
     it('renders slot content', async () => {
       const page = await newE2EPage();
       await page.setContent(`
-        <changebot-provider>
-          <div class="test-content">Test Content</div>
-        </changebot-provider>
+        <changebot-provider />
+        <div class="test-content">Test Content</div>
       `);
 
       const slotContent = await page.find('.test-content');
