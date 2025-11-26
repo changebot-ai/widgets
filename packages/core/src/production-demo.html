@@ -199,7 +199,18 @@
 
         <div class="button-grid">
           <button class="demo-button" onclick="openPanel()">Open Updates Panel</button>
-          <button class="demo-button secondary" onclick="resetBadge()">Reset Badge Count</button>
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h2>Reset Last Viewed</h2>
+        <p>Set the last viewed timestamp to see badge count updates:</p>
+
+        <div class="button-grid">
+          <button class="demo-button secondary" onclick="setLastViewed('yesterday')">Yesterday</button>
+          <button class="demo-button secondary" onclick="setLastViewed('lastWeek')">Last Week</button>
+          <button class="demo-button secondary" onclick="setLastViewed('twoWeeks')">2 Weeks Ago</button>
+          <button class="demo-button secondary" onclick="setLastViewed('lastMonth')">Last Month</button>
         </div>
       </div>
 
@@ -223,9 +234,30 @@
       document.dispatchEvent(event);
     }
 
-    // Reset badge - clear last viewed time so badge appears again
-    function resetBadge() {
-      localStorage.removeItem('changebot:lastViewed:default');
+    // Set last viewed timestamp to a specific period in the past
+    function setLastViewed(period) {
+      const now = new Date();
+      let pastDate;
+
+      switch (period) {
+        case 'yesterday':
+          pastDate = new Date(now.setDate(now.getDate() - 1));
+          break;
+        case 'lastWeek':
+          pastDate = new Date(now.setDate(now.getDate() - 7));
+          break;
+        case 'twoWeeks':
+          pastDate = new Date(now.setDate(now.getDate() - 14));
+          break;
+        case 'lastMonth':
+          pastDate = new Date(now.setMonth(now.getMonth() - 1));
+          break;
+        default:
+          pastDate = new Date(now.setDate(now.getDate() - 1));
+      }
+
+      // Set the lastViewed timestamp in localStorage
+      localStorage.setItem('changebot:lastViewed:default', pastDate.toISOString());
       location.reload();
     }
   </script>
