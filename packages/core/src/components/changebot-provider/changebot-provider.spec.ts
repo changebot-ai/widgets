@@ -175,7 +175,7 @@ describe('changebot-provider', () => {
   });
 
   describe('fetchLastSeen', () => {
-    it('fetches from API when userId is provided', async () => {
+    it('fetches from API when userId is provided and cache is expired', async () => {
       const mockTimestamp = '2024-01-01T00:00:00.000Z';
       (global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
@@ -191,16 +191,24 @@ describe('changebot-provider', () => {
       await page.waitForChanges();
       (global.fetch as jest.Mock).mockClear();
 
+      // Set cache to expired (31 minutes ago)
+      const thirtyOneMinutesAgo = Date.now() - 31 * 60 * 1000;
+      page.win.localStorage.setItem('changebot:lastApiSync:default', thirtyOneMinutesAgo.toString());
+      page.win.localStorage.setItem('changebot:lastViewed:default', '1234567890');
+
       (global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
         json: async () => ({ id: 'user-123', last_seen_at: mockTimestamp }),
       });
 
       const component = page.rootInstance;
-      const result = await component.fetchLastSeen();
+      const result = component.fetchLastSeen();
 
-      expect(result).toBe(new Date(mockTimestamp).getTime());
-      expect(global.fetch).toHaveBeenCalled();
+      // Allow async operations to complete
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      expect(result).toBe(1234567890); // Returns localStorage value immediately
+      expect(global.fetch).toHaveBeenCalled(); // But triggers background sync
     });
 
     it('reads from localStorage when no userId is provided', async () => {
@@ -467,6 +475,227 @@ describe('changebot-provider', () => {
       const component = page.rootInstance;
       expect(component.scopedStore.store.state.lastViewed).toBe(new Date(mockTimestamp).getTime());
       expect(global.fetch).toHaveBeenCalled();
+    });
+  });
+
+  describe('API Caching', () => {
+    it('shouldSyncWithApi returns true when no cache exists', async () => {
+      (global.fetch as jest.Mock).mockImplementation(() => {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ widget: {}, publications: [] }),
+        });
+      });
+
+      const page = await newSpecPage({
+        components: [ChangebotProvider],
+        html: '<changebot-provider slug="test-widget" user-id="user-123" />',
+        autoApplyChanges: true,
+      });
+
+      // Clear the cache that was created during component load
+      page.win.localStorage.removeItem('changebot:lastApiSync:default');
+
+      const component = page.rootInstance;
+      const result = component.shouldSyncWithApi();
+
+      expect(result).toBe(true);
+    });
+
+    it('shouldSyncWithApi returns false when cache is fresh (< 30 min)', async () => {
+      (global.fetch as jest.Mock).mockImplementation(() => {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ widget: {}, publications: [] }),
+        });
+      });
+
+      const page = await newSpecPage({
+        components: [ChangebotProvider],
+        html: '<changebot-provider slug="test-widget" user-id="user-123" />',
+        autoApplyChanges: true,
+      });
+
+      // Set cache timestamp to 10 minutes ago
+      const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
+      page.win.localStorage.setItem('changebot:lastApiSync:default', tenMinutesAgo.toString());
+
+      const component = page.rootInstance;
+      const result = component.shouldSyncWithApi();
+
+      expect(result).toBe(false);
+    });
+
+    it('shouldSyncWithApi returns true when cache is expired (> 30 min)', async () => {
+      (global.fetch as jest.Mock).mockImplementation(() => {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ widget: {}, publications: [] }),
+        });
+      });
+
+      const page = await newSpecPage({
+        components: [ChangebotProvider],
+        html: '<changebot-provider slug="test-widget" user-id="user-123" />',
+        autoApplyChanges: true,
+      });
+
+      // Set cache timestamp to 31 minutes ago
+      const thirtyOneMinutesAgo = Date.now() - 31 * 60 * 1000;
+      page.win.localStorage.setItem('changebot:lastApiSync:default', thirtyOneMinutesAgo.toString());
+
+      const component = page.rootInstance;
+      const result = component.shouldSyncWithApi();
+
+      expect(result).toBe(true);
+    });
+
+    it('fetchLastSeen skips GET request when cache is fresh', async () => {
+      (global.fetch as jest.Mock).mockImplementation(() => {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ widget: {}, publications: [] }),
+        });
+      });
+
+      const page = await newSpecPage({
+        components: [ChangebotProvider],
+        html: '<changebot-provider slug="test-widget" user-id="user-123" />',
+        autoApplyChanges: true,
+      });
+
+      await page.waitForChanges();
+
+      // Set cache timestamp to 10 minutes ago and localStorage value
+      const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
+      page.win.localStorage.setItem('changebot:lastApiSync:default', tenMinutesAgo.toString());
+      page.win.localStorage.setItem('changebot:lastViewed:default', '1234567890');
+
+      (global.fetch as jest.Mock).mockClear();
+
+      const component = page.rootInstance;
+      const result = component.fetchLastSeen();
+
+      // Allow async operations to complete
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      expect(result).toBe(1234567890);
+      expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    it('fetchLastSeen makes GET request when cache is expired', async () => {
+      const mockTimestamp = '2024-01-01T00:00:00.000Z';
+
+      (global.fetch as jest.Mock).mockImplementation(url => {
+        if (url.includes('/users/')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({ id: 'user-123', last_seen_at: mockTimestamp }),
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ widget: {}, publications: [] }),
+        });
+      });
+
+      const page = await newSpecPage({
+        components: [ChangebotProvider],
+        html: '<changebot-provider slug="test-widget" user-id="user-123" />',
+        autoApplyChanges: true,
+      });
+
+      await page.waitForChanges();
+
+      // Set cache timestamp to 31 minutes ago
+      const thirtyOneMinutesAgo = Date.now() - 31 * 60 * 1000;
+      page.win.localStorage.setItem('changebot:lastApiSync:default', thirtyOneMinutesAgo.toString());
+      page.win.localStorage.setItem('changebot:lastViewed:default', '1234567890');
+
+      (global.fetch as jest.Mock).mockClear();
+
+      const component = page.rootInstance;
+      component.fetchLastSeen();
+
+      // Allow async operations to complete
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/users/user-123'),
+        expect.objectContaining({ method: 'GET' }),
+      );
+    });
+
+    it('syncFromApi updates lastApiSync timestamp after successful sync', async () => {
+      const mockTimestamp = '2024-01-01T00:00:00.000Z';
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({ id: 'user-123', last_seen_at: mockTimestamp }),
+      });
+
+      const page = await newSpecPage({
+        components: [ChangebotProvider],
+        html: '<changebot-provider slug="test-widget" user-id="user-123" />',
+        autoApplyChanges: true,
+      });
+
+      const beforeSync = Date.now();
+
+      const component = page.rootInstance;
+      await component.syncFromApi();
+
+      const afterSync = Date.now();
+
+      const stored = page.win.localStorage.getItem('changebot:lastApiSync:default');
+      expect(stored).toBeTruthy();
+
+      const storedTimestamp = parseInt(stored, 10);
+      expect(storedTimestamp).toBeGreaterThanOrEqual(beforeSync);
+      expect(storedTimestamp).toBeLessThanOrEqual(afterSync);
+    });
+
+    it('panel opening does not trigger GET request', async () => {
+      (global.fetch as jest.Mock).mockImplementation(url => {
+        if (url.includes('/users/')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({ id: 'user-123', last_seen_at: null }),
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ widget: {}, publications: [] }),
+        });
+      });
+
+      const page = await newSpecPage({
+        components: [ChangebotProvider],
+        html: '<changebot-provider slug="test-widget" user-id="user-123" />',
+        autoApplyChanges: true,
+      });
+
+      await page.waitForChanges();
+
+      // Set fresh cache to prevent GET on page load
+      page.win.localStorage.setItem('changebot:lastApiSync:default', Date.now().toString());
+
+      (global.fetch as jest.Mock).mockClear();
+
+      // Mock PATCH response
+      (global.fetch as jest.Mock).mockResolvedValue({ ok: true });
+
+      const component = page.rootInstance;
+      await component.markAsViewed();
+
+      await page.waitForChanges();
+
+      // Should have exactly 1 PATCH call, no GET calls
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/users/user-123'),
+        expect.objectContaining({ method: 'PATCH' }),
+      );
     });
   });
 });

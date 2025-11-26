@@ -29,15 +29,20 @@ For B2B SaaS applications with authenticated users, it's valuable to:
 
 ### API Integration
 When `userId` is provided, the widget will:
-1. **On load:** GET from `/api/v1/widgets/:slug/users/:id` to fetch `last_seen_at`
+1. **On load:** GET from `/api/v1/widgets/:slug/users/:id` to fetch `last_seen_at` (with 30-minute caching)
 2. **On view:** PATCH to `/api/v1/widgets/:slug/users/:id` to update `last_seen_at`
 3. **Fallback:** Use localStorage if API calls fail (graceful degradation)
 
 ### Implementation Strategy
 - **Fast initialization:** Component loads with localStorage data (synchronous read, minimal delay)
-- **localStorage-first for reads:** `fetchLastSeen()` synchronously returns localStorage value, then syncs from API in background
+- **localStorage-first for reads:** `fetchLastSeen()` synchronously returns localStorage value, then conditionally syncs from API
+- **30-minute API caching:** GET requests are cached for 30 minutes to reduce API load (96% reduction in typical usage)
+  - `shouldSyncWithApi()` checks if cache has expired before making GET requests
+  - Cache timestamp stored in `localStorage` key: `changebot:lastApiSync:{scope}`
+  - First load or expired cache triggers API sync
 - **Background API sync:** `syncFromApi()` runs asynchronously, updates state when complete without blocking
 - **API sync on write:** `setLastViewed()` updates both localStorage and API when user views updates
+- **Panel opening behavior:** Only PATCH request (no GET) since marking as viewed immediately
 - **Abstraction layer:** Hide API vs localStorage logic behind `fetchLastSeen()` and `setLastViewed()` methods
 - **Call site simplicity:** No implementation details at call sites (`hydrateLastViewed()` and `markAsViewed()`)
 - **Test compatibility:** `hydrateLastViewed()` includes `await Promise.resolve()` to work with Stencil test environment
@@ -73,6 +78,22 @@ The component initializes quickly with localStorage data (synchronous read) whil
 
 ### 6. Null Handling Prevents Notification Spam
 When a user's `last_seen_at` is null (never tracked before), we set it to the current timestamp. This prevents showing all historical updates as "new" when a customer first migrates to user tracking.
+
+### 7. API Efficiency Through Caching
+**Problem:** Without caching, every page load makes a GET request (50 page loads = 50 API calls).
+
+**Solution:** 30-minute cache dramatically reduces API load while maintaining cross-device sync.
+
+**Impact:**
+- **Before caching:** 50 page loads over 20 minutes = 50 GET requests + 1 PATCH = 51 total
+- **After caching:** 50 page loads over 20 minutes = 1 GET request + 1 PATCH = 2 total
+- **Reduction:** 96% fewer API calls for typical browsing sessions
+
+**Trade-off:** Badge may show stale count for up to 30 minutes after viewing on another device. This is acceptable because:
+- Badge is a hint, not critical data
+- When user opens panel, they see correct updates (and mark as viewed)
+- Cross-device sync still works, just with reasonable delay
+- Massive API savings justify the minor UX trade-off
 
 ## API Specification
 
@@ -123,8 +144,9 @@ When a user's `last_seen_at` is null (never tracked before), we set it to the cu
 - `parseUserData()` - Validates and parses userData JSON
 - `fetchUserTracking()` - Low-level GET request to user tracking API
 - `updateUserTracking(timestamp, data?)` - Low-level PATCH request to user tracking API
-- `fetchLastSeen()` - Synchronously reads from localStorage, kicks off `syncFromApi()` in background if userId exists
-- `syncFromApi()` - Background API sync that updates state when complete (non-blocking)
+- `shouldSyncWithApi()` - Checks if 30 minutes have elapsed since last API sync (cache expiration)
+- `fetchLastSeen()` - Synchronously reads from localStorage, conditionally kicks off `syncFromApi()` if cache expired
+- `syncFromApi()` - Background API sync that updates state when complete, stores sync timestamp for caching
 - `setLastViewed(timestamp)` - Updates both API and localStorage
 - `updateLocalStore(timestamp)` - Helper to update both store state and localStorage
 
@@ -167,6 +189,7 @@ Invalid JSON in `userData` prop:
 - **Clean architecture**: Well-abstracted, maintainable code
 - **Graceful degradation**: Works even when API is unavailable
 - **Flexible metadata**: userData allows tracking arbitrary user info
+- **API efficiency**: 30-minute caching reduces API calls by 96% for typical usage patterns
 
 ### Negative
 - **API dependency**: Requires customers to implement and host API endpoints
@@ -190,6 +213,14 @@ Invalid JSON in `userData` prop:
 - API success, failure, and null response handling
 - localStorage fallback behavior
 - Component lifecycle integration
+- API caching behavior:
+  - shouldSyncWithApi() returns true when no cache exists
+  - shouldSyncWithApi() returns false when cache is fresh (< 30 min)
+  - shouldSyncWithApi() returns true when cache is expired (> 30 min)
+  - fetchLastSeen() skips GET request when cache is fresh
+  - fetchLastSeen() makes GET request when cache is expired
+  - syncFromApi() updates lastApiSync timestamp after successful sync
+  - Panel opening only makes PATCH request (no GET)
 
 **Demo Page:**
 - `user-tracking-demo.html` demonstrates both valid and invalid userData
@@ -222,6 +253,15 @@ Invalid JSON in `userData` prop:
 2. **Webhooks**: Server-initiated notifications when new updates are published
 3. **Analytics dashboard**: Built-in reporting on user engagement
 4. **Offline queue**: Queue API calls when offline, sync when reconnected
+
+## Updates
+
+**2025-11-26: API Caching Implemented**
+- Added 30-minute caching for GET requests to reduce API load by 96%
+- New method `shouldSyncWithApi()` checks cache expiration
+- Panel opening behavior optimized to only make PATCH request (no GET)
+- Comprehensive tests added for caching behavior
+- Trade-off: Badge may show stale count for up to 30 minutes (acceptable for massive API savings)
 
 ## Lessons Learned
 

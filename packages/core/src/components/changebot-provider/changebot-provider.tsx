@@ -129,6 +129,20 @@ export class ChangebotProvider {
     }
   }
 
+  private shouldSyncWithApi(): boolean {
+    if (!this.userId) return false;
+
+    const key = getStorageKey(this.scope, 'lastApiSync');
+    const lastSync = localStorage.getItem(key);
+
+    if (!lastSync) return true; // Never synced before
+
+    const SYNC_INTERVAL = 30 * 60 * 1000; // 30 minutes
+    const elapsed = Date.now() - parseInt(lastSync, 10);
+
+    return elapsed > SYNC_INTERVAL;
+  }
+
   private fetchLastSeen(): number | null {
     // Always read localStorage first (fast, synchronous)
     const key = getStorageKey(this.scope, 'lastViewed');
@@ -139,8 +153,8 @@ export class ChangebotProvider {
       console.log('🔌 Provider: Fetched lastViewed from localStorage:', new Date(localValue).toLocaleString());
     }
 
-    // If userId is provided, sync from API in background (non-blocking)
-    if (this.userId) {
+    // Only sync from API if cache has expired
+    if (this.shouldSyncWithApi()) {
       void this.syncFromApi();
     }
 
@@ -170,6 +184,10 @@ export class ChangebotProvider {
 
         this.updateLocalStore(timestamp);
       }
+
+      // Update sync timestamp after successful sync
+      const syncKey = getStorageKey(this.scope, 'lastApiSync');
+      localStorage.setItem(syncKey, Date.now().toString());
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch user tracking data';
       console.warn('⚠️ Changebot widget: Could not fetch last_seen_at from API, using localStorage value.', {
