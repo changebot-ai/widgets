@@ -8,12 +8,14 @@ This is a Stencil web components library. Stencil is a compiler that generates s
 
 ## Development Commands
 
-- `npm install` - Install dependencies
-- `npm start` - Start development server with watch mode and live reload
-- `npm run build` - Build components for production
-- `npm test` - Run all unit tests (both spec and e2e)
-- `npm run test.watch` - Run tests in watch mode
-- `npm run generate` - Generate a new component scaffold
+- `pnpm install` - Install dependencies (or `npm install`)
+- `pnpm start` - Start development server with watch mode and live reload (or `npm start`)
+- `pnpm run build` - Build components for production (or `npm run build`)
+- `pnpm test` - Run all tests (both spec and e2e) (or `npm test`)
+- `pnpm run test.watch` - Run tests in watch mode (or `npm run test.watch`)
+- `pnpm run generate` - Generate a new component scaffold (or `npm run generate`)
+
+**Note**: This project uses `pnpm` as the package manager. All npm commands will also work.
 
 ## Project Architecture
 
@@ -68,7 +70,15 @@ Components use:
 
 ### Testing
 
-Tests run in headless shell mode (configured in `stencil.config.ts`). Unit tests use `newSpecPage` for component snapshot testing. E2E tests use Puppeteer.
+**Running Tests:**
+- `pnpm test` - Runs all tests (both spec and e2e), equivalent to `stencil test --spec --e2e`
+- `pnpm run test.watch` - Runs tests in watch mode for development
+
+**Test Types:**
+- **Spec tests** (`.spec.ts`) - Unit tests using `newSpecPage` from `@stencil/core/testing` for component snapshot testing
+- **E2E tests** (`.e2e.ts`) - End-to-end tests using Puppeteer for browser automation testing
+
+Tests run in headless shell mode (configured in `stencil.config.ts`).
 
 ## TypeScript Configuration
 
