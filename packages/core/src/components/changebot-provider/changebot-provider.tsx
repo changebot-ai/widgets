@@ -214,11 +214,11 @@ export class ChangebotProvider {
   private async fetchUserTracking(): Promise<{ id: string; last_seen_at: string | null }> {
     let apiUrl: string;
     if (this.slug) {
-      apiUrl = `https://api.changebot.ai/v1/widgets/${this.slug}/users/${this.userId}`;
+      apiUrl = `https://api.changebot.ai/v1/widgets/${this.slug}/users/${encodeURIComponent(this.userId)}`;
     } else if (this.url) {
       // For custom URLs, append the user tracking path
       const baseUrl = this.url.replace(/\/updates$/, '');
-      apiUrl = `${baseUrl}/users/${this.userId}`;
+      apiUrl = `${baseUrl}/users/${encodeURIComponent(this.userId)}`;
     } else {
       throw new Error('Either slug or url must be provided for user tracking');
     }
@@ -241,11 +241,11 @@ export class ChangebotProvider {
   private async updateUserTracking(timestamp: number, data?: object): Promise<void> {
     let apiUrl: string;
     if (this.slug) {
-      apiUrl = `https://api.changebot.ai/v1/widgets/${this.slug}/users/${this.userId}`;
+      apiUrl = `https://api.changebot.ai/v1/widgets/${this.slug}/users/${encodeURIComponent(this.userId)}`;
     } else if (this.url) {
       // For custom URLs, append the user tracking path
       const baseUrl = this.url.replace(/\/updates$/, '');
-      apiUrl = `${baseUrl}/users/${this.userId}`;
+      apiUrl = `${baseUrl}/users/${encodeURIComponent(this.userId)}`;
     } else {
       throw new Error('Either slug or url must be provided for user tracking');
     }
