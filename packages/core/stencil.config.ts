@@ -40,6 +40,7 @@ export const config: Config = {
         { src: 'unpkg-demo.html' },
         { src: 'react-demo.html' },
         { src: 'vue-demo.html' },
+        { src: 'user-tracking-demo.html' },
       ],
     },
   ],

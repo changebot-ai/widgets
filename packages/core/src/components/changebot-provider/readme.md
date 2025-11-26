@@ -2,6 +2,7 @@
 
 <!-- Auto Generated Below -->
 
+
 ## Properties
 
 | Property   | Attribute   | Description | Type     | Default     |
@@ -10,7 +11,10 @@
 | `scope`    | `scope`     |             | `string` | `'default'` |
 | `slug`     | `slug`      |             | `string` | `undefined` |
 | `url`      | `url`       |             | `string` | `undefined` |
+| `userData` | `user-data` |             | `string` | `undefined` |
+| `userId`   | `user-id`   |             | `string` | `undefined` |
 
----
 
-_Built with [StencilJS](https://stenciljs.com/)_
+----------------------------------------------
+
+*Built with [StencilJS](https://stenciljs.com/)*

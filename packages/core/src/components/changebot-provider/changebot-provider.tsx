@@ -13,6 +13,8 @@ export class ChangebotProvider {
   @Prop() slug?: string;
   @Prop() scope: string = 'default';
   @Prop() mockData?: string;
+  @Prop() userId?: string;
+  @Prop() userData?: string;
 
   // Create a dedicated store instance for this provider's scope
   private scopedStore = createScopedStore();
@@ -28,7 +30,7 @@ export class ChangebotProvider {
     },
   };
 
-  componentWillLoad() {
+  async componentWillLoad() {
     // Update services config with actual prop values
     this.services.config = {
       url: this.url,
@@ -36,9 +38,8 @@ export class ChangebotProvider {
       scope: this.scope,
     };
 
-    this.hydrateLastViewed();
+    await this.hydrateLastViewed();
 
-    // Load initial data from mockData (for testing/demos) or from API
     if (this.mockData) {
       this.loadMockData();
     } else if (this.url || this.slug) {
@@ -85,7 +86,7 @@ export class ChangebotProvider {
           }
 
           if (type === 'openDisplay') {
-            this.markAsViewed();
+            void this.markAsViewed();
           }
         } catch (error) {
           console.error(`Error executing action ${type}:`, error);
@@ -96,26 +97,17 @@ export class ChangebotProvider {
     }
   }
 
-  private markAsViewed() {
+  private async markAsViewed() {
     console.log('🔌 Provider: Marking as viewed for scope', this.scope);
-
-    const timestamp = Date.now();
-    this.scopedStore.store.state.lastViewed = timestamp;
-
-    const key = getStorageKey(this.scope, 'lastViewed');
-    localStorage.setItem(key, timestamp.toString());
-
-    this.scopedStore.actions.calculateNewCount();
+    await this.setLastViewed(Date.now());
   }
 
-  private hydrateLastViewed() {
-    const key = getStorageKey(this.scope, 'lastViewed');
-    const stored = localStorage.getItem(key);
-
-    if (stored) {
-      const timestamp = parseInt(stored, 10);
-      this.scopedStore.store.state.lastViewed = timestamp;
-      console.log('🔌 Provider: Hydrated lastViewed from localStorage:', new Date(timestamp).toLocaleString());
+  private async hydrateLastViewed() {
+    // Wait for next microtask to allow test environment to properly initialize
+    await Promise.resolve();
+    const timestamp = this.fetchLastSeen();
+    if (timestamp) {
+      this.scopedStore.actions.markViewed(timestamp);
     }
   }
 
@@ -137,9 +129,151 @@ export class ChangebotProvider {
     }
   }
 
+  private fetchLastSeen(): number | null {
+    // Always read localStorage first (fast, synchronous)
+    const key = getStorageKey(this.scope, 'lastViewed');
+    const stored = localStorage.getItem(key);
+    const localValue = stored ? parseInt(stored, 10) : null;
+
+    if (localValue) {
+      console.log('🔌 Provider: Fetched lastViewed from localStorage:', new Date(localValue).toLocaleString());
+    }
+
+    // If userId is provided, sync from API in background (non-blocking)
+    if (this.userId) {
+      void this.syncFromApi();
+    }
+
+    return localValue;
+  }
+
+  private updateLocalStore(timestamp: number) {
+    this.scopedStore.actions.markViewed(timestamp);
+
+    const key = getStorageKey(this.scope, 'lastViewed');
+    localStorage.setItem(key, timestamp.toString());
+  }
+
+  private async syncFromApi(): Promise<void> {
+    try {
+      console.log('🔌 Provider: Fetching last_seen_at from API for user', this.userId);
+      const data = await this.fetchUserTracking();
+
+      if (data.last_seen_at === null) {
+        console.log('🔌 Provider: User not tracked yet, setting last_seen_at to current time');
+        const currentTime = Date.now();
+        await this.setLastViewed(currentTime);
+      } else {
+        // Convert ISO timestamp to Unix timestamp in milliseconds
+        const timestamp = new Date(data.last_seen_at).getTime();
+        console.log('🔌 Provider: Fetched last_seen_at from API:', new Date(timestamp).toLocaleString());
+
+        this.updateLocalStore(timestamp);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch user tracking data';
+      console.warn('⚠️ Changebot widget: Could not fetch last_seen_at from API, using localStorage value.', {
+        error: errorMessage,
+        userId: this.userId,
+      });
+    }
+  }
+
+  private async setLastViewed(timestamp: number): Promise<void> {
+    this.updateLocalStore(timestamp);
+
+    if (this.userId) {
+      try {
+        const userData = this.parseUserData();
+        console.log('🔌 Provider: Updating last_seen_at via API for user', this.userId);
+        await this.updateUserTracking(timestamp, userData);
+        console.log('🔌 Provider: Successfully updated last_seen_at via API');
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to update user tracking data';
+        console.warn('⚠️ Changebot widget: Could not update last_seen_at via API, but localStorage was updated.', {
+          error: errorMessage,
+          userId: this.userId,
+        });
+      }
+    }
+  }
+
+  private async fetchUserTracking(): Promise<{ id: string; last_seen_at: string | null }> {
+    let apiUrl: string;
+    if (this.slug) {
+      apiUrl = `https://api.changebot.ai/v1/widgets/${this.slug}/users/${this.userId}`;
+    } else if (this.url) {
+      // For custom URLs, append the user tracking path
+      const baseUrl = this.url.replace(/\/updates$/, '');
+      apiUrl = `${baseUrl}/users/${this.userId}`;
+    } else {
+      throw new Error('Either slug or url must be provided for user tracking');
+    }
+
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+      mode: 'cors',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch user tracking data: ${response.statusText}`);
+    }
+
+    return await response.json();
+  }
+
+  private async updateUserTracking(timestamp: number, data?: object): Promise<void> {
+    let apiUrl: string;
+    if (this.slug) {
+      apiUrl = `https://api.changebot.ai/v1/widgets/${this.slug}/users/${this.userId}`;
+    } else if (this.url) {
+      // For custom URLs, append the user tracking path
+      const baseUrl = this.url.replace(/\/updates$/, '');
+      apiUrl = `${baseUrl}/users/${this.userId}`;
+    } else {
+      throw new Error('Either slug or url must be provided for user tracking');
+    }
+
+    const body: any = {
+      last_seen_at: new Date(timestamp).toISOString(),
+    };
+
+    if (data) {
+      body.data = data;
+    }
+
+    const response = await fetch(apiUrl, {
+      method: 'PATCH',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      mode: 'cors',
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update user tracking data: ${response.statusText}`);
+    }
+  }
+
+  private parseUserData(): object | null {
+    if (!this.userData) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(this.userData);
+    } catch (error) {
+      console.error('🔌 Provider: Invalid userData JSON, discarding userData but continuing with user tracking:', error);
+      return null;
+    }
+  }
+
   render() {
-    return (
-      <slot></slot>
-    );
+    return <slot></slot>;
   }
 }

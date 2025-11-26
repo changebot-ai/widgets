@@ -39,7 +39,9 @@ export const ChangebotProvider: StencilVueComponent<JSX.ChangebotProvider> = /*@
   'url',
   'slug',
   'scope',
-  'mockData'
+  'mockData',
+  'userId',
+  'userData'
 ]);
 
 
@@ -58,3 +60,4 @@ export const MyComponent: StencilVueComponent<JSX.MyComponent> = /*@__PURE__*/ d
   'middle',
   'last'
 ]);
+

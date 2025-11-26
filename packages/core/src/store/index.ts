@@ -86,7 +86,6 @@ export function createScopedStore() {
 
         store.state.updates = updates;
         store.state.isLoading = false;
-        store.state.newUpdatesCount = calculateNewUpdatesCount(store.state.updates, store.state.lastViewed);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load updates';
         store.state.error = errorMessage;
@@ -136,7 +135,6 @@ export function createScopedStore() {
 
         store.state.updates = updates;
         store.state.isLoading = false;
-        store.state.newUpdatesCount = calculateNewUpdatesCount(store.state.updates, store.state.lastViewed);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load mock updates';
         store.state.error = errorMessage;
@@ -147,16 +145,14 @@ export function createScopedStore() {
       }
     },
 
-    markViewed(timestamp?: string) {
-      const now = timestamp ? new Date(timestamp).getTime() : Date.now();
+    markViewed(timestamp?: number) {
+      const now = timestamp ?? Date.now();
       store.state.lastViewed = now;
-      store.state.newUpdatesCount = calculateNewUpdatesCount(store.state.updates, now);
     },
 
     markAllViewed() {
       const now = Date.now();
       store.state.lastViewed = now;
-      store.state.newUpdatesCount = 0;
     },
 
     openDisplay() {
@@ -175,6 +171,14 @@ export function createScopedStore() {
       store.state.newUpdatesCount = calculateNewUpdatesCount(store.state.updates, store.state.lastViewed);
     }
   };
+
+  store.onChange('lastViewed', () => {
+    store.state.newUpdatesCount = calculateNewUpdatesCount(store.state.updates, store.state.lastViewed);
+  });
+
+  store.onChange('updates', () => {
+    store.state.newUpdatesCount = calculateNewUpdatesCount(store.state.updates, store.state.lastViewed);
+  });
 
   return {
     store,

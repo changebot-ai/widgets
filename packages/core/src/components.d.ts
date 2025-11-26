@@ -60,6 +60,8 @@ export namespace Components {
         "scope": string;
         "slug"?: string;
         "url"?: string;
+        "userData"?: string;
+        "userId"?: string;
     }
     interface ChangebotToast {
         "autoDismiss"?: number;
@@ -177,6 +179,8 @@ declare namespace LocalJSX {
         "scope"?: string;
         "slug"?: string;
         "url"?: string;
+        "userData"?: string;
+        "userId"?: string;
     }
     interface ChangebotToast {
         "autoDismiss"?: number;

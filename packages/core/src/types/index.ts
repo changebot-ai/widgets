@@ -42,6 +42,7 @@ export interface StoreConfig {
 
 export interface StoreActions {
   loadUpdates: () => Promise<void>;
+  markViewed: (timestamp?: number) => void;
   markAllViewed: () => void;
   openDisplay: () => void;
   closeDisplay: () => void;
