@@ -77,6 +77,37 @@ Tests run in headless shell mode (configured in `stencil.config.ts`). Unit tests
 - Decorators enabled for Stencil's `@Component`, `@Prop`, etc.
 - Strict unused locals/parameters checking enabled
 
+## Provider-Consumer Pattern
+
+This library uses a provider-consumer pattern for sharing state between components:
+
+- **Provider placement**: The `<changebot-provider>` listens at the document level and does NOT require consumer components to be nested inside it. Components can be placed anywhere on the page.
+- **Scope-based communication**: Multiple providers can coexist using the `scope` prop for isolation.
+- **Event-based**: Uses CustomEvents (`changebot:context-request`, `changebot:action`) for framework-agnostic communication.
+
+**Correct usage examples:**
+```html
+<!-- Components can be siblings -->
+<changebot-provider slug="my-app" />
+<changebot-badge />
+
+<!-- Or anywhere else on the page -->
+<header>
+  <changebot-badge />
+</header>
+<footer>
+  <changebot-provider slug="my-app" />
+</footer>
+```
+
+**Anti-pattern** (unnecessary nesting):
+```html
+<!-- ❌ Don't wrap - this is unnecessary -->
+<changebot-provider slug="my-app">
+  <changebot-badge />
+</changebot-provider>
+```
+
 ## Documentation Style
 
 - Use self-closing syntax for components in documentation (e.g., `<changebot-provider />` not `<changebot-provider></changebot-provider>`)
