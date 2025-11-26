@@ -1,5 +1,6 @@
 import { Component, h, Prop, Listen, Element } from '@stencil/core';
 import { createScopedStore, getStorageKey } from '../../store';
+import { createAPI } from '../../utils/api';
 
 @Component({
   tag: 'changebot-provider',
@@ -17,6 +18,7 @@ export class ChangebotProvider {
   @Prop() userData?: string;
 
   private scopedStore = createScopedStore();
+  private api = createAPI();
 
   private services = {
     store: this.scopedStore.store,
@@ -34,6 +36,9 @@ export class ChangebotProvider {
       slug: this.slug,
       scope: this.scope,
     };
+
+    // Initialize API client with slug or url
+    this.api = createAPI(this.url || this.slug);
 
     this.hydrateLastViewed();
 
@@ -164,113 +169,53 @@ export class ChangebotProvider {
   }
 
   private async syncFromApi(): Promise<void> {
-    try {
-      console.log('🔌 Provider: Fetching last_seen_at from API for user', this.userId);
-      const data = await this.fetchUserTracking();
+    console.log('🔌 Provider: Fetching last_seen_at from API for user', this.userId);
+    const data = await this.fetchUserTracking();
 
-      if (data.last_seen_at === null) {
-        console.log('🔌 Provider: User not tracked yet, setting last_seen_at to current time');
-        const currentTime = Date.now();
-        await this.setLastViewed(currentTime);
-      } else {
-        // Convert ISO timestamp to Unix timestamp in milliseconds
-        const timestamp = new Date(data.last_seen_at).getTime();
-        console.log('🔌 Provider: Fetched last_seen_at from API:', new Date(timestamp).toLocaleString());
-
-        this.updateLocalStore(timestamp);
-      }
-
-      // Update sync timestamp after successful sync
-      const syncKey = getStorageKey(this.scope, 'lastApiSync');
-      localStorage.setItem(syncKey, Date.now().toString());
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch user tracking data';
-      console.warn('⚠️ Changebot widget: Could not fetch last_seen_at from API, using localStorage value.', {
-        error: errorMessage,
-        userId: this.userId,
-      });
+    if (!data) {
+      console.log('🔌 Provider: Could not fetch last_seen_at from API, using localStorage value');
+      return;
     }
+
+    if (data.last_seen_at === null) {
+      console.log('🔌 Provider: User not tracked yet, setting last_seen_at to current time');
+      const currentTime = Date.now();
+      await this.setLastViewed(currentTime);
+    } else {
+      // Convert ISO timestamp to Unix timestamp in milliseconds
+      const timestamp = new Date(data.last_seen_at).getTime();
+      console.log('🔌 Provider: Fetched last_seen_at from API:', new Date(timestamp).toLocaleString());
+
+      this.updateLocalStore(timestamp);
+    }
+
+    // Update sync timestamp after successful sync
+    const syncKey = getStorageKey(this.scope, 'lastApiSync');
+    localStorage.setItem(syncKey, Date.now().toString());
   }
 
   private async setLastViewed(timestamp: number): Promise<void> {
     this.updateLocalStore(timestamp);
 
     if (this.userId) {
-      try {
-        const userData = this.parseUserData();
-        console.log('🔌 Provider: Updating last_seen_at via API for user', this.userId);
-        await this.updateUserTracking(timestamp, userData);
+      const userData = this.parseUserData();
+      console.log('🔌 Provider: Updating last_seen_at via API for user', this.userId);
+      const success = await this.updateUserTracking(timestamp, userData);
+
+      if (success) {
         console.log('🔌 Provider: Successfully updated last_seen_at via API');
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to update user tracking data';
-        console.warn('⚠️ Changebot widget: Could not update last_seen_at via API, but localStorage was updated.', {
-          error: errorMessage,
-          userId: this.userId,
-        });
+      } else {
+        console.log('🔌 Provider: Could not update last_seen_at via API, but localStorage was updated');
       }
     }
   }
 
-  private async fetchUserTracking(): Promise<{ id: string; last_seen_at: string | null }> {
-    let apiUrl: string;
-    if (this.slug) {
-      apiUrl = `https://api.changebot.ai/v1/widgets/${this.slug}/users/${encodeURIComponent(this.userId)}`;
-    } else if (this.url) {
-      // For custom URLs, append the user tracking path
-      const baseUrl = this.url.replace(/\/updates$/, '');
-      apiUrl = `${baseUrl}/users/${encodeURIComponent(this.userId)}`;
-    } else {
-      throw new Error('Either slug or url must be provided for user tracking');
-    }
-
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
-      mode: 'cors',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch user tracking data: ${response.statusText}`);
-    }
-
-    return await response.json();
+  private async fetchUserTracking(): Promise<{ id: string; last_seen_at: string | null } | null> {
+    return await this.api.fetchUserTracking(this.userId);
   }
 
-  private async updateUserTracking(timestamp: number, data?: object): Promise<void> {
-    let apiUrl: string;
-    if (this.slug) {
-      apiUrl = `https://api.changebot.ai/v1/widgets/${this.slug}/users/${encodeURIComponent(this.userId)}`;
-    } else if (this.url) {
-      // For custom URLs, append the user tracking path
-      const baseUrl = this.url.replace(/\/updates$/, '');
-      apiUrl = `${baseUrl}/users/${encodeURIComponent(this.userId)}`;
-    } else {
-      throw new Error('Either slug or url must be provided for user tracking');
-    }
-
-    const body: any = {
-      last_seen_at: new Date(timestamp).toISOString(),
-    };
-
-    if (data) {
-      body.data = data;
-    }
-
-    const response = await fetch(apiUrl, {
-      method: 'PATCH',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      mode: 'cors',
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to update user tracking data: ${response.statusText}`);
-    }
+  private async updateUserTracking(timestamp: number, data?: object): Promise<boolean> {
+    return await this.api.updateUserTracking(this.userId, timestamp, data);
   }
 
   private parseUserData(): object | null {

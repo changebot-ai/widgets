@@ -275,7 +275,7 @@ describe('changebot-provider', () => {
       const result = component.scopedStore.store.state.lastViewed;
 
       expect(result).toBe(1234567890);
-      expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('Could not fetch last_seen_at from API'), expect.any(Object));
+      expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('Error fetching user tracking data'), expect.any(String));
     });
 
     it('sets current time when API returns null last_seen_at', async () => {
@@ -415,7 +415,7 @@ describe('changebot-provider', () => {
 
       const stored = localStorage.getItem('changebot:lastViewed:default');
       expect(stored).toBe(timestamp.toString());
-      expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('Could not update last_seen_at via API'), expect.any(Object));
+      expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('Error updating user tracking data'), expect.any(String));
     });
   });
 
