@@ -557,15 +557,10 @@ describe('Integration Tests - Full System', () => {
 
       await page.waitForChanges();
 
-      // Verify badge initially shows count (2 new updates)
-      let badgeCount = await page.find('changebot-badge >>> .badge__count');
-      let countText = await badgeCount.textContent;
-      expect(countText).toBe('2');
-
-      // Verify badge is visible
+      // Verify badge initially shows 0 (lastViewed is null on first load)
       let badge = await page.find('changebot-badge >>> .badge');
       let badgeClasses = await badge.getProperty('className');
-      expect(badgeClasses).not.toContain('badge--hidden');
+      expect(badgeClasses).toContain('badge--hidden'); // Hidden when count is 0
 
       // Open panel programmatically using the open() method
       await page.$eval('changebot-panel', (el: any) => {
@@ -627,14 +622,10 @@ describe('Integration Tests - Full System', () => {
 
       await page.waitForChanges();
 
-      // Verify badge initially shows count (3 new updates)
-      let badgeCount = await page.find('changebot-badge >>> .badge__count');
-      let countText = await badgeCount.textContent;
-      expect(countText).toBe('3');
-
+      // Verify badge initially shows 0 (lastViewed is null on first load)
       let badge = await page.find('changebot-badge >>> .badge');
       let badgeClasses = await badge.getProperty('className');
-      expect(badgeClasses).not.toContain('badge--hidden');
+      expect(badgeClasses).toContain('badge--hidden'); // Hidden when count is 0
 
       // Open panel via action event (simulating programmatic opening)
       await page.evaluate(() => {

@@ -6,7 +6,7 @@ export function getStorageKey(scope: string, property: string): string {
 }
 
 function calculateNewUpdatesCount(updates: Update[], lastViewed: number | null): number {
-  if (!lastViewed) return updates.length;
+  if (!lastViewed) return 0;
 
   return updates.filter(update => {
     const updateTime = new Date(update.published_at).getTime();
