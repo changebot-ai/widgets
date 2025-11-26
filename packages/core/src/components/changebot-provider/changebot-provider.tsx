@@ -16,10 +16,8 @@ export class ChangebotProvider {
   @Prop() userId?: string;
   @Prop() userData?: string;
 
-  // Create a dedicated store instance for this provider's scope
   private scopedStore = createScopedStore();
 
-  // Initialize services immediately when component is created
   private services = {
     store: this.scopedStore.store,
     actions: this.scopedStore.actions,
@@ -30,15 +28,14 @@ export class ChangebotProvider {
     },
   };
 
-  async componentWillLoad() {
-    // Update services config with actual prop values
+  componentWillLoad() {
     this.services.config = {
       url: this.url,
       slug: this.slug,
       scope: this.scope,
     };
 
-    await this.hydrateLastViewed();
+    this.hydrateLastViewed();
 
     if (this.mockData) {
       this.loadMockData();
@@ -102,9 +99,7 @@ export class ChangebotProvider {
     await this.setLastViewed(Date.now());
   }
 
-  private async hydrateLastViewed() {
-    // Wait for next microtask to allow test environment to properly initialize
-    await Promise.resolve();
+  private hydrateLastViewed() {
     const timestamp = this.fetchLastSeen();
     if (timestamp) {
       this.scopedStore.actions.markViewed(timestamp);

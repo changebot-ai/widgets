@@ -45,7 +45,6 @@ When `userId` is provided, the widget will:
 - **Panel opening behavior:** Only PATCH request (no GET) since marking as viewed immediately
 - **Abstraction layer:** Hide API vs localStorage logic behind `fetchLastSeen()` and `setLastViewed()` methods
 - **Call site simplicity:** No implementation details at call sites (`hydrateLastViewed()` and `markAsViewed()`)
-- **Test compatibility:** `hydrateLastViewed()` includes `await Promise.resolve()` to work with Stencil test environment
 - **Graceful degradation:** Widget continues to work even if API is unavailable
 - **Validation:** Parse and validate `userData` JSON, discard if invalid but continue tracking
 
@@ -74,7 +73,7 @@ Customers host the API endpoints on their own infrastructure, giving them full c
 By hiding API vs localStorage logic in private methods, we keep the component code clean and maintainable. The `hydrateLastViewed()` and `markAsViewed()` methods simply call `fetchLastSeen()` and `setLastViewed()` without knowing the implementation details.
 
 ### 5. Non-Blocking Performance
-The component initializes quickly with localStorage data (synchronous read) while API sync happens in the background (asynchronous). This ensures the widget never blocks on slow network requests, providing a responsive user experience even with high-latency API endpoints. The `await Promise.resolve()` in `hydrateLastViewed()` adds minimal delay (~0ms) while maintaining test compatibility.
+The component initializes quickly with localStorage data (synchronous read) while API sync happens in the background (asynchronous). This ensures the widget never blocks on slow network requests, providing a responsive user experience even with high-latency API endpoints.
 
 ### 6. Null Handling Prevents Notification Spam
 When a user's `last_seen_at` is null (never tracked before), we set it to the current timestamp. This prevents showing all historical updates as "new" when a customer first migrates to user tracking.
@@ -151,9 +150,9 @@ When a user's `last_seen_at` is null (never tracked before), we set it to the cu
 - `updateLocalStore(timestamp)` - Helper to update both store state and localStorage
 
 **Modified Methods:**
-- `hydrateLastViewed()` - Now async with `await Promise.resolve()` for test compatibility, calls `fetchLastSeen()`
+- `hydrateLastViewed()` - Synchronously calls `fetchLastSeen()` to load from localStorage
 - `markAsViewed()` - Now async, calls `setLastViewed()`
-- `componentWillLoad()` - Now async, awaits `hydrateLastViewed()` (fast in production, testable)
+- `componentWillLoad()` - Synchronously calls `hydrateLastViewed()`, fires `loadUpdates()` without awaiting
 
 ### Error Handling Pattern
 Following existing patterns in the codebase:
@@ -255,6 +254,13 @@ Invalid JSON in `userData` prop:
 4. **Offline queue**: Queue API calls when offline, sync when reconnected
 
 ## Updates
+
+**2025-11-26: Removed Unnecessary Async/Await**
+- Removed `async` keyword and `await Promise.resolve()` from `hydrateLastViewed()`
+- Removed `async` keyword from `componentWillLoad()` (nothing was being awaited)
+- Tests confirm the async/await was unnecessary - all tests pass without it
+- Both methods only perform synchronous operations or fire-and-forget async calls
+- Lesson: Question assumptions and verify them with tests - the "test compatibility" justification was incorrect
 
 **2025-11-26: API Caching Implemented**
 - Added 30-minute caching for GET requests to reduce API load by 96%
