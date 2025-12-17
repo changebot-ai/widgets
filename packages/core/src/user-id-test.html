@@ -1,0 +1,673 @@
+<!doctype html>
+<html dir="ltr" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+  <title>User ID Testing Demo</title>
+
+  <script type="module" src="/build/widgets.esm.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 20px;
+    }
+
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .card h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .badge-demo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+
+    .badge-demo span {
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .button-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+
+    .btn-secondary {
+      background: #48bb78;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #38a169;
+    }
+
+    .btn-danger {
+      background: #f56565;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #e53e3e;
+    }
+
+    .btn-outline {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+
+    .btn-outline:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    .debug-panel {
+      position: sticky;
+      top: 20px;
+    }
+
+    .debug-section {
+      margin-bottom: 20px;
+    }
+
+    .debug-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .debug-section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .debug-info {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .debug-info .key {
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .debug-info .value {
+      color: #333;
+    }
+
+    .debug-info .null {
+      color: #999;
+      font-style: italic;
+    }
+
+    .publication-list {
+      margin-top: 8px;
+    }
+
+    .publication-item {
+      padding: 8px;
+      margin-bottom: 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      border-left: 3px solid #ddd;
+    }
+
+    .publication-item.new {
+      background: #e6ffed;
+      border-left-color: #48bb78;
+    }
+
+    .publication-item.old {
+      background: #f8f9fa;
+      border-left-color: #cbd5e0;
+    }
+
+    .publication-item .title {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .publication-item .date {
+      color: #666;
+      font-size: 11px;
+    }
+
+    .publication-item .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    .publication-item.new .badge {
+      background: #48bb78;
+      color: white;
+    }
+
+    .publication-item.old .badge {
+      background: #cbd5e0;
+      color: #666;
+    }
+
+    .count-display {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .count-display .count {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .count-display .label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .input-group {
+      margin-top: 12px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: 'Monaco', 'Courier New', monospace;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .storage-item {
+      padding: 8px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      font-size: 11px;
+      word-break: break-all;
+    }
+
+    .storage-item .storage-key {
+      color: #667eea;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .storage-item .storage-value {
+      color: #666;
+    }
+
+    @media (max-width: 1024px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .debug-panel {
+        position: relative;
+        top: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Provider with production data -->
+  <changebot-provider
+    id="test-provider"
+    user-id="user-123"
+    slug="922b4221ab0caa23d104e208"></changebot-provider>
+
+  <div class="container">
+    <div class="header">
+      <h1>User ID Testing Demo</h1>
+      <p>Test and debug the user-id feature with production data and real-time debug information</p>
+    </div>
+
+    <div class="layout">
+      <div class="main-content">
+        <!-- Badge Test -->
+        <div class="card">
+          <h2>Badge Component</h2>
+          <div class="badge-demo">
+            <span>Updates Badge:</span>
+            <changebot-badge show-count="true"></changebot-badge>
+          </div>
+          <div class="button-group">
+            <button class="btn btn-primary" onclick="openPanel()">Open Panel</button>
+          </div>
+        </div>
+
+        <!-- User ID Controls -->
+        <div class="card">
+          <h2>User ID Controls</h2>
+          <p style="color: #666; font-size: 14px; margin-bottom: 16px;">
+            Switch between different user IDs to test isolation. Each user has their own lastViewed timestamp.
+          </p>
+          <div class="input-group">
+            <label>Current User ID:</label>
+            <input type="text" id="user-id-input" value="user-123" placeholder="Enter user ID" />
+          </div>
+          <div class="button-group">
+            <button class="btn btn-primary" onclick="setUserId(document.getElementById('user-id-input').value)">Apply User ID</button>
+            <button class="btn btn-outline" onclick="setUserId('user-123')">User 123</button>
+            <button class="btn btn-outline" onclick="setUserId('user-456')">User 456</button>
+            <button class="btn btn-outline" onclick="setUserId('user-789')">User 789</button>
+            <button class="btn btn-outline" onclick="setUserId(null)">Anonymous</button>
+          </div>
+        </div>
+
+        <!-- Last Viewed Controls -->
+        <div class="card">
+          <h2>Last Viewed Timestamp Controls</h2>
+          <p style="color: #666; font-size: 14px; margin-bottom: 16px;">
+            Set the last viewed timestamp to different times to see how the badge count changes.
+          </p>
+          <div class="button-group">
+            <button class="btn btn-secondary" onclick="setLastViewed('1hour')">1 Hour Ago</button>
+            <button class="btn btn-secondary" onclick="setLastViewed('today')">Start of Today</button>
+            <button class="btn btn-secondary" onclick="setLastViewed('yesterday')">Yesterday</button>
+            <button class="btn btn-secondary" onclick="setLastViewed('lastWeek')">Last Week</button>
+            <button class="btn btn-secondary" onclick="setLastViewed('twoWeeks')">2 Weeks Ago</button>
+            <button class="btn btn-secondary" onclick="setLastViewed('now')">Right Now</button>
+          </div>
+        </div>
+
+        <!-- Storage Controls -->
+        <div class="card">
+          <h2>LocalStorage Controls</h2>
+          <div class="button-group">
+            <button class="btn btn-danger" onclick="clearCurrentUserStorage()">Clear Current User</button>
+            <button class="btn btn-danger" onclick="clearAllChangebotStorage()">Clear All Changebot Data</button>
+            <button class="btn btn-outline" onclick="refreshDebugInfo()">Refresh Debug Info</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Debug Panel -->
+      <div class="debug-panel">
+        <div class="card">
+          <h2>Debug Information</h2>
+
+          <div class="debug-section">
+            <h3>Current State</h3>
+            <div class="debug-info" id="current-state">
+              Loading...
+            </div>
+          </div>
+
+          <div class="debug-section">
+            <h3>Live Badge Widget</h3>
+            <div style="display: flex; justify-content: center; padding: 30px; background: #f8f9fa; border-radius: 8px;">
+              <changebot-badge show-count="true"></changebot-badge>
+            </div>
+          </div>
+
+          <div class="debug-section">
+            <h3>Publications Status</h3>
+            <div class="publication-list" id="publications-list">
+              Loading...
+            </div>
+          </div>
+
+          <div class="debug-section">
+            <h3>LocalStorage Keys</h3>
+            <div id="storage-keys">
+              Loading...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel Component -->
+  <changebot-panel mode="drawer-right"></changebot-panel>
+
+  <script>
+    // Publications from production API
+    let publications = [];
+    let widgetData = null;
+    let currentUserId = 'user-123';
+    let currentScope = 'default';
+    let isLoading = true;
+
+    // Get storage key for current user
+    function getStorageKey() {
+      if (currentUserId) {
+        return `changebot:lastViewed:${currentScope}:${currentUserId}`;
+      }
+      return `changebot:lastViewed:${currentScope}`;
+    }
+
+    // Open panel
+    function openPanel() {
+      const event = new CustomEvent('changebot:action', {
+        detail: { type: 'openDisplay' },
+        bubbles: true,
+        composed: true,
+      });
+      document.dispatchEvent(event);
+    }
+
+    // Set user ID
+    function setUserId(userId) {
+      currentUserId = userId;
+      const provider = document.getElementById('test-provider');
+      if (userId) {
+        provider.setAttribute('user-id', userId);
+        document.getElementById('user-id-input').value = userId;
+      } else {
+        provider.removeAttribute('user-id');
+        document.getElementById('user-id-input').value = '';
+      }
+      setTimeout(() => {
+        fetchProviderData();
+        refreshDebugInfo();
+      }, 100);
+    }
+
+    // Set last viewed timestamp
+    function setLastViewed(period) {
+      const now = new Date();
+      let pastDate;
+
+      switch (period) {
+        case '1hour':
+          pastDate = new Date(now.getTime() - (60 * 60 * 1000));
+          break;
+        case 'today':
+          pastDate = new Date(now.setHours(0, 0, 0, 0));
+          break;
+        case 'yesterday':
+          pastDate = new Date(now.setDate(now.getDate() - 1));
+          break;
+        case 'lastWeek':
+          pastDate = new Date(now.setDate(now.getDate() - 7));
+          break;
+        case 'twoWeeks':
+          pastDate = new Date(now.setDate(now.getDate() - 14));
+          break;
+        case 'now':
+          pastDate = new Date();
+          break;
+        default:
+          pastDate = new Date(now.setDate(now.getDate() - 1));
+      }
+
+      const storageKey = getStorageKey();
+      localStorage.setItem(storageKey, pastDate.getTime().toString());
+      console.log(`Set ${storageKey} to ${pastDate.toISOString()}`);
+
+      setTimeout(refreshDebugInfo, 100);
+    }
+
+    // Clear current user's storage
+    function clearCurrentUserStorage() {
+      const storageKey = getStorageKey();
+      localStorage.removeItem(storageKey);
+      console.log(`Cleared ${storageKey}`);
+      setTimeout(refreshDebugInfo, 100);
+    }
+
+    // Clear all changebot storage
+    function clearAllChangebotStorage() {
+      const keys = Object.keys(localStorage);
+      keys.forEach(key => {
+        if (key.startsWith('changebot:')) {
+          localStorage.removeItem(key);
+          console.log(`Removed ${key}`);
+        }
+      });
+      setTimeout(() => {
+        fetchProviderData();
+        refreshDebugInfo();
+      }, 100);
+    }
+
+    // Fetch data from provider
+    function fetchProviderData() {
+      // Request context from provider
+      const event = new CustomEvent('changebot:context-request', {
+        detail: { scope: currentScope },
+        bubbles: true,
+        composed: true,
+      });
+      document.dispatchEvent(event);
+    }
+
+    // Listen for context response
+    document.addEventListener('changebot:context-response', (event) => {
+      if (event.detail.scope === currentScope) {
+        publications = event.detail.publications || [];
+        widgetData = event.detail.widget || null;
+        isLoading = false;
+        refreshDebugInfo();
+      }
+    });
+
+    // Calculate expected count
+    function calculateExpectedCount() {
+      if (!publications.length) return 0;
+
+      const storageKey = getStorageKey();
+      const lastViewedStr = localStorage.getItem(storageKey);
+
+      if (!lastViewedStr) {
+        return publications.length;
+      }
+
+      const lastViewed = new Date(lastViewedStr);
+      return publications.filter(pub => {
+        const pubDate = new Date(pub.published_at);
+        return pubDate > lastViewed;
+      }).length;
+    }
+
+    // Refresh debug information
+    function refreshDebugInfo() {
+      const storageKey = getStorageKey();
+      const lastViewedStr = localStorage.getItem(storageKey);
+      const lastViewed = lastViewedStr ? new Date(lastViewedStr) : null;
+
+      // Update current state
+      let stateHtml = `
+        <div><span class="key">User ID:</span> <span class="value">${currentUserId || '<span class="null">anonymous</span>'}</span></div>
+        <div><span class="key">Scope:</span> <span class="value">${currentScope}</span></div>
+        <div><span class="key">Storage Key:</span> <span class="value">${storageKey}</span></div>
+        <div><span class="key">Last Viewed:</span> <span class="value">${lastViewed ? lastViewed.toLocaleString() : '<span class="null">never</span>'}</span></div>
+      `;
+
+      if (widgetData) {
+        stateHtml += `
+          <div><span class="key">Widget Slug:</span> <span class="value">${widgetData.slug || 'N/A'}</span></div>
+          <div><span class="key">Widget Title:</span> <span class="value">${widgetData.title || 'N/A'}</span></div>
+        `;
+      }
+
+      if (isLoading) {
+        stateHtml += `<div><span class="key">Status:</span> <span class="value" style="color: #f59e0b;">Loading from API...</span></div>`;
+      } else {
+        stateHtml += `<div><span class="key">Publications Loaded:</span> <span class="value" style="color: #48bb78;">${publications.length}</span></div>`;
+      }
+
+      document.getElementById('current-state').innerHTML = stateHtml;
+
+      // Update expected count
+      const count = calculateExpectedCount();
+      document.getElementById('expected-count').textContent = count;
+
+      // Update publications list
+      let publicationsHtml = '';
+      if (isLoading) {
+        publicationsHtml = '<div class="debug-info"><span class="null">Loading publications from API...</span></div>';
+      } else if (!publications.length) {
+        publicationsHtml = '<div class="debug-info"><span class="null">No publications found</span></div>';
+      } else {
+        publications.forEach(pub => {
+          const pubDate = new Date(pub.published_at);
+          const isNew = !lastViewed || pubDate > lastViewed;
+          publicationsHtml += `
+            <div class="publication-item ${isNew ? 'new' : 'old'}">
+              <div class="title">
+                ${pub.title}
+                <span class="badge">${isNew ? 'NEW' : 'READ'}</span>
+              </div>
+              <div class="date">${pubDate.toLocaleString()}</div>
+            </div>
+          `;
+        });
+      }
+      document.getElementById('publications-list').innerHTML = publicationsHtml;
+
+      // Update storage keys
+      const keys = Object.keys(localStorage).filter(key => key.startsWith('changebot:'));
+      let storageHtml = '';
+      if (keys.length === 0) {
+        storageHtml = '<div class="debug-info"><span class="null">No changebot data in localStorage</span></div>';
+      } else {
+        keys.forEach(key => {
+          const value = localStorage.getItem(key);
+          storageHtml += `
+            <div class="storage-item">
+              <div class="storage-key">${key}</div>
+              <div class="storage-value">${value}</div>
+            </div>
+          `;
+        });
+      }
+      document.getElementById('storage-keys').innerHTML = storageHtml;
+    }
+
+    // Initial load and periodic refresh
+    refreshDebugInfo();
+    setInterval(refreshDebugInfo, 1000);
+
+    // Fetch provider data on load
+    window.addEventListener('load', () => {
+      setTimeout(fetchProviderData, 500);
+    });
+
+    // Listen for panel close to refresh
+    document.addEventListener('changebot:action', (event) => {
+      if (event.detail.type === 'closeDisplay') {
+        setTimeout(() => {
+          fetchProviderData();
+          refreshDebugInfo();
+        }, 100);
+      }
+    });
+  </script>
+</body>
+
+</html>

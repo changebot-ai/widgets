@@ -1,7 +1,10 @@
 import { createStore } from '@stencil/store';
 import { StoreState, Update } from '../types';
 
-export function getStorageKey(scope: string, property: string): string {
+export function getStorageKey(scope: string, property: string, userId?: string): string {
+  if (userId) {
+    return `changebot:${property}:${scope}:${userId}`;
+  }
   return `changebot:${property}:${scope}`;
 }
 

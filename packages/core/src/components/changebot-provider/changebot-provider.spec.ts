@@ -193,8 +193,8 @@ describe('changebot-provider', () => {
 
       // Set cache to expired (31 minutes ago)
       const thirtyOneMinutesAgo = Date.now() - 31 * 60 * 1000;
-      page.win.localStorage.setItem('changebot:lastApiSync:default', thirtyOneMinutesAgo.toString());
-      page.win.localStorage.setItem('changebot:lastViewed:default', '1234567890');
+      page.win.localStorage.setItem('changebot:lastApiSync:default:user-123', thirtyOneMinutesAgo.toString());
+      page.win.localStorage.setItem('changebot:lastViewed:default:user-123', '1234567890');
 
       (global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
@@ -264,7 +264,7 @@ describe('changebot-provider', () => {
       });
 
       // Set localStorage AFTER page creation
-      page.win.localStorage.setItem('changebot:lastViewed:default', '1234567890');
+      page.win.localStorage.setItem('changebot:lastViewed:default:user-123', '1234567890');
 
       // Manually call hydrateLastViewed to load from localStorage
       const component = page.rootInstance;
@@ -334,7 +334,7 @@ describe('changebot-provider', () => {
 
       await page.waitForChanges();
 
-      const stored = localStorage.getItem('changebot:lastViewed:default');
+      const stored = localStorage.getItem('changebot:lastViewed:default:user-123');
       expect(stored).toBe(new Date(mockTimestamp).getTime().toString());
     });
   });
@@ -387,7 +387,7 @@ describe('changebot-provider', () => {
       const timestamp = Date.now();
       await component.setLastViewed(timestamp);
 
-      const stored = localStorage.getItem('changebot:lastViewed:default');
+      const stored = localStorage.getItem('changebot:lastViewed:default:user-123');
       expect(stored).toBe(timestamp.toString());
       expect(global.fetch).toHaveBeenCalled();
     });
@@ -413,7 +413,7 @@ describe('changebot-provider', () => {
       const timestamp = Date.now();
       await component.setLastViewed(timestamp);
 
-      const stored = localStorage.getItem('changebot:lastViewed:default');
+      const stored = localStorage.getItem('changebot:lastViewed:default:user-123');
       expect(stored).toBe(timestamp.toString());
       expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('Error updating user tracking data'), expect.any(String));
     });
@@ -494,7 +494,7 @@ describe('changebot-provider', () => {
       });
 
       // Clear the cache that was created during component load
-      page.win.localStorage.removeItem('changebot:lastApiSync:default');
+      page.win.localStorage.removeItem('changebot:lastApiSync:default:user-123');
 
       const component = page.rootInstance;
       const result = component.shouldSyncWithApi();
@@ -518,7 +518,7 @@ describe('changebot-provider', () => {
 
       // Set cache timestamp to 10 minutes ago
       const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
-      page.win.localStorage.setItem('changebot:lastApiSync:default', tenMinutesAgo.toString());
+      page.win.localStorage.setItem('changebot:lastApiSync:default:user-123', tenMinutesAgo.toString());
 
       const component = page.rootInstance;
       const result = component.shouldSyncWithApi();
@@ -542,7 +542,7 @@ describe('changebot-provider', () => {
 
       // Set cache timestamp to 31 minutes ago
       const thirtyOneMinutesAgo = Date.now() - 31 * 60 * 1000;
-      page.win.localStorage.setItem('changebot:lastApiSync:default', thirtyOneMinutesAgo.toString());
+      page.win.localStorage.setItem('changebot:lastApiSync:default:user-123', thirtyOneMinutesAgo.toString());
 
       const component = page.rootInstance;
       const result = component.shouldSyncWithApi();
@@ -568,8 +568,8 @@ describe('changebot-provider', () => {
 
       // Set cache timestamp to 10 minutes ago and localStorage value
       const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
-      page.win.localStorage.setItem('changebot:lastApiSync:default', tenMinutesAgo.toString());
-      page.win.localStorage.setItem('changebot:lastViewed:default', '1234567890');
+      page.win.localStorage.setItem('changebot:lastApiSync:default:user-123', tenMinutesAgo.toString());
+      page.win.localStorage.setItem('changebot:lastViewed:default:user-123', '1234567890');
 
       (global.fetch as jest.Mock).mockClear();
 
@@ -609,8 +609,8 @@ describe('changebot-provider', () => {
 
       // Set cache timestamp to 31 minutes ago
       const thirtyOneMinutesAgo = Date.now() - 31 * 60 * 1000;
-      page.win.localStorage.setItem('changebot:lastApiSync:default', thirtyOneMinutesAgo.toString());
-      page.win.localStorage.setItem('changebot:lastViewed:default', '1234567890');
+      page.win.localStorage.setItem('changebot:lastApiSync:default:user-123', thirtyOneMinutesAgo.toString());
+      page.win.localStorage.setItem('changebot:lastViewed:default:user-123', '1234567890');
 
       (global.fetch as jest.Mock).mockClear();
 
@@ -647,7 +647,7 @@ describe('changebot-provider', () => {
 
       const afterSync = Date.now();
 
-      const stored = page.win.localStorage.getItem('changebot:lastApiSync:default');
+      const stored = page.win.localStorage.getItem('changebot:lastApiSync:default:user-123');
       expect(stored).toBeTruthy();
 
       const storedTimestamp = parseInt(stored, 10);
@@ -678,7 +678,7 @@ describe('changebot-provider', () => {
       await page.waitForChanges();
 
       // Set fresh cache to prevent GET on page load
-      page.win.localStorage.setItem('changebot:lastApiSync:default', Date.now().toString());
+      page.win.localStorage.setItem('changebot:lastApiSync:default:user-123', Date.now().toString());
 
       (global.fetch as jest.Mock).mockClear();
 

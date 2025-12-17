@@ -137,7 +137,7 @@ export class ChangebotProvider {
   private shouldSyncWithApi(): boolean {
     if (!this.userId) return false;
 
-    const key = getStorageKey(this.scope, 'lastApiSync');
+    const key = getStorageKey(this.scope, 'lastApiSync', this.userId);
     const lastSync = localStorage.getItem(key);
 
     if (!lastSync) return true; // Never synced before
@@ -150,7 +150,7 @@ export class ChangebotProvider {
 
   private fetchLastSeen(): number | null {
     // Always read localStorage first (fast, synchronous)
-    const key = getStorageKey(this.scope, 'lastViewed');
+    const key = getStorageKey(this.scope, 'lastViewed', this.userId);
     const stored = localStorage.getItem(key);
     const localValue = stored ? parseInt(stored, 10) : null;
 
@@ -169,7 +169,7 @@ export class ChangebotProvider {
   private updateLocalStore(timestamp: number) {
     this.scopedStore.actions.markViewed(timestamp);
 
-    const key = getStorageKey(this.scope, 'lastViewed');
+    const key = getStorageKey(this.scope, 'lastViewed', this.userId);
     localStorage.setItem(key, timestamp.toString());
   }
 
@@ -195,7 +195,7 @@ export class ChangebotProvider {
     }
 
     // Update sync timestamp after successful sync
-    const syncKey = getStorageKey(this.scope, 'lastApiSync');
+    const syncKey = getStorageKey(this.scope, 'lastApiSync', this.userId);
     localStorage.setItem(syncKey, Date.now().toString());
   }
 

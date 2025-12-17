@@ -41,6 +41,7 @@ export const config: Config = {
         { src: 'react-demo.html' },
         { src: 'vue-demo.html' },
         { src: 'user-tracking-demo.html' },
+        { src: 'user-id-test.html' },
       ],
     },
   ],
