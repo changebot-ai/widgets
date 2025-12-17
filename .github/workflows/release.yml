@@ -68,7 +68,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Upgrade npm for OIDC support
-        run: npm install -g npm@latest
+        run: sudo npm install -g npm@latest
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
