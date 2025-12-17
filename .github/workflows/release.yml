@@ -56,6 +56,9 @@ jobs:
   deploy-npm:
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Required for OIDC/Trusted Publishing
+      contents: read
     steps:
       - uses: actions/checkout@v5
 
@@ -76,6 +79,4 @@ jobs:
         run: pnpm run build
 
       - name: Publish to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: ./scripts/deploy-npm.sh
