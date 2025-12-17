@@ -172,14 +172,39 @@ export class ChangebotBadge {
     this.setCount(store.state.newUpdatesCount);
 
     // Subscribe to newUpdatesCount changes
-    this.unsubscribe = store.onChange('newUpdatesCount', () => {
+    const unsubscribe1 = store.onChange('newUpdatesCount', () => {
       console.log('📛 Badge: newUpdatesCount changed in store', {
         newValue: store.state.newUpdatesCount,
         previousComponentValue: this.newUpdatesCount,
       });
       this.setCount(store.state.newUpdatesCount);
     });
-    console.log('📛 Badge: Successfully subscribed to newUpdatesCount changes');
+
+    // Also subscribe to updates and lastViewed changes to catch indirect newUpdatesCount updates
+    const unsubscribe2 = store.onChange('updates', () => {
+      console.log('📛 Badge: updates changed, reading newUpdatesCount from store', {
+        newValue: store.state.newUpdatesCount,
+        previousComponentValue: this.newUpdatesCount,
+      });
+      this.setCount(store.state.newUpdatesCount);
+    });
+
+    const unsubscribe3 = store.onChange('lastViewed', () => {
+      console.log('📛 Badge: lastViewed changed, reading newUpdatesCount from store', {
+        newValue: store.state.newUpdatesCount,
+        previousComponentValue: this.newUpdatesCount,
+      });
+      this.setCount(store.state.newUpdatesCount);
+    });
+
+    // Combine unsubscribe functions
+    this.unsubscribe = () => {
+      unsubscribe1();
+      unsubscribe2();
+      unsubscribe3();
+    };
+
+    console.log('📛 Badge: Successfully subscribed to newUpdatesCount, updates, and lastViewed changes');
   }
 
   public setNewUpdatesCount(count: number) {
