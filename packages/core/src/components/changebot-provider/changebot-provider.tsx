@@ -1,6 +1,7 @@
 import { Component, h, Prop, Listen, Element } from '@stencil/core';
 import { createScopedStore, getStorageKey } from '../../store';
 import { createAPI } from '../../utils/api';
+import { VERSION } from '../../utils/version';
 
 @Component({
   tag: 'changebot-provider',
@@ -31,6 +32,8 @@ export class ChangebotProvider {
   };
 
   componentWillLoad() {
+    console.log(`🤖 Changebot Widgets v${VERSION}`);
+
     this.services.config = {
       url: this.url,
       slug: this.slug,
