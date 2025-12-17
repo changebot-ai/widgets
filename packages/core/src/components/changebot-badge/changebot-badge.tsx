@@ -33,7 +33,17 @@ export class ChangebotBadge {
 
   private setCount(count: number) {
     if (count !== undefined) {
-      this.newUpdatesCount = Math.max(0, count);
+      const newCount = Math.max(0, count);
+      console.log('📛 Badge: setCount called', {
+        inputCount: count,
+        finalCount: newCount,
+        previousCount: this.newUpdatesCount,
+        willUpdate: newCount !== this.newUpdatesCount,
+      });
+      this.newUpdatesCount = newCount;
+      console.log('📛 Badge: Count updated, badge will', this.newUpdatesCount === 0 ? 'be hidden' : `show ${this.newUpdatesCount}`);
+    } else {
+      console.log('📛 Badge: setCount called with undefined, ignoring');
     }
   }
 
@@ -46,6 +56,12 @@ export class ChangebotBadge {
   }
 
   async componentWillLoad() {
+    console.log('📛 Badge: componentWillLoad', {
+      scope: this.scope || 'default',
+      hasCountProp: this.count !== undefined,
+      countProp: this.count,
+    });
+
     this.setupTheme();
     // Set data-scope attribute if scope is provided
     if (this.scope) {
@@ -54,6 +70,7 @@ export class ChangebotBadge {
 
     // If count prop is provided, use it directly (for testing)
     if (this.count !== undefined) {
+      console.log('📛 Badge: Using count prop (testing mode)', this.count);
       this.setCount(this.count);
       return;
     }
@@ -81,6 +98,8 @@ export class ChangebotBadge {
         detail,
       }),
     );
+
+    console.log('📛 Badge: Context request event dispatched');
   }
 
   disconnectedCallback() {
@@ -133,20 +152,34 @@ export class ChangebotBadge {
   }
 
   public subscribeToStore() {
-    if (!this.services?.store) return;
+    if (!this.services?.store) {
+      console.log('📛 Badge: Cannot subscribe - no store available');
+      return;
+    }
 
     const store = this.services.store;
 
-    console.log('📛 Badge: Subscribing to store, current state:', store.state);
+    console.log('📛 Badge: Subscribing to store, current state:', {
+      newUpdatesCount: store.state.newUpdatesCount,
+      updatesLength: store.state.updates?.length || 0,
+      lastViewed: store.state.lastViewed,
+      lastViewedFormatted: store.state.lastViewed ? new Date(store.state.lastViewed).toISOString() : null,
+      fullState: store.state,
+    });
 
     // Set initial count from store
+    console.log('📛 Badge: Setting initial count from store:', store.state.newUpdatesCount);
     this.setCount(store.state.newUpdatesCount);
 
     // Subscribe to newUpdatesCount changes
     this.unsubscribe = store.onChange('newUpdatesCount', () => {
-      console.log('📛 Badge: newUpdatesCount changed to', store.state.newUpdatesCount);
+      console.log('📛 Badge: newUpdatesCount changed in store', {
+        newValue: store.state.newUpdatesCount,
+        previousComponentValue: this.newUpdatesCount,
+      });
       this.setCount(store.state.newUpdatesCount);
     });
+    console.log('📛 Badge: Successfully subscribed to newUpdatesCount changes');
   }
 
   public setNewUpdatesCount(count: number) {

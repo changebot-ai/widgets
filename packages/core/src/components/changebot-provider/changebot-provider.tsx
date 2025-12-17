@@ -33,6 +33,13 @@ export class ChangebotProvider {
 
   componentWillLoad() {
     console.log(`🤖 Changebot Widgets v${VERSION}`);
+    console.log('🔌 Provider: componentWillLoad', {
+      scope: this.scope,
+      slug: this.slug,
+      url: this.url,
+      userId: this.userId,
+      hasMockData: !!this.mockData,
+    });
 
     this.services.config = {
       url: this.url,
@@ -46,9 +53,13 @@ export class ChangebotProvider {
     this.hydrateLastViewed();
 
     if (this.mockData) {
+      console.log('🔌 Provider: Loading mock data');
       this.loadMockData();
     } else if (this.url || this.slug) {
+      console.log('🔌 Provider: Loading updates from API', { slug: this.slug, url: this.url });
       this.loadUpdates();
+    } else {
+      console.log('🔌 Provider: No slug, url, or mock data provided - skipping update load');
     }
   }
 
@@ -108,14 +119,25 @@ export class ChangebotProvider {
   }
 
   private hydrateLastViewed() {
+    console.log('🔌 Provider: Hydrating lastViewed for scope', this.scope, { userId: this.userId });
     const timestamp = this.fetchLastSeen();
     if (timestamp) {
+      console.log('🔌 Provider: Marking as viewed with timestamp from storage', {
+        timestamp,
+        formatted: new Date(timestamp).toISOString(),
+      });
       this.scopedStore.actions.markViewed(timestamp);
     } else if (!this.userId) {
       // Anonymous user with no localStorage - initialize to now
       // so future updates will show as unread
       const currentTime = Date.now();
+      console.log('🔌 Provider: No timestamp found and no userId, initializing to current time', {
+        currentTime,
+        formatted: new Date(currentTime).toISOString(),
+      });
       this.updateLocalStore(currentTime);
+    } else {
+      console.log('🔌 Provider: No timestamp found but userId exists, waiting for API sync', { userId: this.userId });
     }
   }
 
@@ -154,26 +176,49 @@ export class ChangebotProvider {
   private fetchLastSeen(): number | null {
     // Always read localStorage first (fast, synchronous)
     const key = getStorageKey(this.scope, 'lastViewed', this.userId);
+    console.log('🔌 Provider: Fetching lastViewed from localStorage', {
+      key,
+      scope: this.scope,
+      userId: this.userId,
+    });
+
     const stored = localStorage.getItem(key);
     const localValue = stored ? parseInt(stored, 10) : null;
 
     if (localValue) {
-      console.log('🔌 Provider: Fetched lastViewed from localStorage:', new Date(localValue).toLocaleString());
+      console.log('🔌 Provider: Fetched lastViewed from localStorage:', {
+        value: localValue,
+        formatted: new Date(localValue).toLocaleString(),
+        iso: new Date(localValue).toISOString(),
+      });
+    } else {
+      console.log('🔌 Provider: No lastViewed found in localStorage');
     }
 
     // Only sync from API if cache has expired
     if (this.shouldSyncWithApi()) {
+      console.log('🔌 Provider: API sync needed, initiating sync');
       void this.syncFromApi();
+    } else {
+      console.log('🔌 Provider: API sync not needed (recently synced or no userId)');
     }
 
     return localValue;
   }
 
   private updateLocalStore(timestamp: number) {
+    console.log('🔌 Provider: Updating local store with timestamp', {
+      timestamp,
+      formatted: new Date(timestamp).toISOString(),
+      scope: this.scope,
+      userId: this.userId,
+    });
+
     this.scopedStore.actions.markViewed(timestamp);
 
     const key = getStorageKey(this.scope, 'lastViewed', this.userId);
     localStorage.setItem(key, timestamp.toString());
+    console.log('🔌 Provider: Updated localStorage', { key, value: timestamp });
   }
 
   private async syncFromApi(): Promise<void> {

@@ -9,12 +9,39 @@ export function getStorageKey(scope: string, property: string, userId?: string):
 }
 
 function calculateNewUpdatesCount(updates: Update[], lastViewed: number | null): number {
-  if (!lastViewed) return 0;
+  console.log('🔢 Store: Calculating badge count', {
+    updatesLength: updates.length,
+    lastViewed: lastViewed ? new Date(lastViewed).toISOString() : null,
+    lastViewedTimestamp: lastViewed,
+  });
 
-  return updates.filter(update => {
+  if (!lastViewed) {
+    console.log('🔢 Store: No lastViewed timestamp, returning count = 0');
+    return 0;
+  }
+
+  const newUpdates = updates.filter(update => {
     const updateTime = new Date(update.published_at).getTime();
-    return updateTime > lastViewed;
-  }).length;
+    const isNew = updateTime > lastViewed;
+    console.log('🔢 Store: Update comparison', {
+      title: update.title?.substring(0, 50) || 'No title',
+      published_at: update.published_at,
+      updateTime,
+      updateTimeFormatted: new Date(updateTime).toISOString(),
+      lastViewed,
+      lastViewedFormatted: new Date(lastViewed).toISOString(),
+      isNew,
+    });
+    return isNew;
+  });
+
+  const count = newUpdates.length;
+  console.log(`🔢 Store: Calculated badge count = ${count}`, {
+    totalUpdates: updates.length,
+    newUpdates: count,
+  });
+
+  return count;
 }
 
 export function createScopedStore() {
@@ -57,6 +84,12 @@ export function createScopedStore() {
 
         const data = await response.json();
 
+        console.log('📥 Store: Received data from API', {
+          hasPublications: !!data.publications,
+          publicationsLength: data.publications?.length || 0,
+          isArray: Array.isArray(data),
+        });
+
         // API returns {widget: {...}, publications: [...]}
         let updates = [];
         if (data.publications && Array.isArray(data.publications)) {
@@ -76,6 +109,14 @@ export function createScopedStore() {
           // Fallback: if API returns array directly
           updates = data;
         }
+
+        console.log('📥 Store: Processed updates', {
+          count: updates.length,
+          updates: updates.map(u => ({
+            title: u.title?.substring(0, 50) || 'No title',
+            published_at: u.published_at,
+          })),
+        });
 
         // Extract widget metadata
         if (data.widget) {
@@ -150,6 +191,13 @@ export function createScopedStore() {
 
     markViewed(timestamp?: number) {
       const now = timestamp ?? Date.now();
+      console.log('✅ Store: markViewed called', {
+        providedTimestamp: timestamp,
+        finalTimestamp: now,
+        finalFormatted: new Date(now).toISOString(),
+        previousValue: store.state.lastViewed,
+        previousFormatted: store.state.lastViewed ? new Date(store.state.lastViewed).toISOString() : null,
+      });
       store.state.lastViewed = now;
     },
 
@@ -176,11 +224,23 @@ export function createScopedStore() {
   };
 
   store.onChange('lastViewed', () => {
+    console.log('🔄 Store: lastViewed changed', {
+      newValue: store.state.lastViewed,
+      newValueFormatted: store.state.lastViewed ? new Date(store.state.lastViewed).toISOString() : null,
+      updatesLength: store.state.updates.length,
+    });
     store.state.newUpdatesCount = calculateNewUpdatesCount(store.state.updates, store.state.lastViewed);
+    console.log('🔄 Store: newUpdatesCount updated to', store.state.newUpdatesCount);
   });
 
   store.onChange('updates', () => {
+    console.log('🔄 Store: updates changed', {
+      newLength: store.state.updates.length,
+      lastViewed: store.state.lastViewed,
+      lastViewedFormatted: store.state.lastViewed ? new Date(store.state.lastViewed).toISOString() : null,
+    });
     store.state.newUpdatesCount = calculateNewUpdatesCount(store.state.updates, store.state.lastViewed);
+    console.log('🔄 Store: newUpdatesCount updated to', store.state.newUpdatesCount);
   });
 
   return {
