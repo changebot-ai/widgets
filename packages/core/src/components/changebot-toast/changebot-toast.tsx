@@ -171,7 +171,20 @@ export class ChangebotToast {
 
     // Find the most recent update that's newer than lastViewed AND has highlight_target="toast"
     const newUpdate = updates.find(update => {
+      // Skip updates with null/undefined published_at
+      if (!update.published_at) {
+        console.warn('Toast: Missing published_at for update:', update.title);
+        return false;
+      }
+
       const updateTime = new Date(update.published_at).getTime();
+
+      // Skip updates with invalid timestamps (NaN or 0 from null)
+      if (isNaN(updateTime) || updateTime === 0) {
+        console.warn('Toast: Invalid published_at timestamp for update:', update.title, update.published_at);
+        return false;
+      }
+
       const isNewer = lastViewed === 0 || updateTime > lastViewed;
       const isToast = update.highlight_target === 'toast';
       return isNewer && isToast;
@@ -212,7 +225,18 @@ export class ChangebotToast {
 
     // Mark this update as viewed
     if (this.currentUpdate) {
+      if (!this.currentUpdate.published_at) {
+        console.error('Toast: Cannot mark update as viewed - missing published_at');
+        return;
+      }
+
       const updateTime = new Date(this.currentUpdate.published_at).getTime();
+
+      if (isNaN(updateTime) || updateTime === 0) {
+        console.error('Toast: Cannot mark update as viewed - invalid published_at:', this.currentUpdate.published_at);
+        return;
+      }
+
       const key = `changebot:lastViewed:${this.scope || 'default'}`;
       localStorage.setItem(key, updateTime.toString());
       console.log('🍞 Toast: Marked update as viewed:', this.currentUpdate.title);

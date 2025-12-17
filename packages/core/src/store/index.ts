@@ -21,7 +21,20 @@ function calculateNewUpdatesCount(updates: Update[], lastViewed: number | null):
   }
 
   const newUpdates = updates.filter(update => {
+    // Skip updates with null/undefined published_at
+    if (!update.published_at) {
+      console.warn('Store: Missing published_at for update:', update.title);
+      return false;
+    }
+
     const updateTime = new Date(update.published_at).getTime();
+
+    // Skip updates with invalid timestamps (NaN or 0 from null)
+    if (isNaN(updateTime) || updateTime === 0) {
+      console.warn('Store: Invalid published_at timestamp for update:', update.title, update.published_at);
+      return false;
+    }
+
     const isNew = updateTime > lastViewed;
     console.log('🔢 Store: Update comparison', {
       title: update.title?.substring(0, 50) || 'No title',

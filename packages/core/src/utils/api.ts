@@ -86,6 +86,11 @@ export class ChangebotAPI {
     try {
       const encodedUserId = encodeURIComponent(userId);
 
+      if (isNaN(timestamp)) {
+        console.error('API: Invalid timestamp provided to updateUserTracking:', timestamp);
+        return false;
+      }
+
       const body: any = {
         last_seen_at: new Date(timestamp).toISOString(),
       };

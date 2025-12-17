@@ -230,7 +230,7 @@ export class ChangebotProvider {
       return;
     }
 
-    if (data.last_seen_at === null) {
+    if (data.last_seen_at === null || data.last_seen_at === undefined) {
       console.log('🔌 Provider: User not tracked yet, setting last_seen_at to current time');
       const currentTime = Date.now();
       await this.setLastViewed(currentTime);
@@ -238,7 +238,7 @@ export class ChangebotProvider {
       // Convert ISO timestamp to Unix timestamp in milliseconds
       const timestamp = new Date(data.last_seen_at).getTime();
 
-      if (isNaN(timestamp)) {
+      if (isNaN(timestamp) || timestamp === 0) {
         console.warn('🔌 Provider: Invalid timestamp received from API:', data.last_seen_at);
         return;
       }
