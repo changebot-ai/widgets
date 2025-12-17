@@ -209,7 +209,7 @@ export class ChangebotProvider {
   private updateLocalStore(timestamp: number) {
     console.log('🔌 Provider: Updating local store with timestamp', {
       timestamp,
-      formatted: new Date(timestamp).toISOString(),
+      formatted: !isNaN(timestamp) ? new Date(timestamp).toISOString() : 'Invalid timestamp',
       scope: this.scope,
       userId: this.userId,
     });
@@ -237,6 +237,12 @@ export class ChangebotProvider {
     } else {
       // Convert ISO timestamp to Unix timestamp in milliseconds
       const timestamp = new Date(data.last_seen_at).getTime();
+
+      if (isNaN(timestamp)) {
+        console.warn('🔌 Provider: Invalid timestamp received from API:', data.last_seen_at);
+        return;
+      }
+
       console.log('🔌 Provider: Fetched last_seen_at from API:', new Date(timestamp).toLocaleString());
 
       this.updateLocalStore(timestamp);
