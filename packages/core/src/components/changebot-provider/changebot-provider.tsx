@@ -108,6 +108,11 @@ export class ChangebotProvider {
     const timestamp = this.fetchLastSeen();
     if (timestamp) {
       this.scopedStore.actions.markViewed(timestamp);
+    } else if (!this.userId) {
+      // Anonymous user with no localStorage - initialize to now
+      // so future updates will show as unread
+      const currentTime = Date.now();
+      this.updateLocalStore(currentTime);
     }
   }
 
