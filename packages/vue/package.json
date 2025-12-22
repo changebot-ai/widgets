@@ -1,6 +1,6 @@
 {
   "name": "@changebot/widgets-vue",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Vue wrapper components for Changebot widgets",
   "main": "dist/index.js",
   "module": "dist/index.js",
