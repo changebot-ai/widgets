@@ -1,0 +1,74 @@
+name: Auto Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/*/package.json'
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      released: ${{ steps.check.outputs.released }}
+      version: ${{ steps.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Check for version change and create releases
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Get version from core package.json
+          VERSION=$(jq -r '.version' packages/core/package.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          # Check if core tag already exists
+          if git tag -l "core-v$VERSION" | grep -q .; then
+            echo "Tags for v$VERSION already exist, skipping"
+            echo "released=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "Creating tags and releases for v$VERSION"
+          echo "released=true" >> $GITHUB_OUTPUT
+
+          # Create tags
+          git tag "core-v$VERSION"
+          git tag "widgets-react-v$VERSION"
+          git tag "widgets-vue-v$VERSION"
+
+          # Push tags
+          git push origin "core-v$VERSION" "widgets-react-v$VERSION" "widgets-vue-v$VERSION"
+
+          # Create GitHub releases
+          gh release create "core-v$VERSION" \
+            --title "core v$VERSION" \
+            --notes "Release of @changebot/core v$VERSION" \
+            --generate-notes
+
+          gh release create "widgets-react-v$VERSION" \
+            --title "widgets-react v$VERSION" \
+            --notes "Release of @changebot/widgets-react v$VERSION - Version sync with core"
+
+          gh release create "widgets-vue-v$VERSION" \
+            --title "widgets-vue v$VERSION" \
+            --notes "Release of @changebot/widgets-vue v$VERSION - Version sync with core"
+
+  trigger-deploy:
+    needs: create-release
+    if: needs.create-release.outputs.released == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger deploy workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run release.yml --repo ${{ github.repository }}
