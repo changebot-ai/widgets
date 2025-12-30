@@ -1,6 +1,10 @@
 import { Component, Element, Prop, State, Watch, Method, h, Host } from '@stencil/core';
-import { Update } from '../../types';
+import { Services, Update } from '../../types';
 import { Theme } from '../../utils/themes';
+import { requestServices } from '../../utils/context';
+import { createThemeManager, ThemeManager } from '../../utils/theme-manager';
+import { formatDisplayDate, setLastViewedTime, validatePublishedAt } from '../../utils/date-utils';
+import { findHighlightedUpdate } from '../../utils/update-checker';
 
 @Component({
   tag: 'changebot-toast',
@@ -29,22 +33,27 @@ export class ChangebotToast {
     }
   }
 
-  private services: any;
+  private services?: Services;
   private unsubscribeUpdates?: () => void;
-  private mediaQuery?: MediaQueryList;
-  private mediaQueryListener?: (e: MediaQueryListEvent) => void;
-  private autoDismissTimer?: NodeJS.Timeout;
+  private themeManager?: ThemeManager;
+  private autoDismissTimer?: ReturnType<typeof setTimeout>;
   private resizeObserver?: ResizeObserver;
 
   @Watch('theme')
   @Watch('light')
   @Watch('dark')
-  onThemeChange() {
-    this.updateActiveTheme();
+  onThemePropsChange() {
+    // Re-initialize theme manager when props change
+    this.themeManager?.cleanup();
+    this.themeManager = createThemeManager(this, theme => {
+      this.activeTheme = theme;
+    });
   }
 
   async componentWillLoad() {
-    this.setupTheme();
+    this.themeManager = createThemeManager(this, theme => {
+      this.activeTheme = theme;
+    });
 
     // Set data-scope attribute if scope is provided
     if (this.scope) {
@@ -52,28 +61,17 @@ export class ChangebotToast {
     }
 
     // Request context from provider
-    const detail = {
-      callback: (services: any) => {
-        console.log('🍞 Toast: Received services from provider', {
-          hasStore: !!services?.store,
-          hasActions: !!services?.actions,
-          storeState: services?.store?.state
-        });
-        this.services = services;
-        this.subscribeToStore();
-      },
-      scope: this.scope || 'default'
-    };
+    console.log('🍞 Toast: Requesting context with scope:', this.scope || 'default');
 
-    console.log('🍞 Toast: Requesting context with scope:', detail.scope);
-
-    this.el.dispatchEvent(
-      new CustomEvent('changebot:context-request', {
-        bubbles: true,
-        composed: true,
-        detail
-      })
-    );
+    requestServices(this.el, this.scope, services => {
+      console.log('🍞 Toast: Received services from provider', {
+        hasStore: !!services?.store,
+        hasActions: !!services?.actions,
+        storeState: services?.store?.state,
+      });
+      this.services = services;
+      this.subscribeToStore();
+    });
   }
 
   componentDidLoad() {
@@ -86,9 +84,7 @@ export class ChangebotToast {
     if (this.unsubscribeUpdates) {
       this.unsubscribeUpdates();
     }
-    if (this.mediaQuery && this.mediaQueryListener) {
-      this.mediaQuery.removeEventListener('change', this.mediaQueryListener);
-    }
+    this.themeManager?.cleanup();
     if (this.autoDismissTimer) {
       clearTimeout(this.autoDismissTimer);
     }
@@ -98,47 +94,6 @@ export class ChangebotToast {
     // Clean up window event listeners
     window.removeEventListener('resize', this.updateContainerBounds);
     window.removeEventListener('scroll', this.updateContainerBounds);
-  }
-
-  private setupTheme() {
-    // If theme is explicitly set, use it
-    if (this.theme) {
-      this.activeTheme = this.theme;
-      return;
-    }
-
-    // If light and dark are provided, listen to system preference
-    if (this.light || this.dark) {
-      this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      this.updateActiveTheme();
-
-      // Listen for changes in system preference
-      this.mediaQueryListener = () => {
-        this.updateActiveTheme();
-      };
-      this.mediaQuery.addEventListener('change', this.mediaQueryListener);
-    }
-  }
-
-  private updateActiveTheme() {
-    // If theme is explicitly set, use it
-    if (this.theme) {
-      this.activeTheme = this.theme;
-      return;
-    }
-
-    // Use system preference to choose between light and dark
-    const prefersDark = this.mediaQuery?.matches || window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    if (prefersDark && this.dark) {
-      this.activeTheme = this.dark;
-    } else if (!prefersDark && this.light) {
-      this.activeTheme = this.light;
-    } else if (this.light) {
-      this.activeTheme = this.light;
-    } else if (this.dark) {
-      this.activeTheme = this.dark;
-    }
   }
 
   private subscribeToStore() {
@@ -161,38 +116,10 @@ export class ChangebotToast {
   }
 
   private checkForNewUpdate(updates: Update[]) {
-    if (!updates || updates.length === 0) {
-      this.isVisible = false;
-      this.currentUpdate = undefined;
-      return;
-    }
+    const result = findHighlightedUpdate(updates, 'toast', this.scope, this.currentUpdate?.id, '🍞 Toast');
 
-    const lastViewed = this.getLastViewedTime();
-
-    // Find the most recent update that's newer than lastViewed AND has highlight_target="toast"
-    const newUpdate = updates.find(update => {
-      // Skip updates with null/undefined published_at
-      if (!update.published_at) {
-        console.warn('Toast: Missing published_at for update:', update.title);
-        return false;
-      }
-
-      const updateTime = new Date(update.published_at).getTime();
-
-      // Skip updates with invalid timestamps (NaN or 0 from null)
-      if (isNaN(updateTime) || updateTime === 0) {
-        console.warn('Toast: Invalid published_at timestamp for update:', update.title, update.published_at);
-        return false;
-      }
-
-      const isNewer = lastViewed === 0 || updateTime > lastViewed;
-      const isToast = update.highlight_target === 'toast';
-      return isNewer && isToast;
-    });
-
-    if (newUpdate && newUpdate.id !== this.currentUpdate?.id) {
-      console.log('🍞 Toast: Found new update to display:', newUpdate.title);
-      this.currentUpdate = newUpdate;
+    if (result.shouldShow && result.newUpdate) {
+      this.currentUpdate = result.newUpdate;
       this.isVisible = true;
 
       // Setup auto-dismiss if configured
@@ -204,16 +131,10 @@ export class ChangebotToast {
           this.handleDismiss();
         }, this.autoDismiss * 1000);
       }
-    } else if (!newUpdate) {
+    } else if (!result.newUpdate) {
       this.isVisible = false;
       this.currentUpdate = undefined;
     }
-  }
-
-  private getLastViewedTime(): number {
-    const key = `changebot:lastViewed:${this.scope || 'default'}`;
-    const stored = localStorage.getItem(key);
-    return stored ? parseInt(stored, 10) : 0;
   }
 
   private handleDismiss = () => {
@@ -225,20 +146,14 @@ export class ChangebotToast {
 
     // Mark this update as viewed
     if (this.currentUpdate) {
-      if (!this.currentUpdate.published_at) {
-        console.error('Toast: Cannot mark update as viewed - missing published_at');
+      const updateTime = validatePublishedAt(this.currentUpdate.published_at, 'Toast', this.currentUpdate.title);
+
+      if (updateTime === null) {
+        console.error('Toast: Cannot mark update as viewed - invalid published_at');
         return;
       }
 
-      const updateTime = new Date(this.currentUpdate.published_at).getTime();
-
-      if (isNaN(updateTime) || updateTime === 0) {
-        console.error('Toast: Cannot mark update as viewed - invalid published_at:', this.currentUpdate.published_at);
-        return;
-      }
-
-      const key = `changebot:lastViewed:${this.scope || 'default'}`;
-      localStorage.setItem(key, updateTime.toString());
+      setLastViewedTime(this.scope || 'default', updateTime);
       console.log('🍞 Toast: Marked update as viewed:', this.currentUpdate.title);
     }
 
@@ -278,15 +193,6 @@ export class ChangebotToast {
   @Method()
   async dismiss() {
     this.handleDismiss();
-  }
-
-  private formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
   }
 
   private getPositionClass(): string {
@@ -396,7 +302,7 @@ export class ChangebotToast {
             <div class="toast-content" innerHTML={this.currentUpdate.content}></div>
           )}
           <time class="toast-date" dateTime={this.currentUpdate.display_date}>
-            {this.formatDate(this.currentUpdate.display_date)}
+            {formatDisplayDate(this.currentUpdate.display_date)}
           </time>
         </div>
       </Host>

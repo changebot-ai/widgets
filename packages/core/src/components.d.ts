@@ -82,20 +82,6 @@ export namespace Components {
         "show": (update: Update) => Promise<void>;
         "theme"?: Theme;
     }
-    interface MyComponent {
-        /**
-          * The first name
-         */
-        "first": string;
-        /**
-          * The last name
-         */
-        "last": string;
-        /**
-          * The middle name
-         */
-        "middle": string;
-    }
 }
 declare global {
     interface HTMLChangebotBadgeElement extends Components.ChangebotBadge, HTMLStencilElement {
@@ -128,19 +114,12 @@ declare global {
         prototype: HTMLChangebotToastElement;
         new (): HTMLChangebotToastElement;
     };
-    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-    }
-    var HTMLMyComponentElement: {
-        prototype: HTMLMyComponentElement;
-        new (): HTMLMyComponentElement;
-    };
     interface HTMLElementTagNameMap {
         "changebot-badge": HTMLChangebotBadgeElement;
         "changebot-banner": HTMLChangebotBannerElement;
         "changebot-panel": HTMLChangebotPanelElement;
         "changebot-provider": HTMLChangebotProviderElement;
         "changebot-toast": HTMLChangebotToastElement;
-        "my-component": HTMLMyComponentElement;
     }
 }
 declare namespace LocalJSX {
@@ -193,27 +172,12 @@ declare namespace LocalJSX {
         "scope"?: string;
         "theme"?: Theme;
     }
-    interface MyComponent {
-        /**
-          * The first name
-         */
-        "first"?: string;
-        /**
-          * The last name
-         */
-        "last"?: string;
-        /**
-          * The middle name
-         */
-        "middle"?: string;
-    }
     interface IntrinsicElements {
         "changebot-badge": ChangebotBadge;
         "changebot-banner": ChangebotBanner;
         "changebot-panel": ChangebotPanel;
         "changebot-provider": ChangebotProvider;
         "changebot-toast": ChangebotToast;
-        "my-component": MyComponent;
     }
 }
 export { LocalJSX as JSX };
@@ -225,7 +189,6 @@ declare module "@stencil/core" {
             "changebot-panel": LocalJSX.ChangebotPanel & JSXBase.HTMLAttributes<HTMLChangebotPanelElement>;
             "changebot-provider": LocalJSX.ChangebotProvider & JSXBase.HTMLAttributes<HTMLChangebotProviderElement>;
             "changebot-toast": LocalJSX.ChangebotToast & JSXBase.HTMLAttributes<HTMLChangebotToastElement>;
-            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
     }
 }

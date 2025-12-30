@@ -54,10 +54,3 @@ export const ChangebotToast: StencilVueComponent<JSX.ChangebotToast> = /*@__PURE
   'autoDismiss'
 ]);
 
-
-export const MyComponent: StencilVueComponent<JSX.MyComponent> = /*@__PURE__*/ defineContainer<JSX.MyComponent>('my-component', undefined, [
-  'first',
-  'middle',
-  'last'
-]);
-

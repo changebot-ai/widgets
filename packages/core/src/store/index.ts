@@ -1,11 +1,65 @@
 import { createStore } from '@stencil/store';
-import { StoreState, Update } from '../types';
+import { StoreState, Update, Widget, Tag } from '../types';
+import { validatePublishedAt } from '../utils/date-utils';
 
 export function getStorageKey(scope: string, property: string, userId?: string): string {
   if (userId) {
     return `changebot:${property}:${scope}:${userId}`;
   }
   return `changebot:${property}:${scope}`;
+}
+
+interface ApiPublication {
+  tags?: (string | Tag)[];
+  [key: string]: unknown;
+}
+
+interface ApiResponse {
+  publications?: ApiPublication[];
+  widget?: {
+    title?: string;
+    subheading?: string | null;
+    slug?: string;
+    branded?: boolean;
+  };
+}
+
+/**
+ * Transform API publications to Update type
+ */
+function transformPublications(data: ApiResponse | ApiPublication[]): Update[] {
+  let publications: ApiPublication[] = [];
+
+  if (Array.isArray(data)) {
+    publications = data;
+  } else if (data.publications && Array.isArray(data.publications)) {
+    publications = data.publications;
+  }
+
+  return publications.map((pub) => ({
+    ...pub,
+    tags: Array.isArray(pub.tags)
+      ? pub.tags.map((tag) =>
+          typeof tag === 'string'
+            ? { id: 0, name: tag, color: '#667eea' }
+            : tag
+        )
+      : [],
+  })) as Update[];
+}
+
+/**
+ * Extract widget metadata from API response
+ */
+function extractWidget(data: ApiResponse): Widget | null {
+  if (!data.widget) return null;
+
+  return {
+    title: data.widget.title || 'Updates',
+    subheading: data.widget.subheading || null,
+    slug: data.widget.slug || '',
+    branded: data.widget.branded !== false,
+  };
 }
 
 function calculateNewUpdatesCount(updates: Update[], lastViewed: number | null): number {
@@ -21,19 +75,8 @@ function calculateNewUpdatesCount(updates: Update[], lastViewed: number | null):
   }
 
   const newUpdates = updates.filter(update => {
-    // Skip updates with null/undefined published_at
-    if (!update.published_at) {
-      console.warn('Store: Missing published_at for update:', update.title);
-      return false;
-    }
-
-    const updateTime = new Date(update.published_at).getTime();
-
-    // Skip updates with invalid timestamps (NaN or 0 from null)
-    if (isNaN(updateTime) || updateTime === 0) {
-      console.warn('Store: Invalid published_at timestamp for update:', update.title, update.published_at);
-      return false;
-    }
+    const updateTime = validatePublishedAt(update.published_at, 'Store', update.title);
+    if (updateTime === null) return false;
 
     const isNew = updateTime > lastViewed;
     console.log('🔢 Store: Update comparison', {
@@ -103,25 +146,7 @@ export function createScopedStore() {
           isArray: Array.isArray(data),
         });
 
-        // API returns {widget: {...}, publications: [...]}
-        let updates = [];
-        if (data.publications && Array.isArray(data.publications)) {
-          // Transform publications to match our Update type
-          updates = data.publications.map((pub: any) => ({
-            ...pub,
-            // Transform tags from string array to object array if needed
-            tags: Array.isArray(pub.tags)
-              ? pub.tags.map((tag: any) =>
-                typeof tag === 'string'
-                  ? { id: 0, name: tag, color: '#667eea' }
-                  : tag
-              )
-              : []
-          }));
-        } else if (Array.isArray(data)) {
-          // Fallback: if API returns array directly
-          updates = data;
-        }
+        const updates = transformPublications(data);
 
         console.log('📥 Store: Processed updates', {
           count: updates.length,
@@ -131,16 +156,7 @@ export function createScopedStore() {
           })),
         });
 
-        // Extract widget metadata
-        if (data.widget) {
-          store.state.widget = {
-            title: data.widget.title || 'Updates',
-            subheading: data.widget.subheading || null,
-            slug: data.widget.slug || '',
-            branded: data.widget.branded !== false // Default to true if not provided
-          };
-        }
-
+        store.state.widget = extractWidget(data);
         store.state.updates = updates;
         store.state.isLoading = false;
       } catch (error) {
@@ -155,49 +171,20 @@ export function createScopedStore() {
       }
     },
 
-    loadMockUpdates(data: any) {
+    loadMockUpdates(data: ApiResponse | ApiPublication[]) {
       store.state.isLoading = true;
       store.state.error = null;
 
       try {
-        // API returns {widget: {...}, publications: [...]}
-        let updates = [];
-        if (data.publications && Array.isArray(data.publications)) {
-          // Transform publications to match our Update type
-          updates = data.publications.map((pub: any) => ({
-            ...pub,
-            // Transform tags from string array to object array if needed
-            tags: Array.isArray(pub.tags)
-              ? pub.tags.map((tag: any) =>
-                typeof tag === 'string'
-                  ? { id: 0, name: tag, color: '#667eea' }
-                  : tag
-              )
-              : []
-          }));
-        } else if (Array.isArray(data)) {
-          // Fallback: if API returns array directly
-          updates = data;
-        }
-
-        // Extract widget metadata
-        if (data.widget) {
-          store.state.widget = {
-            title: data.widget.title || 'Updates',
-            subheading: data.widget.subheading || null,
-            slug: data.widget.slug || '',
-            branded: data.widget.branded !== false // Default to true if not provided
-          };
-        }
-
-        store.state.updates = updates;
+        store.state.updates = transformPublications(data);
+        store.state.widget = Array.isArray(data) ? null : extractWidget(data);
         store.state.isLoading = false;
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load mock updates';
         store.state.error = errorMessage;
         store.state.isLoading = false;
         console.warn('⚠️ Changebot widget: Could not load mock updates.', {
-          error: errorMessage
+          error: errorMessage,
         });
       }
     },

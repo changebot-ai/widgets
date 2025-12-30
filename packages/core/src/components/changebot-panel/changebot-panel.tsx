@@ -1,7 +1,9 @@
 import { Component, Element, Prop, State, Method, Watch, Listen, h, Host } from '@stencil/core';
-import { dispatchAction } from '../../utils/context';
-import { Update, Widget } from '../../types';
+import { dispatchAction, requestServices } from '../../utils/context';
+import { Services, Update, Widget } from '../../types';
 import { Theme } from '../../utils/themes';
+import { createThemeManager, ThemeManager } from '../../utils/theme-manager';
+import { formatDisplayDate } from '../../utils/date-utils';
 
 @Component({
   tag: 'changebot-panel',
@@ -21,28 +23,31 @@ export class ChangebotPanel {
   @State() updates: Update[] = [];
   @State() widget: Widget | null = null;
   @State() activeTheme?: Theme;
-  @State() prefersDark: boolean = false;
 
-  private services: any;
+  private services?: Services;
   private unsubscribeIsOpen?: () => void;
   private unsubscribeUpdates?: () => void;
   private unsubscribeWidget?: () => void;
   private panelElement?: HTMLDivElement;
   private firstFocusableElement?: HTMLElement;
   private lastFocusableElement?: HTMLElement;
-  private mediaQuery?: MediaQueryList;
-  private mediaQueryListener?: (e: MediaQueryListEvent) => void;
+  private themeManager?: ThemeManager;
 
   @Watch('theme')
   @Watch('light')
   @Watch('dark')
-  @Watch('prefersDark')
-  onThemeChange() {
-    this.updateActiveTheme();
+  onThemePropsChange() {
+    // Re-initialize theme manager when props change
+    this.themeManager?.cleanup();
+    this.themeManager = createThemeManager(this, theme => {
+      this.activeTheme = theme;
+    });
   }
 
   async componentWillLoad() {
-    this.setupTheme();
+    this.themeManager = createThemeManager(this, theme => {
+      this.activeTheme = theme;
+    });
 
     // Set data-scope attribute if scope is provided
     if (this.scope) {
@@ -50,34 +55,23 @@ export class ChangebotPanel {
     }
 
     // Request context from provider with error handling
+    console.log('📂 Panel: Requesting context with scope:', this.scope || 'default');
+
     try {
-      const detail = {
-        callback: (services: any) => {
-          try {
-            console.log('📂 Panel: Received services from provider', {
-              hasStore: !!services?.store,
-              hasActions: !!services?.actions,
-              storeState: services?.store?.state,
-            });
-            this.services = services;
-            this.subscribeToStore();
-          } catch (error) {
-            // If provider setup fails, panel will still work in standalone mode
-            console.warn('Panel: Failed to setup provider connection, using standalone mode:', error);
-          }
-        },
-        scope: this.scope || 'default',
-      };
-
-      console.log('📂 Panel: Requesting context with scope:', detail.scope);
-
-      this.el.dispatchEvent(
-        new CustomEvent('changebot:context-request', {
-          bubbles: true,
-          composed: true,
-          detail,
-        }),
-      );
+      requestServices(this.el, this.scope, services => {
+        try {
+          console.log('📂 Panel: Received services from provider', {
+            hasStore: !!services?.store,
+            hasActions: !!services?.actions,
+            storeState: services?.store?.state,
+          });
+          this.services = services;
+          this.subscribeToStore();
+        } catch (error) {
+          // If provider setup fails, panel will still work in standalone mode
+          console.warn('Panel: Failed to setup provider connection, using standalone mode:', error);
+        }
+      });
     } catch (error) {
       // If provider request fails, continue in standalone mode
       console.warn('Panel: Failed to request provider context, using standalone mode:', error);
@@ -100,51 +94,7 @@ export class ChangebotPanel {
     if (this.unsubscribeWidget) {
       this.unsubscribeWidget();
     }
-
-    // Cleanup media query listener
-    if (this.mediaQuery && this.mediaQueryListener) {
-      this.mediaQuery.removeEventListener('change', this.mediaQueryListener);
-    }
-  }
-
-  private setupTheme() {
-    // If theme is explicitly set, use it
-    if (this.theme) {
-      this.activeTheme = this.theme;
-      return;
-    }
-
-    // If light and dark are provided, listen to system preference
-    if (this.light || this.dark) {
-      this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      this.prefersDark = this.mediaQuery.matches;
-      this.updateActiveTheme();
-
-      // Listen for changes in system preference
-      this.mediaQueryListener = (e: MediaQueryListEvent) => {
-        this.prefersDark = e.matches; // Triggers @Watch and re-render
-      };
-      this.mediaQuery.addEventListener('change', this.mediaQueryListener);
-    }
-  }
-
-  private updateActiveTheme() {
-    // If theme is explicitly set, use it
-    if (this.theme) {
-      this.activeTheme = this.theme;
-      return;
-    }
-
-    // Use system preference to choose between light and dark
-    if (this.prefersDark && this.dark) {
-      this.activeTheme = this.dark;
-    } else if (!this.prefersDark && this.light) {
-      this.activeTheme = this.light;
-    } else if (this.light) {
-      this.activeTheme = this.light;
-    } else if (this.dark) {
-      this.activeTheme = this.dark;
-    }
+    this.themeManager?.cleanup();
   }
 
   public subscribeToStore() {
@@ -293,15 +243,6 @@ export class ChangebotPanel {
     }
   };
 
-  private formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  }
-
   private transformHtmlUrls(html: string): string {
     if (!html) return html;
 
@@ -416,7 +357,7 @@ export class ChangebotPanel {
         <div class="update-header">
           <h3 class="update-title">{titleContent}</h3>
           <time class="update-date" dateTime={update.display_date}>
-            {this.formatDate(update.display_date)}
+            {formatDisplayDate(update.display_date)}
           </time>
         </div>
         {update.content && <div class="update-description" innerHTML={this.transformHtmlUrls(update.content)}></div>}

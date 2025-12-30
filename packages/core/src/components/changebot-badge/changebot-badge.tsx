@@ -1,6 +1,8 @@
 import { Component, Element, Prop, State, Watch, h } from '@stencil/core';
-import { dispatchAction } from '../../utils/context';
+import { dispatchAction, requestServices } from '../../utils/context';
+import { Services } from '../../types';
 import { Theme } from '../../utils/themes';
+import { createThemeManager, ThemeManager } from '../../utils/theme-manager';
 
 @Component({
   tag: 'changebot-badge',
@@ -19,12 +21,10 @@ export class ChangebotBadge {
 
   @State() newUpdatesCount: number = 0;
   @State() activeTheme?: Theme;
-  @State() prefersDark: boolean = false;
 
-  private services: any;
+  private services?: Services;
   private unsubscribe?: () => void;
-  private mediaQuery?: MediaQueryList;
-  private mediaQueryListener?: (e: MediaQueryListEvent) => void;
+  private themeManager?: ThemeManager;
 
   @Watch('count')
   onCountChange(newCount: number) {
@@ -50,9 +50,12 @@ export class ChangebotBadge {
   @Watch('theme')
   @Watch('light')
   @Watch('dark')
-  @Watch('prefersDark')
-  onThemeChange() {
-    this.updateActiveTheme();
+  onThemePropsChange() {
+    // Re-initialize theme manager when props change
+    this.themeManager?.cleanup();
+    this.themeManager = createThemeManager(this, theme => {
+      this.activeTheme = theme;
+    });
   }
 
   async componentWillLoad() {
@@ -62,7 +65,10 @@ export class ChangebotBadge {
       countProp: this.count,
     });
 
-    this.setupTheme();
+    this.themeManager = createThemeManager(this, theme => {
+      this.activeTheme = theme;
+    });
+
     // Set data-scope attribute if scope is provided
     if (this.scope) {
       this.el.setAttribute('data-scope', this.scope);
@@ -76,28 +82,17 @@ export class ChangebotBadge {
     }
 
     // Request context from provider
-    const detail = {
-      callback: (services: any) => {
-        console.log('📛 Badge: Received services from provider', {
-          hasStore: !!services?.store,
-          hasActions: !!services?.actions,
-          storeState: services?.store?.state,
-        });
-        this.services = services;
-        this.subscribeToStore();
-      },
-      scope: this.scope || 'default', // Ensure we always have a scope
-    };
+    console.log('📛 Badge: Requesting context with scope:', this.scope || 'default');
 
-    console.log('📛 Badge: Requesting context with scope:', detail.scope);
-
-    this.el.dispatchEvent(
-      new CustomEvent('changebot:context-request', {
-        bubbles: true,
-        composed: true,
-        detail,
-      }),
-    );
+    requestServices(this.el, this.scope, services => {
+      console.log('📛 Badge: Received services from provider', {
+        hasStore: !!services?.store,
+        hasActions: !!services?.actions,
+        storeState: services?.store?.state,
+      });
+      this.services = services;
+      this.subscribeToStore();
+    });
 
     console.log('📛 Badge: Context request event dispatched');
   }
@@ -106,49 +101,7 @@ export class ChangebotBadge {
     if (this.unsubscribe) {
       this.unsubscribe();
     }
-    if (this.mediaQuery && this.mediaQueryListener) {
-      this.mediaQuery.removeEventListener('change', this.mediaQueryListener);
-    }
-  }
-
-  private setupTheme() {
-    // If theme is explicitly set, use it
-    if (this.theme) {
-      this.activeTheme = this.theme;
-      return;
-    }
-
-    // If light and dark are provided, listen to system preference
-    if (this.light || this.dark) {
-      this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      this.prefersDark = this.mediaQuery.matches;
-      this.updateActiveTheme();
-
-      // Listen for changes in system preference
-      this.mediaQueryListener = (e: MediaQueryListEvent) => {
-        this.prefersDark = e.matches; // Triggers @Watch and re-render
-      };
-      this.mediaQuery.addEventListener('change', this.mediaQueryListener);
-    }
-  }
-
-  private updateActiveTheme() {
-    // If theme is explicitly set, use it
-    if (this.theme) {
-      this.activeTheme = this.theme;
-      return;
-    }
-
-    // Use system preference to choose between light and dark
-    if (this.prefersDark && this.dark) {
-      this.activeTheme = this.dark;
-    } else if (!this.prefersDark && this.light) {
-      this.activeTheme = this.light;
-    } else if (this.light) {
-      this.activeTheme = this.light;
-    } else if (this.dark) {
-      this.activeTheme = this.dark;
-    }
+    this.themeManager?.cleanup();
   }
 
   public subscribeToStore() {

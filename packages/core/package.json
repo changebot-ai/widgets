@@ -33,14 +33,6 @@
       "import": "./dist/components/changebot-toast.js",
       "types": "./dist/components/changebot-toast.d.ts"
     },
-    "./dist/components/my-component.js": {
-      "import": "./dist/components/my-component.js",
-      "types": "./dist/components/my-component.d.ts"
-    },
-    "./my-component": {
-      "import": "./dist/components/my-component.js",
-      "types": "./dist/components/my-component.d.ts"
-    },
     "./loader": {
       "import": "./loader/index.js",
       "require": "./loader/index.cjs",

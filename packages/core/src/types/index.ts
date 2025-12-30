@@ -50,20 +50,30 @@ export interface StoreActions {
   calculateNewCount: () => void;
 }
 
+/**
+ * Stencil Store interface for state management
+ */
+export interface StencilStore<T> {
+  state: T;
+  onChange: <K extends keyof T>(propName: K, callback: (newValue: T[K]) => void) => () => void;
+  reset: () => void;
+  dispose: () => void;
+}
+
 export interface Services {
-  store: any;
+  store: StencilStore<StoreState>;
   config: StoreConfig;
   actions: StoreActions;
 }
 
-export interface ContextRequestDetail<T = any> {
+export interface ContextRequestDetail<T = unknown> {
   key: keyof Services;
   scope?: string;
   provide: (value: T) => void;
 }
 
-export interface ActionDetail {
+export interface ActionDetail<T = unknown> {
   type: keyof StoreActions;
-  payload?: any;
+  payload?: T;
   scope?: string;
 }

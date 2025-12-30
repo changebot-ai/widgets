@@ -12,7 +12,6 @@ import { ChangebotBanner as ChangebotBannerElement, defineCustomElement as defin
 import { ChangebotPanel as ChangebotPanelElement, defineCustomElement as defineChangebotPanel } from "@changebot/core/dist/components/changebot-panel.js";
 import { ChangebotProvider as ChangebotProviderElement, defineCustomElement as defineChangebotProvider } from "@changebot/core/dist/components/changebot-provider.js";
 import { ChangebotToast as ChangebotToastElement, defineCustomElement as defineChangebotToast } from "@changebot/core/dist/components/changebot-toast.js";
-import { MyComponent as MyComponentElement, defineCustomElement as defineMyComponent } from "@changebot/core/dist/components/my-component.js";
 import type { StencilReactComponent } from '@stencil/react-output-target/runtime';
 import { createComponent } from '@stencil/react-output-target/runtime';
 import React from 'react';
@@ -70,15 +69,4 @@ export const ChangebotToast: StencilReactComponent<ChangebotToastElement, Change
     react: React,
     events: {} as ChangebotToastEvents,
     defineCustomElement: defineChangebotToast
-});
-
-export type MyComponentEvents = NonNullable<unknown>;
-
-export const MyComponent: StencilReactComponent<MyComponentElement, MyComponentEvents> = /*@__PURE__*/ createComponent<MyComponentElement, MyComponentEvents>({
-    tagName: 'my-component',
-    elementClass: MyComponentElement,
-    // @ts-ignore - ignore potential React type mismatches between the Stencil Output Target and your project.
-    react: React,
-    events: {} as MyComponentEvents,
-    defineCustomElement: defineMyComponent
 });

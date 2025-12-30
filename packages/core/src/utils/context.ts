@@ -1,4 +1,31 @@
-import { ContextRequestDetail, ActionDetail } from '../types';
+import { ContextRequestDetail, ActionDetail, Services } from '../types';
+
+/**
+ * Request all services from the provider component via bubbling event.
+ * This is the preferred method for consumer components to get store, actions, and config.
+ *
+ * @param element The element dispatching the request
+ * @param scope Optional scope for multi-provider scenarios (default: 'default')
+ * @param callback Callback that receives the services object
+ */
+export function requestServices(
+  element: HTMLElement,
+  scope: string | undefined,
+  callback: (services: Services) => void
+): void {
+  const detail = {
+    callback,
+    scope: scope || 'default',
+  };
+
+  element.dispatchEvent(
+    new CustomEvent('changebot:context-request', {
+      bubbles: true,
+      composed: true,
+      detail,
+    })
+  );
+}
 
 /**
  * Request a service from the provider component via bubbling event.
