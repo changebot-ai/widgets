@@ -35,8 +35,7 @@ done
 cd "$ROOT_DIR"
 git add packages/*/package.json
 git commit -m "chore: Bump all packages to v$NEW_VERSION"
-git push origin main
 
 echo ""
 echo "Done! Version $NEW_VERSION pushed to main."
-echo "GitHub Actions will automatically create tags and releases."
+echo "GitHub Actions will automatically create tags and releases after you push."
