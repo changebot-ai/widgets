@@ -15,11 +15,14 @@ unset NODE_AUTH_TOKEN
 
 # Pack each package (converts workspace: to real versions)
 echo "Packing @changebot/core..."
-CORE_TARBALL=$(cd packages/core && pnpm pack --pack-destination .)
+(cd packages/core && pnpm pack --pack-destination . > /dev/null)
+CORE_TARBALL="changebot-core-${VERSION}.tgz"
 echo "Packing @changebot/widgets-react..."
-REACT_TARBALL=$(cd packages/react && pnpm pack --pack-destination .)
+(cd packages/react && pnpm pack --pack-destination . > /dev/null)
+REACT_TARBALL="changebot-widgets-react-${VERSION}.tgz"
 echo "Packing @changebot/widgets-vue..."
-VUE_TARBALL=$(cd packages/vue && pnpm pack --pack-destination .)
+(cd packages/vue && pnpm pack --pack-destination . > /dev/null)
+VUE_TARBALL="changebot-widgets-vue-${VERSION}.tgz"
 
 # Publish the packed tarballs
 echo "Publishing @changebot/core..."
