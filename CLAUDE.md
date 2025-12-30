@@ -4,7 +4,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Stencil web components library. Stencil is a compiler that generates standards-based Web Components using TypeScript, JSX, and a virtual DOM. Components are framework-agnostic and can be used standalone or with any major framework.
+This is a pnpm monorepo containing a Stencil web components library with auto-generated React and Vue wrappers. Stencil compiles to standards-based Web Components using TypeScript, JSX, and a virtual DOM.
+
+### Monorepo Structure
+
+```
+packages/
+├── core/     # @changebot/core - Stencil web components (source of truth)
+├── react/    # @changebot/widgets-react - Auto-generated React wrappers
+└── vue/      # @changebot/widgets-vue - Auto-generated Vue wrappers
+```
+
+- **Core** contains all component logic; React/Vue packages are generated during build
+- Packages use `workspace:^` references and must be kept at the same version
+- Framework wrappers are generated via Stencil output targets in `stencil.config.ts`
 
 ## Development Commands
 
@@ -50,7 +63,7 @@ Demo pages are copied from `src/` to `www/` during build. The dev server watches
 
 ### Component Structure
 
-Components live in `src/components/[component-name]/`:
+Components live in `packages/core/src/components/[component-name]/`:
 - `[component-name].tsx` - Component implementation using `@Component` decorator, JSX with `h` function
 - `[component-name].css` - Component styles
 - `[component-name].spec.ts` - Unit tests using `newSpecPage` from `@stencil/core/testing`
@@ -64,9 +77,9 @@ Components use:
 
 ### Entry Points
 
-- `src/index.ts` - Library entry point (exports utilities and types, NOT components)
+- `packages/core/src/index.ts` - Library entry point (exports utilities and types, NOT components)
 - Components are consumed via package exports defined in `package.json`
-- Two consumption patterns supported: lazy loading via loader script, or direct custom element imports
+- Two consumption patterns: lazy loading via loader script, or direct custom element imports
 
 ### Testing
 
@@ -130,3 +143,55 @@ The following props are for internal testing purposes only and should **not** be
 - `mockData` (changebot-provider) - JSON string for loading mock data directly (for demos and testing when API is unavailable)
 
 These props should be omitted from all customer-facing documentation.
+
+## State Management
+
+Uses `@stencil/store` with scope-based stores for multi-provider support:
+
+- `createScopedStore(scope)` creates isolated stores per provider instance
+- Store state: `updates`, `widget`, `lastViewed`, `isOpen`, `newUpdatesCount`, `isLoading`, `error`
+- Actions: `loadUpdates()`, `markViewed()`, `openDisplay()`, `closeDisplay()`, etc.
+- Reactive subscriptions via `store.onChange(property, callback)`
+
+## Theme System
+
+Themes defined in `packages/core/src/utils/themes.ts` with 14 palettes (Catppuccin, Gruvbox, Dracula, Nord, etc.).
+
+Theme selection priority:
+1. Explicit `theme` prop → use that theme
+2. `light`/`dark` props → auto-switch based on `prefers-color-scheme`
+3. Fallback → first available theme
+
+Theme manager (`utils/theme-manager.ts`) handles media query listeners for automatic dark mode switching.
+
+## API Communication
+
+- `ChangebotAPI` class in `utils/api.ts` handles all API calls
+- Slug-based: `https://api.changebot.ai/v1/widgets/{slug}`
+- `NullAPI` fallback when no slug/URL provided (logs warnings, returns null)
+- Publications from API are transformed to `Update` type with normalized tags
+
+## Version Management
+
+```bash
+# Bump all packages to new version
+./scripts/bump-version.sh X.Y.Z
+```
+
+This updates:
+- All three `package.json` files
+- `packages/core/src/utils/version.ts` VERSION constant
+
+GitHub Actions auto-release workflow creates tags and publishes to npm when version changes on main.
+
+## Logging
+
+Component-specific loggers in `utils/logger.ts`:
+```typescript
+const log = createLogger('🔌 Provider');
+log.debug('message', { data });  // Respects LOGGING_ENABLED flag
+log.warn('warning');             // Always shown
+log.error('error');              // Always shown
+```
+
+Set `LOGGING_ENABLED = false` in logger.ts to disable debug/info logs.
