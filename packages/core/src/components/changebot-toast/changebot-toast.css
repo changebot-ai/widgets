@@ -157,6 +157,8 @@
   line-height: 1.5;
   color: var(--cb-toast-content-text);
   word-wrap: break-word;
+  overflow: hidden;
+  max-height: 150px;
 }
 
 .toast-content p {
@@ -170,6 +172,21 @@
 .toast-content a {
   color: var(--cb-toast-title);
   text-decoration: underline;
+}
+
+.toast-content img,
+.toast-content figure {
+  display: none;
+}
+
+.toast-content ul,
+.toast-content ol {
+  margin: 4px 0;
+  padding-left: 20px;
+}
+
+.toast-content li {
+  margin-bottom: 2px;
 }
 
 /* Toast Date */

@@ -19,7 +19,7 @@
 
 ### `dismiss() => Promise<void>`
 
-Dismiss the banner
+
 
 #### Returns
 
@@ -29,7 +29,7 @@ Type: `Promise<void>`
 
 ### `show(update: Update) => Promise<void>`
 
-Show the banner with a specific update
+
 
 #### Parameters
 
@@ -45,7 +45,7 @@ Type: `Promise<void>`
 
 ### `toggle() => Promise<void>`
 
-Toggle expanded state
+
 
 #### Returns
 

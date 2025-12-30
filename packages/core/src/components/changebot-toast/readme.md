@@ -21,7 +21,7 @@
 
 ### `dismiss() => Promise<void>`
 
-Dismiss the toast
+
 
 #### Returns
 
@@ -31,7 +31,7 @@ Type: `Promise<void>`
 
 ### `show(update: Update) => Promise<void>`
 
-Show the toast with a specific update
+
 
 #### Parameters
 

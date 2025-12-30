@@ -62,7 +62,7 @@ export class SubscriptionManager {
   /**
    * Subscribe to a store property change
    */
-  subscribe<T>(
+  subscribe(
     store: { onChange: (prop: string, callback: () => void) => () => void },
     prop: string,
     callback: () => void
