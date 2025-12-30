@@ -31,9 +31,14 @@ for pkg in core react vue; do
   echo "  Updated packages/$pkg/package.json"
 done
 
+# Update version.ts
+VERSION_FILE="$ROOT_DIR/packages/core/src/utils/version.ts"
+sed -i "s/export const VERSION = '.*'/export const VERSION = '$NEW_VERSION'/" "$VERSION_FILE"
+echo "  Updated packages/core/src/utils/version.ts"
+
 # Stage, commit, and push
 cd "$ROOT_DIR"
-git add packages/*/package.json
+git add packages/*/package.json packages/core/src/utils/version.ts
 git commit -m "chore: Bump all packages to v$NEW_VERSION"
 
 echo ""
