@@ -3,7 +3,8 @@ import { Services, Update } from '../../types';
 import { Theme } from '../../utils/themes';
 import { requestServices } from '../../utils/context';
 import { createThemeManager, ThemeManager } from '../../utils/theme-manager';
-import { formatDisplayDate, setLastViewedTime, validatePublishedAt } from '../../utils/date-utils';
+import { formatDisplayDate, validatePublishedAt } from '../../utils/date-utils';
+import { setLastViewedTime } from '../../utils/storage-utils';
 import { findHighlightedUpdate } from '../../utils/update-checker';
 
 @Component({

@@ -3,7 +3,8 @@
  */
 
 import { Update } from '../types';
-import { getLastViewedTime, validatePublishedAt } from './date-utils';
+import { validatePublishedAt } from './date-utils';
+import { getLastViewedTime } from './storage-utils';
 
 export type HighlightTarget = 'banner' | 'toast';
 
