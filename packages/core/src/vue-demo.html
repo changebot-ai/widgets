@@ -1,69 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Changebot Widgets - Vue Demo</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
-      background: #f5f5f5;
-    }
-    h1 {
-      color: #333;
-      margin-bottom: 0.5rem;
-    }
-    .subtitle {
-      color: #666;
-      margin-bottom: 2rem;
-    }
-    #app {
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .demo-section {
-      margin-bottom: 2rem;
-    }
-    .demo-section h2 {
-      color: #555;
-      margin-bottom: 1rem;
-      font-size: 1.25rem;
-    }
-    button {
-      background: #42b983;
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1rem;
-      margin-right: 0.5rem;
-    }
-    button:hover {
-      background: #359268;
-    }
-    .code {
-      background: #f8f9fa;
-      padding: 1rem;
-      border-radius: 4px;
-      font-family: 'Courier New', monospace;
-      font-size: 0.875rem;
-      overflow-x: auto;
-      margin-top: 1rem;
-      white-space: pre-wrap;
-    }
-  </style>
-</head>
-<body>
-  <h1>Changebot Widgets - Vue Demo</h1>
-  <p class="subtitle">Using Changebot web components in a Vue 3 application (loaded from CDN)</p>
+<!doctype html>
+<html dir="ltr" lang="en">
 
-  <div id="app"></div>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vue Demo - Changebot Widgets</title>
 
   <!-- Load Vue 3 from CDN -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -71,149 +12,717 @@
   <!-- Load Changebot components -->
   <script type="module" src="/build/widgets.esm.js"></script>
 
-  <!-- Vue App -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+    }
+
+    .demo-header {
+      background: linear-gradient(135deg, #42b883 0%, #35495e 100%);
+      color: white;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .demo-header h1 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .demo-header .badge-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .demo-header .badge-label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .control-section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .control-section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .control-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .control-row label {
+      min-width: 120px;
+      font-size: 13px;
+      color: #555;
+    }
+
+    .control-row select,
+    .control-row input[type="text"],
+    .control-row input[type="datetime-local"] {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      background: white;
+    }
+
+    .control-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .control-row .btn {
+      flex-shrink: 0;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #42b883;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #359268;
+    }
+
+    .btn-secondary {
+      background: #e9ecef;
+      color: #495057;
+    }
+
+    .btn-secondary:hover {
+      background: #dee2e6;
+    }
+
+    .btn-success {
+      background: #48bb78;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #38a169;
+    }
+
+    .btn-warning {
+      background: #ed8936;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #dd6b20;
+    }
+
+    .btn-danger {
+      background: #e53e3e;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c53030;
+    }
+
+    .debug-panel {
+      background: #35495e;
+      color: #42b883;
+      border-radius: 12px;
+      padding: 20px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 12px;
+      margin-top: 24px;
+    }
+
+    .debug-panel h3 {
+      color: #42b883;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .debug-row {
+      display: flex;
+      margin-bottom: 8px;
+    }
+
+    .debug-label {
+      color: #8dc891;
+      min-width: 180px;
+    }
+
+    .debug-value {
+      color: #c3e88d;
+    }
+
+    .debug-value.warning {
+      color: #ffcb6b;
+    }
+
+    .mock-data-info {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #4a6079;
+    }
+
+    .mock-data-info h4 {
+      color: #42b883;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+
+    .mock-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 6px;
+      font-size: 11px;
+    }
+
+    .mock-item .id {
+      color: #697a8d;
+      min-width: 30px;
+    }
+
+    .mock-item .title {
+      color: #b2ccd6;
+      flex: 1;
+    }
+
+    .mock-item .date {
+      color: #89ddff;
+    }
+
+    .mock-item .target {
+      color: #c792ea;
+      min-width: 60px;
+    }
+
+    .vue-note {
+      background: #35495e;
+      color: #b2ccd6;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      border-left: 4px solid #42b883;
+    }
+
+    .vue-note code {
+      background: #4a6079;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+
   <script type="module">
-    const { createApp, ref, onMounted } = Vue;
+    const { createApp, ref, computed, onMounted, watch } = Vue;
+
+    // Generate mock data with dynamic dates
+    function generateMockData() {
+      const now = Date.now();
+      const day = 24 * 60 * 60 * 1000;
+
+      return {
+        widget: {
+          title: 'Product Updates',
+          subheading: 'Latest features and improvements',
+          slug: 'vue-demo',
+          branded: false
+        },
+        publications: [
+          {
+            id: 1,
+            title: "Today's Feature Release",
+            content: '<p>We just launched a brand new feature!</p>',
+            display_date: new Date().toISOString().split('T')[0],
+            published_at: new Date().toISOString(),
+            expires_on: null,
+            highlight_target: 'banner',
+            hosted_url: null,
+            tags: [{ id: 1, name: 'Feature', color: '#10b981' }]
+          },
+          {
+            id: 2,
+            title: 'Performance Improvements (3 days ago)',
+            content: '<p>Loading times reduced by 40%.</p>',
+            display_date: new Date(now - 3 * day).toISOString().split('T')[0],
+            published_at: new Date(now - 3 * day).toISOString(),
+            expires_on: null,
+            highlight_target: 'toast',
+            hosted_url: null,
+            tags: [{ id: 2, name: 'Performance', color: '#3b82f6' }]
+          },
+          {
+            id: 3,
+            title: 'Bug Fixes (1 week ago)',
+            content: '<p>Fixed several reported issues.</p>',
+            display_date: new Date(now - 7 * day).toISOString().split('T')[0],
+            published_at: new Date(now - 7 * day).toISOString(),
+            expires_on: null,
+            highlight_target: null,
+            hosted_url: null,
+            tags: [{ id: 3, name: 'Bug Fix', color: '#ef4444' }]
+          },
+          {
+            id: 4,
+            title: 'New Dashboard (2 weeks ago)',
+            content: '<p>Redesigned analytics dashboard.</p>',
+            display_date: new Date(now - 14 * day).toISOString().split('T')[0],
+            published_at: new Date(now - 14 * day).toISOString(),
+            expires_on: null,
+            highlight_target: null,
+            hosted_url: null,
+            tags: [{ id: 1, name: 'Feature', color: '#10b981' }]
+          },
+          {
+            id: 5,
+            title: 'API Updates (1 month ago)',
+            content: '<p>New API endpoints.</p>',
+            display_date: new Date(now - 30 * day).toISOString().split('T')[0],
+            published_at: new Date(now - 30 * day).toISOString(),
+            expires_on: null,
+            highlight_target: null,
+            hosted_url: null,
+            tags: [{ id: 4, name: 'API', color: '#8b5cf6' }]
+          }
+        ]
+      };
+    }
+
+    const mockData = generateMockData();
+    const SCOPE = 'vue-demo';
+    const LS_KEY = `changebot:lastViewed:${SCOPE}`;
 
     const App = {
       setup() {
-        const badgeCount = ref(0);
-        const panelOpen = ref(false);
-        const panelRef = ref(null);
+        // Component visibility
+        const showBadge = ref(true);
+        const showPanel = ref(true);
+        const showBanner = ref(true);
+        const showToast = ref(true);
 
-        const mockUpdates = [
-          {
-            id: '1',
-            title: 'New Dashboard Features',
-            content: '<p>We have added new analytics to the dashboard.</p>',
-            display_date: new Date().toISOString(),
-            tags: [{ id: '1', name: 'Feature', color: '#4CAF50' }]
-          },
-          {
-            id: '2',
-            title: 'Performance Improvements',
-            content: '<p>The app is now 2x faster!</p>',
-            display_date: new Date(Date.now() - 86400000).toISOString(),
-            tags: [{ id: '2', name: 'Enhancement', color: '#2196F3' }]
-          }
-        ];
+        // Component options
+        const badgeShowCount = ref(true);
+        const panelMode = ref('drawer-right');
+        const bannerPosition = ref('top');
+        const toastPosition = ref('bottom-right');
 
-        onMounted(() => {
-          // Set initial updates on the panel
-          if (panelRef.value) {
-            panelRef.value.setUpdates(mockUpdates);
+        // Theme
+        const themeMode = ref('fixed');
+        const fixedTheme = ref('catppuccin-mocha');
+        const lightTheme = ref('catppuccin-latte');
+        const darkTheme = ref('catppuccin-mocha');
+
+        // Custom date
+        const customDate = ref('');
+
+        // Debug
+        const debugRaw = ref('');
+        const debugFormatted = ref('');
+        const debugCount = ref(0);
+
+        // Refs
+        const bannerRef = ref(null);
+        const toastRef = ref(null);
+
+        // Computed theme props
+        const themeProps = computed(() => {
+          if (themeMode.value === 'fixed') {
+            return { theme: fixedTheme.value };
           }
+          return { light: lightTheme.value, dark: darkTheme.value };
         });
 
-        const handleBadgeClick = () => {
-          if (panelRef.value) {
-            panelRef.value.open();
-            panelOpen.value = true;
+        const themeDebug = computed(() => {
+          if (themeMode.value === 'fixed') {
+            return fixedTheme.value;
+          }
+          return `light: ${lightTheme.value}, dark: ${darkTheme.value}`;
+        });
+
+        // Refresh debug
+        const refreshDebug = () => {
+          const raw = localStorage.getItem(LS_KEY);
+          debugRaw.value = raw || '(not set)';
+          debugFormatted.value = raw ? new Date(parseInt(raw)).toLocaleString() : '(not set)';
+
+          const lastViewed = raw ? parseInt(raw) : null;
+          if (lastViewed) {
+            debugCount.value = mockData.publications.filter(p => {
+              const pubTime = new Date(p.published_at).getTime();
+              return pubTime > lastViewed;
+            }).length;
+          } else {
+            debugCount.value = 0;
           }
         };
 
-        const handleOpenPanel = () => {
-          if (panelRef.value) {
-            panelRef.value.open();
-            panelOpen.value = true;
+        // Watch theme changes
+        watch([themeMode, fixedTheme, lightTheme, darkTheme], refreshDebug);
+
+        onMounted(refreshDebug);
+
+        // Last viewed controls
+        const setLastViewed = (period) => {
+          const now = Date.now();
+          const day = 24 * 60 * 60 * 1000;
+          let timestamp;
+
+          switch (period) {
+            case 'now': timestamp = now; break;
+            case '1day': timestamp = now - day; break;
+            case '7days': timestamp = now - 7 * day; break;
+            case '30days': timestamp = now - 30 * day; break;
+            case 'clear':
+              localStorage.removeItem(LS_KEY);
+              location.reload();
+              return;
+          }
+
+          localStorage.setItem(LS_KEY, timestamp.toString());
+          location.reload();
+        };
+
+        const setCustomDateValue = () => {
+          if (customDate.value) {
+            const timestamp = new Date(customDate.value).getTime();
+            localStorage.setItem(LS_KEY, timestamp.toString());
+            location.reload();
           }
         };
 
-        const handleClosePanel = () => {
-          if (panelRef.value) {
-            panelRef.value.close();
-            panelOpen.value = false;
+        // Actions
+        const openPanel = () => {
+          document.dispatchEvent(new CustomEvent('changebot:action', {
+            detail: { type: 'openDisplay', scope: SCOPE },
+            bubbles: true,
+            composed: true
+          }));
+        };
+
+        const triggerToast = async () => {
+          if (toastRef.value && toastRef.value.show) {
+            await toastRef.value.show(mockData.publications[1]);
           }
         };
 
-        const handleAddUpdate = () => {
-          if (panelRef.value) {
-            const newUpdate = {
-              id: Date.now().toString(),
-              title: 'New Update Added',
-              content: '<p>This update was added dynamically from Vue!</p>',
-              display_date: new Date().toISOString(),
-              tags: [{ id: '3', name: 'Dynamic', color: '#FF9800' }]
-            };
-            panelRef.value.setUpdates([newUpdate, ...mockUpdates]);
+        const triggerBanner = async () => {
+          if (bannerRef.value && bannerRef.value.show) {
+            await bannerRef.value.show(mockData.publications[0]);
           }
         };
 
         return {
-          badgeCount,
-          panelOpen,
-          panelRef,
-          handleBadgeClick,
-          handleOpenPanel,
-          handleClosePanel,
-          handleAddUpdate
+          mockData,
+          mockDataJson: JSON.stringify(mockData),
+          SCOPE,
+          LS_KEY,
+          showBadge,
+          showPanel,
+          showBanner,
+          showToast,
+          badgeShowCount,
+          panelMode,
+          bannerPosition,
+          toastPosition,
+          themeMode,
+          fixedTheme,
+          lightTheme,
+          darkTheme,
+          customDate,
+          debugRaw,
+          debugFormatted,
+          debugCount,
+          themeDebug,
+          themeProps,
+          bannerRef,
+          toastRef,
+          setLastViewed,
+          setCustomDateValue,
+          openPanel,
+          triggerToast,
+          triggerBanner,
+          refreshDebug
         };
       },
       template: `
-        <div>
-          <div class="demo-section">
-            <h2>Badge Component</h2>
-            <p>Click the badge to open the panel:</p>
+        <changebot-provider :scope="SCOPE" :mock-data="mockDataJson" />
+
+        <changebot-banner
+          v-if="showBanner"
+          ref="bannerRef"
+          :scope="SCOPE"
+          :position="bannerPosition"
+          v-bind="themeProps"
+        />
+
+        <header class="demo-header">
+          <h1>Vue Demo</h1>
+          <div class="badge-wrapper">
+            <span class="badge-label">Updates:</span>
             <changebot-badge
-              scope="vue-demo"
-              theme="default"
-              :show-count="true"
-              :count="badgeCount"
-              @click="handleBadgeClick"
+              v-if="showBadge"
+              :scope="SCOPE"
+              :show-count="badgeShowCount.toString()"
+              v-bind="themeProps"
             />
-            <div class="code">&lt;changebot-badge scope="vue-demo" theme="default" :show-count="true" :count="{{ badgeCount }}" /&gt;</div>
+          </div>
+        </header>
+
+        <div class="container">
+          <div class="vue-note">
+            <strong>Vue 3 Integration:</strong> Using Composition API with refs.
+            In production, use <code>@changebot/widgets-vue</code> for better type support.
           </div>
 
-          <div class="demo-section">
-            <h2>Panel Component (Drawer Mode)</h2>
-            <p>Control the panel programmatically:</p>
-            <button @click="handleOpenPanel">Open Panel</button>
-            <button @click="handleClosePanel">Close Panel</button>
-            <button @click="handleAddUpdate">Add Dynamic Update</button>
+          <div class="controls-grid">
+            <!-- Last Viewed -->
+            <div class="control-section">
+              <h3>Last Viewed Time</h3>
+              <div class="button-row">
+                <button class="btn btn-secondary" @click="setLastViewed('now')">Now</button>
+                <button class="btn btn-secondary" @click="setLastViewed('1day')">1 Day</button>
+                <button class="btn btn-secondary" @click="setLastViewed('7days')">7 Days</button>
+                <button class="btn btn-secondary" @click="setLastViewed('30days')">30 Days</button>
+                <button class="btn btn-danger" @click="setLastViewed('clear')">Clear</button>
+              </div>
+              <div class="control-row" style="margin-top: 12px;">
+                <label>Custom:</label>
+                <input type="datetime-local" v-model="customDate" />
+                <button class="btn btn-primary" @click="setCustomDateValue">Set</button>
+              </div>
+            </div>
 
-            <changebot-panel
-              ref="panelRef"
-              scope="vue-demo"
-              mode="drawer-right"
-              theme="default"
-            />
-            <div class="code">&lt;changebot-panel ref="panelRef" scope="vue-demo" mode="drawer-right" theme="default" /&gt;</div>
+            <!-- Theme -->
+            <div class="control-section">
+              <h3>Theme</h3>
+              <div class="control-row">
+                <label>Mode:</label>
+                <select v-model="themeMode">
+                  <option value="fixed">Fixed Theme</option>
+                  <option value="auto">Light/Dark Auto</option>
+                </select>
+              </div>
+              <div class="control-row" v-if="themeMode === 'fixed'">
+                <label>Theme:</label>
+                <select v-model="fixedTheme">
+                  <optgroup label="Light">
+                    <option value="catppuccin-latte">Catppuccin Latte</option>
+                    <option value="gruvbox-light">Gruvbox Light</option>
+                    <option value="solarized-light">Solarized Light</option>
+                    <option value="everforest-light">Everforest Light</option>
+                    <option value="frost">Frost</option>
+                  </optgroup>
+                  <optgroup label="Dark">
+                    <option value="catppuccin-frappe">Catppuccin Frappe</option>
+                    <option value="catppuccin-macchiato">Catppuccin Macchiato</option>
+                    <option value="catppuccin-mocha">Catppuccin Mocha</option>
+                    <option value="gruvbox-dark">Gruvbox Dark</option>
+                    <option value="dracula">Dracula</option>
+                    <option value="nord">Nord</option>
+                    <option value="solarized-dark">Solarized Dark</option>
+                    <option value="everforest-dark">Everforest Dark</option>
+                    <option value="tokyo-night">Tokyo Night</option>
+                    <option value="cyberpunk">Cyberpunk</option>
+                  </optgroup>
+                </select>
+              </div>
+              <template v-else>
+                <div class="control-row">
+                  <label>Light:</label>
+                  <select v-model="lightTheme">
+                    <option value="catppuccin-latte">Catppuccin Latte</option>
+                    <option value="gruvbox-light">Gruvbox Light</option>
+                    <option value="solarized-light">Solarized Light</option>
+                    <option value="everforest-light">Everforest Light</option>
+                    <option value="frost">Frost</option>
+                  </select>
+                </div>
+                <div class="control-row">
+                  <label>Dark:</label>
+                  <select v-model="darkTheme">
+                    <option value="catppuccin-frappe">Catppuccin Frappe</option>
+                    <option value="catppuccin-macchiato">Catppuccin Macchiato</option>
+                    <option value="catppuccin-mocha">Catppuccin Mocha</option>
+                    <option value="gruvbox-dark">Gruvbox Dark</option>
+                    <option value="dracula">Dracula</option>
+                    <option value="nord">Nord</option>
+                    <option value="solarized-dark">Solarized Dark</option>
+                    <option value="everforest-dark">Everforest Dark</option>
+                    <option value="tokyo-night">Tokyo Night</option>
+                    <option value="cyberpunk">Cyberpunk</option>
+                  </select>
+                </div>
+              </template>
+            </div>
+
+            <!-- Components -->
+            <div class="control-section">
+              <h3>Components</h3>
+              <div class="control-row">
+                <input type="checkbox" v-model="showBadge" />
+                <label>Badge</label>
+                <input type="checkbox" v-model="badgeShowCount" style="margin-left: auto;" />
+                <label style="min-width: auto;">Count</label>
+              </div>
+              <div class="control-row">
+                <input type="checkbox" v-model="showPanel" />
+                <label>Panel</label>
+                <select v-model="panelMode" style="margin-left: auto; flex: none; width: 140px;">
+                  <option value="drawer-right">Drawer Right</option>
+                  <option value="drawer-left">Drawer Left</option>
+                  <option value="modal">Modal</option>
+                </select>
+              </div>
+              <div class="control-row">
+                <input type="checkbox" v-model="showBanner" />
+                <label>Banner</label>
+                <select v-model="bannerPosition" style="margin-left: auto; flex: none; width: 140px;">
+                  <option value="top">Top</option>
+                  <option value="bottom">Bottom</option>
+                </select>
+              </div>
+              <div class="control-row">
+                <input type="checkbox" v-model="showToast" />
+                <label>Toast</label>
+                <select v-model="toastPosition" style="margin-left: auto; flex: none; width: 140px;">
+                  <option value="bottom-right">Bottom Right</option>
+                  <option value="bottom-left">Bottom Left</option>
+                  <option value="top-right">Top Right</option>
+                  <option value="top-left">Top Left</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="control-section">
+              <h3>Actions</h3>
+              <div class="button-row">
+                <button class="btn btn-primary" @click="openPanel">Open Panel</button>
+                <button class="btn btn-success" @click="triggerToast">Show Toast</button>
+                <button class="btn btn-warning" @click="triggerBanner">Show Banner</button>
+              </div>
+              <div class="button-row" style="margin-top: 12px;">
+                <button class="btn btn-secondary" @click="refreshDebug">Refresh Debug</button>
+                <button class="btn btn-danger" @click="setLastViewed('clear')">Reset All</button>
+              </div>
+            </div>
           </div>
 
-          <div class="demo-section">
-            <h2>Toast Notifications</h2>
-            <p>Toast notifications appear in the corner:</p>
-            <changebot-toast
-              scope="vue-demo"
-              position="bottom-right"
-              theme="default"
-              :auto-dismiss="true"
-            />
-            <div class="code">&lt;changebot-toast scope="vue-demo" position="bottom-right" theme="default" :auto-dismiss="true" /&gt;</div>
-          </div>
+          <!-- Debug Panel -->
+          <div class="debug-panel">
+            <h3>Debug Info</h3>
+            <div class="debug-row">
+              <span class="debug-label">Last Viewed (raw):</span>
+              <span :class="['debug-value', debugRaw === '(not set)' ? 'warning' : '']">{{ debugRaw }}</span>
+            </div>
+            <div class="debug-row">
+              <span class="debug-label">Last Viewed (formatted):</span>
+              <span class="debug-value">{{ debugFormatted }}</span>
+            </div>
+            <div class="debug-row">
+              <span class="debug-label">Calculated Count:</span>
+              <span class="debug-value">{{ debugCount }}</span>
+            </div>
+            <div class="debug-row">
+              <span class="debug-label">Theme:</span>
+              <span class="debug-value">{{ themeDebug }}</span>
+            </div>
+            <div class="debug-row">
+              <span class="debug-label">localStorage Key:</span>
+              <span class="debug-value">{{ LS_KEY }}</span>
+            </div>
 
-          <div class="demo-section">
-            <h2>Integration Notes</h2>
-            <p><strong>Using in Vue 3:</strong></p>
-            <ul>
-              <li>Web components work directly in Vue templates</li>
-              <li>Use <code>ref</code> to access component methods like <code>open()</code>, <code>close()</code>, <code>setUpdates()</code></li>
-              <li>Vue automatically handles prop binding with <code>:prop-name</code> syntax</li>
-              <li>Event listeners work with <code>@event-name</code> syntax</li>
-              <li>For production, use the Vue wrapper package: <code>npm install @changebot/widgets-vue</code></li>
-            </ul>
-            <div class="code">import { ChangebotPanel } from '@changebot/widgets-vue';
-
-export default {
-  components: { ChangebotPanel },
-  template: '&lt;changebot-panel scope="my-app" mode="drawer-right" /&gt;'
-}</div>
+            <div class="mock-data-info">
+              <h4>Mock Data Publications</h4>
+              <div class="mock-item" v-for="p in mockData.publications" :key="p.id">
+                <span class="id">#{{ p.id }}</span>
+                <span class="title">{{ p.title }}</span>
+                <span class="target">{{ p.highlight_target || '-' }}</span>
+                <span class="date">{{ new Date(p.published_at).toLocaleDateString() }}</span>
+              </div>
+            </div>
           </div>
         </div>
+
+        <changebot-panel
+          v-if="showPanel"
+          :scope="SCOPE"
+          :mode="panelMode"
+          v-bind="themeProps"
+        />
+
+        <changebot-toast
+          v-if="showToast"
+          ref="toastRef"
+          :scope="SCOPE"
+          :position="toastPosition"
+          v-bind="themeProps"
+        />
       `
     };
 
     createApp(App).mount('#app');
   </script>
 </body>
+
 </html>
