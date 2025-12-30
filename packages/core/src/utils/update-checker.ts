@@ -4,7 +4,6 @@
 
 import { Update } from '../types';
 import { validatePublishedAt } from './date-utils';
-import { getLastViewedTime } from './storage-utils';
 
 export type HighlightTarget = 'banner' | 'toast';
 
@@ -19,7 +18,7 @@ export interface UpdateCheckResult {
  * Check for a new update that matches the given highlight target
  * @param updates Array of updates to check
  * @param highlightTarget The target type ('banner' or 'toast')
- * @param scope The scope identifier for lastViewed lookup
+ * @param lastViewed The timestamp of when updates were last viewed (from store)
  * @param currentUpdateId The ID of the currently displayed update (to avoid re-showing)
  * @param context Context string for logging (e.g., 'Banner', 'Toast')
  * @returns UpdateCheckResult with the new update (if any) and whether to show it
@@ -27,7 +26,7 @@ export interface UpdateCheckResult {
 export function findHighlightedUpdate(
   updates: Update[],
   highlightTarget: HighlightTarget,
-  scope: string | undefined,
+  lastViewed: number | null,
   currentUpdateId: number | undefined,
   context: string
 ): UpdateCheckResult {
@@ -35,14 +34,12 @@ export function findHighlightedUpdate(
     return { newUpdate: undefined, shouldShow: false };
   }
 
-  const lastViewed = getLastViewedTime(scope || 'default');
-
   // Find the most recent update that's newer than lastViewed AND has the target highlight_target
   const newUpdate = updates.find(update => {
     const updateTime = validatePublishedAt(update.published_at, context, update.title);
     if (updateTime === null) return false;
 
-    const isNewer = lastViewed === 0 || updateTime > lastViewed;
+    const isNewer = lastViewed === null || lastViewed === 0 || updateTime > lastViewed;
     const matchesTarget = update.highlight_target === highlightTarget;
     return isNewer && matchesTarget;
   });

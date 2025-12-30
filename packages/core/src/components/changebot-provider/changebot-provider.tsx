@@ -1,5 +1,6 @@
-import { Component, h, Prop, Listen, Element } from '@stencil/core';
+import { Component, h, Prop, Element } from '@stencil/core';
 import { createScopedStore, getStorageKey } from '../../store';
+import { registerStore, unregisterStore } from '../../store/registry';
 import { createAPI } from '../../utils/api';
 import { VERSION } from '../../utils/version';
 import { logProvider as log } from '../../utils/logger';
@@ -30,9 +31,11 @@ export class ChangebotProvider {
       slug: this.slug,
       scope: this.scope || 'default',
     },
+    // Provider-level actions that handle side effects (localStorage, API sync)
+    openAndMarkViewed: () => this.openAndMarkViewed(),
   };
 
-  componentWillLoad() {
+  async componentWillLoad() {
     log.info(`Changebot Widgets v${VERSION}`);
     log.debug('componentWillLoad', {
       scope: this.scope,
@@ -58,65 +61,30 @@ export class ChangebotProvider {
       this.loadMockData();
     } else if (this.url || this.slug) {
       log.debug('Loading updates from API', { slug: this.slug, url: this.url });
-      this.loadUpdates();
+      await this.loadUpdates();
     } else {
       log.debug('No slug, url, or mock data provided - skipping update load');
     }
+
+    // Register store in registry after data is loaded
+    registerStore(this.scope, this.services);
+    log.debug('Registered store in registry', { scope: this.scope });
   }
 
-  @Listen('changebot:context-request', { target: 'document', capture: true })
-  handleContextRequest(event: CustomEvent<{ callback: Function; scope?: string }>) {
-    const requestScope = event.detail.scope || 'default';
-
-    log.debug(`Received context request for scope "${requestScope}", my scope is "${this.scope}"`);
-
-    // Only respond if scope matches
-    if (requestScope === this.scope) {
-      // Stop propagation to prevent other providers from responding
-      event.stopPropagation();
-
-      log.debug('Responding with services');
-
-      // Provide the services via callback
-      if (event.detail.callback) {
-        event.detail.callback(this.services);
-      }
-    } else {
-      log.debug('Ignoring request (scope mismatch)');
-    }
-  }
-
-  @Listen('changebot:action', { target: 'document', capture: true })
-  handleAction(event: CustomEvent<{ type: string; payload?: any; scope?: string }>) {
-    const actionScope = event.detail.scope || 'default';
-
-    // Only handle if scope matches
-    if (actionScope === this.scope) {
-      const { type, payload } = event.detail;
-
-      if (type in this.scopedStore.actions) {
-        try {
-          if (payload !== undefined) {
-            this.scopedStore.actions[type](payload);
-          } else {
-            this.scopedStore.actions[type]();
-          }
-
-          if (type === 'openDisplay') {
-            void this.markAsViewed();
-          }
-        } catch (error) {
-          log.error(`Error executing action ${type}`, { error });
-        }
-      } else {
-        log.warn(`Unknown action type: ${type}`);
-      }
-    }
+  disconnectedCallback() {
+    unregisterStore(this.scope);
+    log.debug('Unregistered store from registry', { scope: this.scope });
   }
 
   private async markAsViewed() {
     log.debug('Marking as viewed', { scope: this.scope });
     await this.setLastViewed(Date.now());
+  }
+
+  private openAndMarkViewed() {
+    log.debug('Opening display and marking as viewed', { scope: this.scope });
+    this.scopedStore.actions.openDisplay();
+    void this.markAsViewed();
   }
 
   private hydrateLastViewed() {

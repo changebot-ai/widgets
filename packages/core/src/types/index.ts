@@ -60,10 +60,18 @@ export interface StencilStore<T> {
   dispose: () => void;
 }
 
+export interface ProviderConfig {
+  url?: string;
+  slug?: string;
+  scope: string;
+}
+
 export interface Services {
   store: StencilStore<StoreState>;
-  config: StoreConfig;
+  config: ProviderConfig;
   actions: StoreActions;
+  /** Opens display and persists lastViewed to localStorage/API */
+  openAndMarkViewed: () => void;
 }
 
 export interface ActionDetail<T = unknown> {

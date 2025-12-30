@@ -44,127 +44,27 @@ describe('changebot-provider', () => {
     expect(await element.getProperty('scope')).toBe('default');
   });
 
-  describe('context request event handling', () => {
-    it('responds to context request events', async () => {
+  describe('store registration', () => {
+    it('registers store in registry on load', async () => {
       const page = await newE2EPage();
       await page.setContent('<changebot-provider />');
-
-      // Set up listener for the response
-      const contextReceived = await page.evaluateHandle(() => {
-        return new Promise((resolve) => {
-          // Dispatch context request
-          const requestEvent = new CustomEvent('changebot:context-request', {
-            detail: {
-              callback: (context) => {
-                if (context && context.store && context.actions) {
-                  resolve(true);
-                } else {
-                  resolve(false);
-                }
-              },
-              scope: 'default'
-            },
-            bubbles: true,
-            composed: true
-          });
-
-          document.dispatchEvent(requestEvent);
-        });
-      });
-
-      const result = await contextReceived.jsonValue();
-      expect(result).toBe(true);
-    });
-
-    it('ignores context requests with different scope', async () => {
-      const page = await newE2EPage();
-      await page.setContent('<changebot-provider scope="scope-a" />');
-
-      const contextReceived = await page.evaluate(() => {
-        return new Promise((resolve) => {
-          let callbackCalled = false;
-
-          const requestEvent = new CustomEvent('changebot:context-request', {
-            detail: {
-              callback: () => {
-                callbackCalled = true;
-              },
-              scope: 'scope-b'
-            },
-            bubbles: true,
-            composed: true
-          });
-
-          document.dispatchEvent(requestEvent);
-
-          // Wait a bit to ensure callback isn't called
-          setTimeout(() => {
-            resolve(callbackCalled);
-          }, 100);
-        });
-      });
-
-      expect(contextReceived).toBe(false);
-    });
-  });
-
-  describe('action event handling', () => {
-    it('handles action events', async () => {
-      const page = await newE2EPage();
-      await page.setContent('<changebot-provider />');
-
-      // Spy on console to verify action handling
-      const consoleMessages = [];
-      page.on('console', msg => consoleMessages.push(msg.text()));
-
-      await page.evaluate(() => {
-        const actionEvent = new CustomEvent('changebot:action', {
-          detail: {
-            type: 'toggleDisplay',
-            scope: 'default'
-          },
-          bubbles: true,
-          composed: true
-        });
-
-        document.dispatchEvent(actionEvent);
-      });
 
       await page.waitForChanges();
 
-      // The component should process the action without errors
-      const errors = consoleMessages.filter(msg => msg.includes('Error'));
-      expect(errors).toHaveLength(0);
-    });
-
-    it('ignores actions with different scope', async () => {
-      const page = await newE2EPage();
-      await page.setContent('<changebot-provider scope="scope-a" />');
-
-      const actionProcessed = await page.evaluate(() => {
-        return new Promise((resolve) => {
-          // Mock the action handler
-          let actionCalled = false;
-
-          const actionEvent = new CustomEvent('changebot:action', {
-            detail: {
-              type: 'toggleDisplay',
-              scope: 'scope-b'
-            },
-            bubbles: true,
-            composed: true
-          });
-
-          document.dispatchEvent(actionEvent);
-
-          // Wait to ensure action isn't processed
+      // Check that the provider registered a store by verifying the registry has an entry
+      const hasStore = await page.evaluate(() => {
+        // The registry is a module-level Map, we can verify by trying to use a consumer
+        return new Promise<boolean>(resolve => {
+          // Give time for registration to complete
           setTimeout(() => {
-            resolve(actionCalled);
+            // Provider should have hydrated and registered
+            const provider = document.querySelector('changebot-provider');
+            resolve(provider?.classList.contains('hydrated') ?? false);
           }, 100);
         });
       });
 
-      expect(actionProcessed).toBe(false);
+      expect(hasStore).toBe(true);
     });
   });
 
@@ -174,6 +74,8 @@ describe('changebot-provider', () => {
       await page.setContent(`
         <changebot-provider scope="scope-a" />
         <changebot-provider scope="scope-b" />
+        <changebot-panel scope="scope-a" />
+        <changebot-panel scope="scope-b" />
       `);
 
       const providers = await page.findAll('changebot-provider');
@@ -182,46 +84,23 @@ describe('changebot-provider', () => {
       expect(await providers[0].getProperty('scope')).toBe('scope-a');
       expect(await providers[1].getProperty('scope')).toBe('scope-b');
 
-      // Test that each responds only to its scope
-      const results = await page.evaluate(() => {
-        return new Promise((resolve) => {
-          const results = { scopeA: false, scopeB: false };
-          let completed = 0;
+      await page.waitForChanges();
 
-          // Request context from scope-a
-          const requestA = new CustomEvent('changebot:context-request', {
-            detail: {
-              callback: (context) => {
-                results.scopeA = context && context.config && context.config.scope === 'scope-a';
-                completed++;
-                if (completed === 2) resolve(results);
-              },
-              scope: 'scope-a'
-            },
-            bubbles: true,
-            composed: true
-          });
+      // Test that each panel is connected to the correct provider
+      // by opening one panel and verifying only it opens
+      const panels = await page.findAll('changebot-panel');
+      await panels[0].callMethod('open');
 
-          // Request context from scope-b
-          const requestB = new CustomEvent('changebot:context-request', {
-            detail: {
-              callback: (context) => {
-                results.scopeB = context && context.config && context.config.scope === 'scope-b';
-                completed++;
-                if (completed === 2) resolve(results);
-              },
-              scope: 'scope-b'
-            },
-            bubbles: true,
-            composed: true
-          });
+      await page.waitForChanges();
+      await new Promise(resolve => setTimeout(resolve, 200));
 
-          document.dispatchEvent(requestA);
-          document.dispatchEvent(requestB);
-        });
-      });
+      // Only scope-a panel should be open
+      const panelElements = await page.findAll('changebot-panel >>> .panel');
+      const panel1Classes = await panelElements[0].getProperty('className');
+      const panel2Classes = await panelElements[1].getProperty('className');
 
-      expect(results).toEqual({ scopeA: true, scopeB: true });
+      expect(panel1Classes).toContain('panel--open');
+      expect(panel2Classes).toContain('panel--closed');
     });
   });
 

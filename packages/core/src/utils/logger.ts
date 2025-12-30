@@ -102,3 +102,10 @@ export const logStore = {
   warn: (msg: string, data?: LogData) => logger.warn('⚠️ Store', msg, data),
   error: (msg: string, data?: LogData) => logger.error('Store', msg, data),
 };
+
+export const logRegistry = {
+  debug: (msg: string, data?: LogData) => logger.debug('📦 Registry', msg, data),
+  info: (msg: string, data?: LogData) => logger.info('📦 Registry', msg, data),
+  warn: (msg: string, data?: LogData) => logger.warn('⚠️ Registry', msg, data),
+  error: (msg: string, data?: LogData) => logger.error('Registry', msg, data),
+};

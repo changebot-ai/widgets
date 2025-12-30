@@ -169,7 +169,7 @@ describe('changebot-toast', () => {
     expect(component.isVisible).toBe(false);
   });
 
-  it('marks update as viewed when dismissed', async () => {
+  it('calls markViewed action when dismissed with services', async () => {
     const publishedAt = new Date().toISOString();
     const mockUpdate = {
       id: 1,
@@ -183,12 +183,22 @@ describe('changebot-toast', () => {
       tags: []
     };
 
+    const mockMarkViewed = jest.fn();
+    const mockStore = {
+      state: { updates: [], lastViewed: null },
+      onChange: jest.fn()
+    };
+
     const page = await newSpecPage({
       components: [ChangebotToast],
       html: '<changebot-toast scope="test"></changebot-toast>',
     });
 
     const component = page.rootInstance;
+    component.services = {
+      store: mockStore,
+      actions: { markViewed: mockMarkViewed }
+    };
     component.currentUpdate = mockUpdate;
     component.isVisible = true;
     await page.waitForChanges();
@@ -197,8 +207,38 @@ describe('changebot-toast', () => {
     closeButton.click();
     await page.waitForChanges();
 
-    const lastViewed = localStorage.getItem('changebot:lastViewed:test');
-    expect(lastViewed).toBe(new Date(publishedAt).getTime().toString());
+    expect(mockMarkViewed).toHaveBeenCalledWith(new Date(publishedAt).getTime());
+  });
+
+  it('dismisses without error when no services available', async () => {
+    const mockUpdate = {
+      id: 1,
+      title: 'Update',
+      content: '',
+      display_date: new Date().toISOString().split('T')[0],
+      published_at: new Date().toISOString(),
+      expires_on: null,
+      highlight_target: null,
+      hosted_url: null,
+      tags: []
+    };
+
+    const page = await newSpecPage({
+      components: [ChangebotToast],
+      html: '<changebot-toast></changebot-toast>',
+    });
+
+    const component = page.rootInstance;
+    component.currentUpdate = mockUpdate;
+    component.isVisible = true;
+    await page.waitForChanges();
+
+    // Should not throw when dismissed without services
+    const closeButton = page.root.shadowRoot.querySelector('.toast-close') as HTMLElement;
+    expect(() => closeButton.click()).not.toThrow();
+    await page.waitForChanges();
+
+    expect(component.isVisible).toBe(false);
   });
 
   it('handles keyboard navigation with Enter key', async () => {
@@ -290,7 +330,7 @@ describe('changebot-toast', () => {
     expect(date.textContent).toMatch(/Oct 4, 2025/);
   });
 
-  it('requests context on component load', async () => {
+  it('loads without provider (services remain undefined)', async () => {
     const page = await newSpecPage({
       components: [ChangebotToast],
       html: '<changebot-toast></changebot-toast>',
@@ -299,8 +339,8 @@ describe('changebot-toast', () => {
     // Verify component loaded successfully
     expect(page.rootInstance).toBeDefined();
 
-    // The context request event is dispatched during componentWillLoad
-    expect(page.rootInstance.services).toBeUndefined(); // No services until context received
+    // Services should be undefined since no provider registered a store
+    expect(page.rootInstance.services).toBeUndefined();
   });
 
   it('subscribes to store updates when context is received', async () => {

@@ -1,9 +1,8 @@
 import { Component, Element, Prop, State, Method, Watch, Listen, h, Host } from '@stencil/core';
-import { dispatchAction } from '../../utils/context';
 import { Services, Update, Widget } from '../../types';
+import { waitForStore } from '../../store/registry';
 import { Theme } from '../../utils/themes';
 import { createThemeManager, ThemeManager } from '../../utils/theme-manager';
-import { connectToProvider, SubscriptionManager } from '../../utils/provider-connection';
 import { logPanel as log } from '../../utils/logger';
 import { formatDisplayDate } from '../../utils/date-utils';
 
@@ -27,7 +26,7 @@ export class ChangebotPanel {
   @State() activeTheme?: Theme;
 
   private services?: Services;
-  private subscriptions = new SubscriptionManager();
+  private subscriptionCleanups: (() => void)[] = [];
   private panelElement?: HTMLDivElement;
   private firstFocusableElement?: HTMLElement;
   private lastFocusableElement?: HTMLElement;
@@ -43,16 +42,31 @@ export class ChangebotPanel {
     });
   }
 
-  async componentWillLoad() {
+  componentWillLoad() {
     this.themeManager = createThemeManager(this, theme => {
       this.activeTheme = theme;
     });
 
-    // Connect to provider
-    connectToProvider(this.el, this.scope, services => {
-      this.services = services;
+    // Set data-scope attribute for debugging
+    if (this.scope) {
+      this.el.setAttribute('data-scope', this.scope);
+    }
+
+    // Connect to provider asynchronously (don't block rendering)
+    this.connectToProvider();
+  }
+
+  private async connectToProvider() {
+    try {
+      this.services = await waitForStore(this.scope || 'default');
+      log.debug('Connected to provider via registry', { scope: this.scope || 'default' });
       this.subscribeToStore();
-    }, log);
+    } catch (error) {
+      log.warn('Failed to connect to provider', {
+        error: error instanceof Error ? error.message : error,
+        scope: this.scope || 'default',
+      });
+    }
   }
 
   componentDidLoad() {
@@ -60,35 +74,42 @@ export class ChangebotPanel {
   }
 
   disconnectedCallback() {
-    this.subscriptions.cleanup();
+    this.subscriptionCleanups.forEach(cleanup => cleanup());
+    this.subscriptionCleanups = [];
     this.themeManager?.cleanup();
   }
 
-  public subscribeToStore() {
+  private subscribeToStore() {
     if (!this.services?.store) return;
 
     const store = this.services.store;
     log.debug('Subscribing to store', { state: store.state });
 
-    this.subscriptions.subscribe(store, 'isOpen', () => {
-      log.debug('isOpen changed', { isOpen: store.state.isOpen });
-      const wasOpen = this.isOpen;
-      this.isOpen = store.state.isOpen;
+    this.subscriptionCleanups.push(
+      store.onChange('isOpen', () => {
+        log.debug('isOpen changed', { isOpen: store.state.isOpen });
+        const wasOpen = this.isOpen;
+        this.isOpen = store.state.isOpen;
 
-      if (this.isOpen && !wasOpen) {
-        setTimeout(() => this.focusFirstElement(), 100);
-      }
-    });
+        if (this.isOpen && !wasOpen) {
+          setTimeout(() => this.focusFirstElement(), 100);
+        }
+      })
+    );
 
-    this.subscriptions.subscribe(store, 'updates', () => {
-      log.debug('Updates changed', { count: store.state.updates?.length });
-      this.updates = store.state.updates || [];
-    });
+    this.subscriptionCleanups.push(
+      store.onChange('updates', () => {
+        log.debug('Updates changed', { count: store.state.updates?.length });
+        this.updates = store.state.updates || [];
+      })
+    );
 
-    this.subscriptions.subscribe(store, 'widget', () => {
-      log.debug('Widget metadata changed', { widget: store.state.widget });
-      this.widget = store.state.widget;
-    });
+    this.subscriptionCleanups.push(
+      store.onChange('widget', () => {
+        log.debug('Widget metadata changed', { widget: store.state.widget });
+        this.widget = store.state.widget;
+      })
+    );
 
     // Set initial state
     this.isOpen = store.state.isOpen || false;
@@ -98,12 +119,21 @@ export class ChangebotPanel {
 
   @Method()
   async open() {
-    dispatchAction(this.el, 'openDisplay', undefined, this.scope);
+    if (this.services) {
+      this.services.openAndMarkViewed();
+    } else {
+      log.warn('Cannot open panel - no services available');
+    }
   }
 
   @Method()
   async close() {
-    dispatchAction(this.el, 'closeDisplay', undefined, this.scope);
+    if (this.services?.actions) {
+      this.services.actions.closeDisplay();
+    } else {
+      log.warn('Cannot close panel - no services available');
+      this.isOpen = false;
+    }
   }
 
   @Method()
@@ -133,11 +163,11 @@ export class ChangebotPanel {
    */
   private closePanel = () => {
     try {
-      if (this.services) {
-        dispatchAction(this.el, 'closeDisplay', undefined, this.scope);
+      if (this.services?.actions) {
+        this.services.actions.closeDisplay();
       }
     } catch (error) {
-      log.warn('Failed to dispatch close action', { error });
+      log.warn('Failed to close panel', { error });
     } finally {
       // Always close the panel, regardless of provider state
       this.isOpen = false;

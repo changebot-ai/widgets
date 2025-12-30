@@ -1,9 +1,8 @@
 import { Component, Element, Prop, State, Watch, h } from '@stencil/core';
-import { dispatchAction } from '../../utils/context';
 import { Services } from '../../types';
+import { waitForStore } from '../../store/registry';
 import { Theme } from '../../utils/themes';
 import { createThemeManager, ThemeManager } from '../../utils/theme-manager';
-import { connectToProvider, SubscriptionManager } from '../../utils/provider-connection';
 import { logBadge as log } from '../../utils/logger';
 
 @Component({
@@ -25,7 +24,7 @@ export class ChangebotBadge {
   @State() activeTheme?: Theme;
 
   private services?: Services;
-  private subscriptions = new SubscriptionManager();
+  private subscriptionCleanups: (() => void)[] = [];
   private themeManager?: ThemeManager;
 
   @Watch('count')
@@ -56,7 +55,7 @@ export class ChangebotBadge {
     });
   }
 
-  async componentWillLoad() {
+  componentWillLoad() {
     log.debug('componentWillLoad', {
       scope: this.scope || 'default',
       hasCountProp: this.count !== undefined,
@@ -67,28 +66,51 @@ export class ChangebotBadge {
       this.activeTheme = theme;
     });
 
-    // If count prop is provided, use it directly (for testing)
+    // If count prop is provided, use it directly (for testing/standalone mode)
     if (this.count !== undefined) {
       log.debug('Using count prop (testing mode)', { count: this.count });
       this.setCount(this.count);
-      return;
     }
 
-    // Connect to provider
-    connectToProvider(this.el, this.scope, services => {
-      this.services = services;
+    // Set data-scope attribute for debugging
+    if (this.scope) {
+      this.el.setAttribute('data-scope', this.scope);
+    }
+
+    // Connect to provider asynchronously (don't block rendering)
+    // This allows click to open panel even when count prop is used
+    this.connectToProvider();
+  }
+
+  private async connectToProvider() {
+    try {
+      this.services = await waitForStore(this.scope || 'default');
+      log.debug('Connected to provider via registry', { scope: this.scope || 'default' });
       this.subscribeToStore();
-    }, log);
+    } catch (error) {
+      log.warn('Failed to connect to provider', {
+        error: error instanceof Error ? error.message : error,
+        scope: this.scope || 'default',
+      });
+    }
   }
 
   disconnectedCallback() {
-    this.subscriptions.cleanup();
+    this.subscriptionCleanups.forEach(cleanup => cleanup());
+    this.subscriptionCleanups = [];
     this.themeManager?.cleanup();
   }
 
-  public subscribeToStore() {
+  private subscribeToStore() {
     if (!this.services?.store) {
       log.debug('Cannot subscribe - no store available');
+      return;
+    }
+
+    // If count prop is provided, don't override from store
+    // (badge is in standalone mode with explicit count)
+    if (this.count !== undefined) {
+      log.debug('Count prop provided, skipping store subscription for count');
       return;
     }
 
@@ -103,32 +125,26 @@ export class ChangebotBadge {
     // Set initial count from store
     this.setCount(store.state.newUpdatesCount);
 
-    // Subscribe to newUpdatesCount changes
-    this.subscriptions.subscribe(store, 'newUpdatesCount', () => {
-      log.debug('newUpdatesCount changed', {
-        newValue: store.state.newUpdatesCount,
-        previousComponentValue: this.newUpdatesCount,
-      });
-      this.setCount(store.state.newUpdatesCount);
-    });
-
-    // Subscribe to updates changes (indirect newUpdatesCount updates)
-    this.subscriptions.subscribe(store, 'updates', () => {
-      log.debug('updates changed', { newValue: store.state.newUpdatesCount });
-      this.setCount(store.state.newUpdatesCount);
-    });
-
-    // Subscribe to lastViewed changes (indirect newUpdatesCount updates)
-    this.subscriptions.subscribe(store, 'lastViewed', () => {
-      log.debug('lastViewed changed', { newValue: store.state.newUpdatesCount });
-      this.setCount(store.state.newUpdatesCount);
-    });
+    // Subscribe to newUpdatesCount changes (store auto-calculates when updates/lastViewed change)
+    this.subscriptionCleanups.push(
+      store.onChange('newUpdatesCount', () => {
+        log.debug('newUpdatesCount changed', {
+          newValue: store.state.newUpdatesCount,
+          previousComponentValue: this.newUpdatesCount,
+        });
+        this.setCount(store.state.newUpdatesCount);
+      })
+    );
 
     log.debug('Successfully subscribed to store changes');
   }
 
   private handleClick = () => {
-    dispatchAction(this.el, 'openDisplay', undefined, this.scope);
+    if (this.services) {
+      this.services.openAndMarkViewed();
+    } else {
+      log.warn('Cannot open display - no services available');
+    }
   };
 
   private handleKeyDown = (event: KeyboardEvent) => {

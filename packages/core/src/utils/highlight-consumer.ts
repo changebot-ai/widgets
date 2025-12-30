@@ -5,10 +5,9 @@
  * similar update checking and dismiss logic.
  */
 
-import { Update } from '../types';
+import { StoreActions, Update } from '../types';
 import { findHighlightedUpdate, HighlightTarget } from './update-checker';
 import { validatePublishedAt } from './date-utils';
-import { setLastViewedTime } from './storage-utils';
 
 type LogFn = {
   debug: (msg: string, data?: Record<string, unknown>) => void;
@@ -28,16 +27,22 @@ export interface HighlightConsumerCallbacks {
 
 /**
  * Check for a new highlighted update and trigger appropriate callbacks
+ * @param updates Array of updates to check
+ * @param target The highlight target type ('banner' or 'toast')
+ * @param lastViewed The timestamp of when updates were last viewed (from store)
+ * @param currentUpdateId The ID of the currently displayed update
+ * @param callbacks Callbacks for show/hide events
+ * @param logPrefix Prefix for logging
  */
 export function checkForHighlightedUpdate(
   updates: Update[],
   target: HighlightTarget,
-  scope: string | undefined,
+  lastViewed: number | null,
   currentUpdateId: number | undefined,
   callbacks: HighlightConsumerCallbacks,
   logPrefix: string
 ): void {
-  const result = findHighlightedUpdate(updates, target, scope, currentUpdateId, logPrefix);
+  const result = findHighlightedUpdate(updates, target, lastViewed, currentUpdateId, logPrefix);
 
   if (result.shouldShow && result.newUpdate) {
     callbacks.onShow(result.newUpdate);
@@ -47,11 +52,15 @@ export function checkForHighlightedUpdate(
 }
 
 /**
- * Mark an update as viewed by saving its timestamp to localStorage
+ * Mark an update as viewed by calling the store action
+ * @param update The update to mark as viewed
+ * @param actions Store actions to call markViewed
+ * @param log Logger instance
+ * @param componentName Name of the component for logging
  */
 export function markUpdateAsViewed(
   update: Update,
-  scope: string | undefined,
+  actions: StoreActions,
   log: LogFn,
   componentName: string
 ): boolean {
@@ -62,36 +71,7 @@ export function markUpdateAsViewed(
     return false;
   }
 
-  setLastViewedTime(scope || 'default', updateTime);
+  actions.markViewed(updateTime);
   log.info(`Marked update as viewed: ${update.title}`);
   return true;
-}
-
-/**
- * Creates a standardized dismiss handler for highlight consumers
- */
-export function createDismissHandler(
-  getState: () => HighlightConsumerState,
-  setState: (visible: boolean, update?: Update) => void,
-  scope: string | undefined,
-  log: LogFn,
-  componentName: string,
-  clearTimer?: () => void
-): () => void {
-  return () => {
-    // Clear any auto-dismiss timer
-    if (clearTimer) {
-      clearTimer();
-    }
-
-    const state = getState();
-
-    // Mark update as viewed
-    if (state.currentUpdate) {
-      markUpdateAsViewed(state.currentUpdate, scope, log, componentName);
-    }
-
-    // Hide the component
-    setState(false, undefined);
-  };
 }

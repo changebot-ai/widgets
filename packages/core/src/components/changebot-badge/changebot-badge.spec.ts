@@ -106,9 +106,9 @@ describe('changebot-badge', () => {
     expect(badge.getAttribute('aria-label')).toBe('New updates available');
   });
 
-  it('requests context on component load', async () => {
-    // This test verifies that the component requests context
-    // The actual context request happens in componentWillLoad
+  it('loads without provider (services remain undefined)', async () => {
+    // When badge loads without a provider, services should be undefined
+    // but the component should still render correctly
     const page = await newSpecPage({
       components: [ChangebotBadge],
       html: '<changebot-badge></changebot-badge>',
@@ -117,9 +117,8 @@ describe('changebot-badge', () => {
     // Verify component loaded successfully
     expect(page.rootInstance).toBeDefined();
 
-    // The context request event is dispatched during componentWillLoad
-    // We can verify by checking that the component is ready to receive context
-    expect(page.rootInstance.services).toBeUndefined(); // No services until context received
+    // Services should be undefined since no provider registered a store
+    expect(page.rootInstance.services).toBeUndefined();
   });
 
   it('subscribes to store changes when context is received', async () => {
@@ -148,91 +147,100 @@ describe('changebot-badge', () => {
     expect(mockStore.onChange).toHaveBeenCalledWith('newUpdatesCount', expect.any(Function));
   });
 
-  it('dispatches openDisplay action on click', async () => {
+  it('calls openAndMarkViewed on click when services available', async () => {
+    const mockOpenAndMarkViewed = jest.fn();
+    const mockStore = {
+      state: { updates: [], lastViewed: Date.now(), newUpdatesCount: 3 },
+      onChange: jest.fn()
+    };
+
     const page = await newSpecPage({
       components: [ChangebotBadge],
       html: '<changebot-badge count="3"></changebot-badge>',
     });
 
-    // Listen for the action event
-    let eventDetail: any;
-    const eventPromise = new Promise<void>(resolve => {
-      page.root.addEventListener('changebot:action', ((e: CustomEvent) => {
-        eventDetail = e.detail;
-        resolve();
-      }) as EventListener);
-    });
+    const component = page.rootInstance;
+
+    // Simulate having services
+    component.services = {
+      store: mockStore,
+      openAndMarkViewed: mockOpenAndMarkViewed
+    };
 
     const badge = page.root.shadowRoot.querySelector('.badge') as HTMLElement;
     badge.click();
 
-    await eventPromise;
     await page.waitForChanges();
 
-    expect(eventDetail).toEqual(
-      expect.objectContaining({
-        type: 'openDisplay',
-        scope: 'default'
-      })
-    );
+    expect(mockOpenAndMarkViewed).toHaveBeenCalled();
   });
 
-  it('handles keyboard navigation with Enter key', async () => {
+  it('handles click gracefully without services', async () => {
     const page = await newSpecPage({
       components: [ChangebotBadge],
       html: '<changebot-badge count="3"></changebot-badge>',
     });
 
-    // Listen for the action event
-    let eventDetail: any;
-    const eventPromise = new Promise<void>(resolve => {
-      page.root.addEventListener('changebot:action', ((e: CustomEvent) => {
-        eventDetail = e.detail;
-        resolve();
-      }) as EventListener);
+    const component = page.rootInstance;
+    expect(component.services).toBeUndefined();
+
+    // Click should not throw when services are undefined
+    const badge = page.root.shadowRoot.querySelector('.badge') as HTMLElement;
+    expect(() => badge.click()).not.toThrow();
+  });
+
+  it('handles keyboard navigation with Enter key', async () => {
+    const mockOpenAndMarkViewed = jest.fn();
+    const mockStore = {
+      state: { updates: [], lastViewed: Date.now(), newUpdatesCount: 3 },
+      onChange: jest.fn()
+    };
+
+    const page = await newSpecPage({
+      components: [ChangebotBadge],
+      html: '<changebot-badge count="3"></changebot-badge>',
     });
+
+    const component = page.rootInstance;
+    component.services = {
+      store: mockStore,
+      openAndMarkViewed: mockOpenAndMarkViewed
+    };
 
     const badge = page.root.shadowRoot.querySelector('.badge') as HTMLElement;
     const enterEvent = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
     badge.dispatchEvent(enterEvent);
 
-    await eventPromise;
     await page.waitForChanges();
 
-    expect(eventDetail).toEqual(
-      expect.objectContaining({
-        type: 'openDisplay'
-      })
-    );
+    expect(mockOpenAndMarkViewed).toHaveBeenCalled();
   });
 
   it('handles keyboard navigation with Space key', async () => {
+    const mockOpenAndMarkViewed = jest.fn();
+    const mockStore = {
+      state: { updates: [], lastViewed: Date.now(), newUpdatesCount: 3 },
+      onChange: jest.fn()
+    };
+
     const page = await newSpecPage({
       components: [ChangebotBadge],
       html: '<changebot-badge count="3"></changebot-badge>',
     });
 
-    // Listen for the action event
-    let eventDetail: any;
-    const eventPromise = new Promise<void>(resolve => {
-      page.root.addEventListener('changebot:action', ((e: CustomEvent) => {
-        eventDetail = e.detail;
-        resolve();
-      }) as EventListener);
-    });
+    const component = page.rootInstance;
+    component.services = {
+      store: mockStore,
+      openAndMarkViewed: mockOpenAndMarkViewed
+    };
 
     const badge = page.root.shadowRoot.querySelector('.badge') as HTMLElement;
     const spaceEvent = new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true });
     badge.dispatchEvent(spaceEvent);
 
-    await eventPromise;
     await page.waitForChanges();
 
-    expect(eventDetail).toEqual(
-      expect.objectContaining({
-        type: 'openDisplay'
-      })
-    );
+    expect(mockOpenAndMarkViewed).toHaveBeenCalled();
   });
 
   it('cleans up store subscription on disconnect', async () => {

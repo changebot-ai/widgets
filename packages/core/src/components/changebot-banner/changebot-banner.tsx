@@ -1,8 +1,8 @@
 import { Component, Element, Prop, State, Watch, Method, h, Host } from '@stencil/core';
 import { Services, Update } from '../../types';
+import { waitForStore } from '../../store/registry';
 import { Theme } from '../../utils/themes';
 import { createThemeManager, ThemeManager } from '../../utils/theme-manager';
-import { connectToProvider, SubscriptionManager } from '../../utils/provider-connection';
 import { logBanner as log } from '../../utils/logger';
 import { formatDisplayDate } from '../../utils/date-utils';
 import { checkForHighlightedUpdate, markUpdateAsViewed } from '../../utils/highlight-consumer';
@@ -27,7 +27,7 @@ export class ChangebotBanner {
   @State() activeTheme?: Theme;
 
   private services?: Services;
-  private subscriptions = new SubscriptionManager();
+  private subscriptionCleanups: (() => void)[] = [];
   private themeManager?: ThemeManager;
 
   @Watch('theme')
@@ -40,20 +40,36 @@ export class ChangebotBanner {
     });
   }
 
-  async componentWillLoad() {
+  componentWillLoad() {
     this.themeManager = createThemeManager(this, theme => {
       this.activeTheme = theme;
     });
 
-    // Connect to provider
-    connectToProvider(this.el, this.scope, services => {
-      this.services = services;
+    // Set data-scope attribute for debugging
+    if (this.scope) {
+      this.el.setAttribute('data-scope', this.scope);
+    }
+
+    // Connect to provider asynchronously (don't block rendering)
+    this.connectToProvider();
+  }
+
+  private async connectToProvider() {
+    try {
+      this.services = await waitForStore(this.scope || 'default');
+      log.debug('Connected to provider via registry', { scope: this.scope || 'default' });
       this.subscribeToStore();
-    }, log);
+    } catch (error) {
+      log.warn('Failed to connect to provider', {
+        error: error instanceof Error ? error.message : error,
+        scope: this.scope || 'default',
+      });
+    }
   }
 
   disconnectedCallback() {
-    this.subscriptions.cleanup();
+    this.subscriptionCleanups.forEach(cleanup => cleanup());
+    this.subscriptionCleanups = [];
     this.themeManager?.cleanup();
   }
 
@@ -63,10 +79,12 @@ export class ChangebotBanner {
     const store = this.services.store;
     log.debug('Subscribing to store', { state: store.state });
 
-    this.subscriptions.subscribe(store, 'updates', () => {
-      log.debug('Updates changed, checking for new update...');
-      this.checkForNewUpdate(store.state.updates);
-    });
+    this.subscriptionCleanups.push(
+      store.onChange('updates', () => {
+        log.debug('Updates changed, checking for new update...');
+        this.checkForNewUpdate(store.state.updates);
+      })
+    );
 
     // Check initially
     if (store.state.updates) {
@@ -75,10 +93,11 @@ export class ChangebotBanner {
   }
 
   private checkForNewUpdate(updates: Update[]) {
+    const lastViewed = this.services?.store.state.lastViewed ?? null;
     checkForHighlightedUpdate(
       updates,
       'banner',
-      this.scope,
+      lastViewed,
       this.currentUpdate?.id,
       {
         onShow: update => {
@@ -107,8 +126,8 @@ export class ChangebotBanner {
     // Start dismissing animation
     this.isDismissing = true;
 
-    if (this.currentUpdate) {
-      markUpdateAsViewed(this.currentUpdate, this.scope, log, 'Banner');
+    if (this.currentUpdate && this.services?.actions) {
+      markUpdateAsViewed(this.currentUpdate, this.services.actions, log, 'Banner');
     }
 
     // Wait for animation to complete, then hide banner

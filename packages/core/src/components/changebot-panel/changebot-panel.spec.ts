@@ -84,7 +84,7 @@ describe('changebot-panel', () => {
   });
 
   // Store integration tests
-  it('requests context on component load', async () => {
+  it('loads without provider (services remain undefined)', async () => {
     const page = await newSpecPage({
       components: [ChangebotPanel],
       html: '<changebot-panel></changebot-panel>',
@@ -93,7 +93,7 @@ describe('changebot-panel', () => {
     // Verify component loaded successfully
     expect(page.rootInstance).toBeDefined();
 
-    // No services until context received
+    // Services should be undefined since no provider registered a store
     expect(page.rootInstance.services).toBeUndefined();
   });
 
@@ -227,18 +227,20 @@ describe('changebot-panel', () => {
   });
 
   // Close interaction tests
-  it('dispatches closeDisplay action on close button click', async () => {
+  it('calls closeDisplay action on close button click', async () => {
     const page = await newSpecPage({
       components: [ChangebotPanel],
       html: '<changebot-panel></changebot-panel>',
     });
 
     const component = page.rootInstance;
-    const dispatchEventSpy = jest.fn();
+    const mockCloseDisplay = jest.fn();
 
-    // Mock services to trigger action dispatch path
-    component.services = { store: { state: {} }, actions: {} };
-    component.el.dispatchEvent = dispatchEventSpy;
+    // Mock services with actions
+    component.services = {
+      store: { state: {} },
+      actions: { closeDisplay: mockCloseDisplay }
+    };
     component.isOpen = true;
 
     await page.waitForChanges();
@@ -246,33 +248,24 @@ describe('changebot-panel', () => {
     const closeButton = page.root.shadowRoot.querySelector('.close-button') as HTMLElement;
     if (closeButton) {
       closeButton.click();
-
-      expect(dispatchEventSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'changebot:action',
-          bubbles: true,
-          composed: true,
-          detail: expect.objectContaining({
-            type: 'closeDisplay',
-            scope: 'default'
-          })
-        })
-      );
+      expect(mockCloseDisplay).toHaveBeenCalled();
     }
   });
 
-  it('dispatches closeDisplay action on ESC key', async () => {
+  it('calls closeDisplay action on ESC key', async () => {
     const page = await newSpecPage({
       components: [ChangebotPanel],
       html: '<changebot-panel></changebot-panel>',
     });
 
     const component = page.rootInstance;
-    const dispatchEventSpy = jest.fn();
+    const mockCloseDisplay = jest.fn();
 
-    // Mock services to trigger action dispatch path
-    component.services = { store: { state: {} }, actions: {} };
-    component.el.dispatchEvent = dispatchEventSpy;
+    // Mock services with actions
+    component.services = {
+      store: { state: {} },
+      actions: { closeDisplay: mockCloseDisplay }
+    };
     component.isOpen = true;
 
     await page.waitForChanges();
@@ -281,14 +274,7 @@ describe('changebot-panel', () => {
     const escEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
     document.dispatchEvent(escEvent);
 
-    expect(dispatchEventSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: 'changebot:action',
-        detail: expect.objectContaining({
-          type: 'closeDisplay'
-        })
-      })
-    );
+    expect(mockCloseDisplay).toHaveBeenCalled();
   });
 
   it('closes directly when no provider (standalone mode)', async () => {
@@ -309,37 +295,32 @@ describe('changebot-panel', () => {
 
       await page.waitForChanges();
 
-      // Should close directly without dispatching action
+      // Should close directly without services
       expect(component.isOpen).toBe(false);
     }
   });
 
-  it('dispatches closeDisplay action on backdrop click (modal only)', async () => {
-    const dispatchEventSpy = jest.fn();
+  it('calls closeDisplay action on backdrop click (modal only)', async () => {
+    const mockCloseDisplay = jest.fn();
 
-    const { root } = await newSpecPage({
+    const page = await newSpecPage({
       components: [ChangebotPanel],
       html: '<changebot-panel mode="modal"></changebot-panel>',
     });
 
-    const component = root as any;
+    const component = page.rootInstance;
+    component.services = {
+      store: { state: {} },
+      actions: { closeDisplay: mockCloseDisplay }
+    };
     component.isOpen = true;
-    component.dispatchEvent = dispatchEventSpy;
 
-    await component.componentDidLoad?.();
+    await page.waitForChanges();
 
-    const backdrop = root.shadowRoot.querySelector('.backdrop') as HTMLElement;
+    const backdrop = page.root.shadowRoot.querySelector('.backdrop') as HTMLElement;
     if (backdrop) {
       backdrop.click();
-
-      expect(dispatchEventSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'changebot:action',
-          detail: expect.objectContaining({
-            type: 'closeDisplay'
-          })
-        })
-      );
+      expect(mockCloseDisplay).toHaveBeenCalled();
     }
   });
 
