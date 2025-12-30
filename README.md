@@ -43,7 +43,7 @@ Load directly from CDN - no build step required:
 For production, pin to a specific version:
 
 ```html
-<script type="module" src="https://widgets.changebot.ai/v0.0.2.js"></script>
+<script type="module" src="https://widgets.changebot.ai/v0.1.13.js"></script>
 ```
 
 ### Option 2: npm (For bundled apps)
@@ -68,8 +68,7 @@ Required component that manages state and API calls.
 
 **Props:**
 
-- `slug` (string, optional) - Your Changebot product slug (either `slug` or `url` required)
-- `url` (string, optional) - Custom API URL (either `slug` or `url` required)
+- `slug` (string, required) - Your Changebot product slug
 - `scope` (string, default: "default") - Scope for multiple providers
 
 ```html
@@ -326,12 +325,6 @@ await drawer.setUpdates([
 ]);
 ```
 
-### Custom API Endpoint
-
-```html
-<changebot-provider url="https://your-api.com/updates" />
-```
-
 ### Using with React
 
 Install the React wrapper:
@@ -400,11 +393,10 @@ import { ChangebotProvider, ChangebotBadge, ChangebotPanel, ChangebotBanner, Cha
 
 Required component that manages state and API calls.
 
-| Prop    | Type   | Default     | Description                                                   |
-| ------- | ------ | ----------- | ------------------------------------------------------------- |
-| `slug`  | string | -           | Your Changebot product slug (either `slug` or `url` required) |
-| `url`   | string | -           | Custom API URL (either `slug` or `url` required)              |
-| `scope` | string | `"default"` | Scope for multiple providers                                  |
+| Prop    | Type   | Default     | Description                      |
+| ------- | ------ | ----------- | -------------------------------- |
+| `slug`  | string | -           | Your Changebot product slug      |
+| `scope` | string | `"default"` | Scope for multiple providers     |
 
 **Events:**
 
@@ -706,20 +698,22 @@ localStorage.setItem(key, Date.now().toString());
 
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Start dev server with hot reload
-npm start
+pnpm start
 
 # Build for production
-npm run build
+pnpm run build
 
 # Run tests
-npm test
+pnpm test
 
 # Generate new component
-npm run generate
+pnpm run generate
 ```
+
+**Note**: This project uses `pnpm` as the package manager. All npm commands will also work.
 
 ## Release Process
 
