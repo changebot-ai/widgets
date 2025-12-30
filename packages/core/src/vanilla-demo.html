@@ -585,23 +585,41 @@
           {
             id: 1,
             title: "Today's Feature Release",
-            content: '<p>We just launched a brand new feature that will revolutionize your workflow!</p>',
+            content: `<p>We just launched a brand new feature that will revolutionize your workflow! This update brings significant improvements to how you manage your projects and collaborate with your team.</p>
+              <img src="https://picsum.photos/800/400?random=1" alt="Feature screenshot" />
+              <p>Key highlights include:</p>
+              <ul>
+                <li>Real-time collaboration with team members</li>
+                <li>Advanced filtering and search capabilities</li>
+                <li>Customizable dashboards for every user</li>
+                <li>Integration with popular third-party tools</li>
+              </ul>
+              <p>We've been working on this for months and we're thrilled to finally share it with you. Try it out today and let us know what you think!</p>`,
             display_date: new Date().toISOString().split('T')[0],
             published_at: new Date().toISOString(),
             expires_on: null,
             highlight_target: 'banner',
-            hosted_url: null,
+            hosted_url: 'https://example.com/feature-release',
             tags: [{ id: 1, name: 'Feature', color: '#10b981' }]
           },
           {
             id: 2,
             title: 'Performance Improvements (3 days ago)',
-            content: '<p>Loading times reduced by 40% through optimization.</p>',
+            content: `<p>We've made significant performance improvements across the entire platform. Loading times have been reduced by 40% through careful optimization of our backend services and frontend rendering pipeline.</p>
+              <figure><img src="https://picsum.photos/800/400?random=2" alt="Performance graph" /></figure>
+              <p>Here's what we improved:</p>
+              <ul>
+                <li>Database query optimization reducing response times by 50%</li>
+                <li>Implemented lazy loading for images and components</li>
+                <li>Added CDN caching for static assets worldwide</li>
+                <li>Reduced JavaScript bundle size by 30%</li>
+              </ul>
+              <p>These improvements mean faster page loads, smoother interactions, and a better overall experience for all users. We're committed to continuous performance optimization.</p>`,
             display_date: new Date(now - 3 * day).toISOString().split('T')[0],
             published_at: new Date(now - 3 * day).toISOString(),
             expires_on: null,
             highlight_target: 'toast',
-            hosted_url: null,
+            hosted_url: 'https://example.com/performance',
             tags: [{ id: 2, name: 'Performance', color: '#3b82f6' }]
           },
           {

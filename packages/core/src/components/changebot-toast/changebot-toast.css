@@ -152,6 +152,7 @@
 
 /* Toast Content */
 .toast-content {
+  position: relative;
   margin-bottom: 8px;
   font-size: 14px;
   line-height: 1.5;
@@ -159,6 +160,8 @@
   word-wrap: break-word;
   overflow: hidden;
   max-height: 150px;
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
 }
 
 .toast-content p {
