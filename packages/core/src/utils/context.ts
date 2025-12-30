@@ -1,4 +1,4 @@
-import { ContextRequestDetail, ActionDetail, Services } from '../types';
+import { ActionDetail, Services } from '../types';
 
 /**
  * Request all services from the provider component via bubbling event.
@@ -25,37 +25,6 @@ export function requestServices(
       detail,
     })
   );
-}
-
-/**
- * Request a service from the provider component via bubbling event.
- * The provider listens in capture phase and will provide the requested service.
- *
- * @param element The element dispatching the request
- * @param key The service key to request ('store', 'config', or 'actions')
- * @param scope Optional scope for multi-provider scenarios (default: 'default')
- * @returns Promise that resolves with the requested service
- */
-export function requestContext<T = any>(
-  element: HTMLElement,
-  key: string,
-  scope = 'default'
-): Promise<T> {
-  return new Promise<T>((resolve) => {
-    const detail: ContextRequestDetail<T> = {
-      key: key as any,
-      scope,
-      provide: resolve
-    };
-
-    element.dispatchEvent(
-      new CustomEvent('changebot:context-request', {
-        bubbles: true,
-        composed: true,
-        detail
-      })
-    );
-  });
 }
 
 /**

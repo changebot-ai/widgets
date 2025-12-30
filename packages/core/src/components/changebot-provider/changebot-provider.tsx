@@ -2,6 +2,7 @@ import { Component, h, Prop, Listen, Element } from '@stencil/core';
 import { createScopedStore, getStorageKey } from '../../store';
 import { createAPI } from '../../utils/api';
 import { VERSION } from '../../utils/version';
+import { logProvider as log } from '../../utils/logger';
 
 @Component({
   tag: 'changebot-provider',
@@ -32,8 +33,8 @@ export class ChangebotProvider {
   };
 
   componentWillLoad() {
-    console.log(`🤖 Changebot Widgets v${VERSION}`);
-    console.log('🔌 Provider: componentWillLoad', {
+    log.info(`Changebot Widgets v${VERSION}`);
+    log.debug('componentWillLoad', {
       scope: this.scope,
       slug: this.slug,
       url: this.url,
@@ -53,13 +54,13 @@ export class ChangebotProvider {
     this.hydrateLastViewed();
 
     if (this.mockData) {
-      console.log('🔌 Provider: Loading mock data');
+      log.debug('Loading mock data');
       this.loadMockData();
     } else if (this.url || this.slug) {
-      console.log('🔌 Provider: Loading updates from API', { slug: this.slug, url: this.url });
+      log.debug('Loading updates from API', { slug: this.slug, url: this.url });
       this.loadUpdates();
     } else {
-      console.log('🔌 Provider: No slug, url, or mock data provided - skipping update load');
+      log.debug('No slug, url, or mock data provided - skipping update load');
     }
   }
 
@@ -67,21 +68,21 @@ export class ChangebotProvider {
   handleContextRequest(event: CustomEvent<{ callback: Function; scope?: string }>) {
     const requestScope = event.detail.scope || 'default';
 
-    console.log(`🔌 Provider: Received context request for scope "${requestScope}", my scope is "${this.scope}"`);
+    log.debug(`Received context request for scope "${requestScope}", my scope is "${this.scope}"`);
 
     // Only respond if scope matches
     if (requestScope === this.scope) {
       // Stop propagation to prevent other providers from responding
       event.stopPropagation();
 
-      console.log('🔌 Provider: Responding with services', this.services);
+      log.debug('Responding with services');
 
       // Provide the services via callback
       if (event.detail.callback) {
         event.detail.callback(this.services);
       }
     } else {
-      console.log(`🔌 Provider: Ignoring request (scope mismatch)`);
+      log.debug('Ignoring request (scope mismatch)');
     }
   }
 
@@ -105,39 +106,38 @@ export class ChangebotProvider {
             void this.markAsViewed();
           }
         } catch (error) {
-          console.error(`Error executing action ${type}:`, error);
+          log.error(`Error executing action ${type}`, { error });
         }
       } else {
-        console.warn('Unknown action type:', type);
+        log.warn(`Unknown action type: ${type}`);
       }
     }
   }
 
   private async markAsViewed() {
-    console.log('🔌 Provider: Marking as viewed for scope', this.scope);
+    log.debug('Marking as viewed', { scope: this.scope });
     await this.setLastViewed(Date.now());
   }
 
   private hydrateLastViewed() {
-    console.log('🔌 Provider: Hydrating lastViewed for scope', this.scope, { userId: this.userId });
+    log.debug('Hydrating lastViewed', { scope: this.scope, userId: this.userId });
     const timestamp = this.fetchLastSeen();
     if (timestamp) {
-      console.log('🔌 Provider: Marking as viewed with timestamp from storage', {
+      log.debug('Marking as viewed with timestamp from storage', {
         timestamp,
         formatted: new Date(timestamp).toISOString(),
       });
       this.scopedStore.actions.markViewed(timestamp);
     } else if (!this.userId) {
       // Anonymous user with no localStorage - initialize to now
-      // so future updates will show as unread
       const currentTime = Date.now();
-      console.log('🔌 Provider: No timestamp found and no userId, initializing to current time', {
+      log.debug('No timestamp found and no userId, initializing to current time', {
         currentTime,
         formatted: new Date(currentTime).toISOString(),
       });
       this.updateLocalStore(currentTime);
     } else {
-      console.log('🔌 Provider: No timestamp found but userId exists, waiting for API sync', { userId: this.userId });
+      log.debug('No timestamp found but userId exists, waiting for API sync', { userId: this.userId });
     }
   }
 
@@ -145,8 +145,7 @@ export class ChangebotProvider {
     try {
       await this.scopedStore.actions.loadUpdates(this.slug, this.url);
     } catch (error) {
-      console.error('🔌 Provider: Failed to load updates:', error);
-      // Store error is already handled in the action
+      log.error('Failed to load updates', { error });
     }
   }
 
@@ -155,7 +154,7 @@ export class ChangebotProvider {
       const data = JSON.parse(this.mockData);
       this.scopedStore.actions.loadMockUpdates(data);
     } catch (error) {
-      console.error('🔌 Provider: Failed to parse mock data:', error);
+      log.error('Failed to parse mock data', { error });
     }
   }
 
@@ -176,7 +175,7 @@ export class ChangebotProvider {
   private fetchLastSeen(): number | null {
     // Always read localStorage first (fast, synchronous)
     const key = getStorageKey(this.scope, 'lastViewed', this.userId);
-    console.log('🔌 Provider: Fetching lastViewed from localStorage', {
+    log.debug('Fetching lastViewed from localStorage', {
       key,
       scope: this.scope,
       userId: this.userId,
@@ -186,28 +185,27 @@ export class ChangebotProvider {
     const localValue = stored ? parseInt(stored, 10) : null;
 
     if (localValue) {
-      console.log('🔌 Provider: Fetched lastViewed from localStorage:', {
+      log.debug('Fetched lastViewed from localStorage', {
         value: localValue,
         formatted: new Date(localValue).toLocaleString(),
-        iso: new Date(localValue).toISOString(),
       });
     } else {
-      console.log('🔌 Provider: No lastViewed found in localStorage');
+      log.debug('No lastViewed found in localStorage');
     }
 
     // Only sync from API if cache has expired
     if (this.shouldSyncWithApi()) {
-      console.log('🔌 Provider: API sync needed, initiating sync');
+      log.debug('API sync needed, initiating sync');
       void this.syncFromApi();
     } else {
-      console.log('🔌 Provider: API sync not needed (recently synced or no userId)');
+      log.debug('API sync not needed (recently synced or no userId)');
     }
 
     return localValue;
   }
 
   private updateLocalStore(timestamp: number) {
-    console.log('🔌 Provider: Updating local store with timestamp', {
+    log.debug('Updating local store with timestamp', {
       timestamp,
       formatted: !isNaN(timestamp) ? new Date(timestamp).toISOString() : 'Invalid timestamp',
       scope: this.scope,
@@ -218,20 +216,20 @@ export class ChangebotProvider {
 
     const key = getStorageKey(this.scope, 'lastViewed', this.userId);
     localStorage.setItem(key, timestamp.toString());
-    console.log('🔌 Provider: Updated localStorage', { key, value: timestamp });
+    log.debug('Updated localStorage', { key, value: timestamp });
   }
 
   private async syncFromApi(): Promise<void> {
-    console.log('🔌 Provider: Fetching last_seen_at from API for user', this.userId);
+    log.debug('Fetching last_seen_at from API', { userId: this.userId });
     const data = await this.fetchUserTracking();
 
     if (!data) {
-      console.log('🔌 Provider: Could not fetch last_seen_at from API, using localStorage value');
+      log.debug('Could not fetch last_seen_at from API, using localStorage value');
       return;
     }
 
     if (data.last_seen_at === null || data.last_seen_at === undefined) {
-      console.log('🔌 Provider: User not tracked yet, setting last_seen_at to current time');
+      log.debug('User not tracked yet, setting last_seen_at to current time');
       const currentTime = Date.now();
       await this.setLastViewed(currentTime);
     } else {
@@ -239,11 +237,11 @@ export class ChangebotProvider {
       const timestamp = new Date(data.last_seen_at).getTime();
 
       if (isNaN(timestamp) || timestamp === 0) {
-        console.warn('🔌 Provider: Invalid timestamp received from API:', data.last_seen_at);
+        log.warn('Invalid timestamp received from API', { last_seen_at: data.last_seen_at });
         return;
       }
 
-      console.log('🔌 Provider: Fetched last_seen_at from API:', new Date(timestamp).toLocaleString());
+      log.debug('Fetched last_seen_at from API', { formatted: new Date(timestamp).toLocaleString() });
 
       this.updateLocalStore(timestamp);
     }
@@ -258,13 +256,13 @@ export class ChangebotProvider {
 
     if (this.userId) {
       const userData = this.parseUserData();
-      console.log('🔌 Provider: Updating last_seen_at via API for user', this.userId);
+      log.debug('Updating last_seen_at via API', { userId: this.userId });
       const success = await this.updateUserTracking(timestamp, userData);
 
       if (success) {
-        console.log('🔌 Provider: Successfully updated last_seen_at via API');
+        log.debug('Successfully updated last_seen_at via API');
       } else {
-        console.log('🔌 Provider: Could not update last_seen_at via API, but localStorage was updated');
+        log.debug('Could not update last_seen_at via API, but localStorage was updated');
       }
     }
   }
@@ -285,7 +283,7 @@ export class ChangebotProvider {
     try {
       return JSON.parse(this.userData);
     } catch (error) {
-      console.error('🔌 Provider: Invalid userData JSON, discarding userData but continuing with user tracking:', error);
+      log.error('Invalid userData JSON, discarding userData but continuing with user tracking', { error });
       return null;
     }
   }

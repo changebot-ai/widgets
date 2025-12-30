@@ -66,12 +66,6 @@ export interface Services {
   actions: StoreActions;
 }
 
-export interface ContextRequestDetail<T = unknown> {
-  key: keyof Services;
-  scope?: string;
-  provide: (value: T) => void;
-}
-
 export interface ActionDetail<T = unknown> {
   type: keyof StoreActions;
   payload?: T;

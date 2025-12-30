@@ -1,11 +1,11 @@
 import { Component, Element, Prop, State, Watch, Method, h, Host } from '@stencil/core';
 import { Services, Update } from '../../types';
 import { Theme } from '../../utils/themes';
-import { requestServices } from '../../utils/context';
 import { createThemeManager, ThemeManager } from '../../utils/theme-manager';
-import { formatDisplayDate, validatePublishedAt } from '../../utils/date-utils';
-import { setLastViewedTime } from '../../utils/storage-utils';
-import { findHighlightedUpdate } from '../../utils/update-checker';
+import { connectToProvider, SubscriptionManager } from '../../utils/provider-connection';
+import { logToast as log } from '../../utils/logger';
+import { formatDisplayDate } from '../../utils/date-utils';
+import { checkForHighlightedUpdate, markUpdateAsViewed } from '../../utils/highlight-consumer';
 
 @Component({
   tag: 'changebot-toast',
@@ -29,13 +29,12 @@ export class ChangebotToast {
   @Watch('isVisible')
   onVisibilityChange() {
     if (this.isVisible) {
-      // Update container bounds when toast becomes visible
       this.updateContainerBounds();
     }
   }
 
   private services?: Services;
-  private unsubscribeUpdates?: () => void;
+  private subscriptions = new SubscriptionManager();
   private themeManager?: ThemeManager;
   private autoDismissTimer?: ReturnType<typeof setTimeout>;
   private resizeObserver?: ResizeObserver;
@@ -44,7 +43,6 @@ export class ChangebotToast {
   @Watch('light')
   @Watch('dark')
   onThemePropsChange() {
-    // Re-initialize theme manager when props change
     this.themeManager?.cleanup();
     this.themeManager = createThemeManager(this, theme => {
       this.activeTheme = theme;
@@ -56,43 +54,25 @@ export class ChangebotToast {
       this.activeTheme = theme;
     });
 
-    // Set data-scope attribute if scope is provided
-    if (this.scope) {
-      this.el.setAttribute('data-scope', this.scope);
-    }
-
-    // Request context from provider
-    console.log('🍞 Toast: Requesting context with scope:', this.scope || 'default');
-
-    requestServices(this.el, this.scope, services => {
-      console.log('🍞 Toast: Received services from provider', {
-        hasStore: !!services?.store,
-        hasActions: !!services?.actions,
-        storeState: services?.store?.state,
-      });
+    // Connect to provider
+    connectToProvider(this.el, this.scope, services => {
       this.services = services;
       this.subscribeToStore();
-    });
+    }, log);
   }
 
   componentDidLoad() {
-    // Set up container bounds tracking
     this.updateContainerBounds();
     this.setupContainerTracking();
   }
 
   disconnectedCallback() {
-    if (this.unsubscribeUpdates) {
-      this.unsubscribeUpdates();
-    }
+    this.subscriptions.cleanup();
     this.themeManager?.cleanup();
-    if (this.autoDismissTimer) {
-      clearTimeout(this.autoDismissTimer);
-    }
+    this.clearAutoDismissTimer();
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
-    // Clean up window event listeners
     window.removeEventListener('resize', this.updateContainerBounds);
     window.removeEventListener('scroll', this.updateContainerBounds);
   }
@@ -101,12 +81,10 @@ export class ChangebotToast {
     if (!this.services?.store) return;
 
     const store = this.services.store;
+    log.debug('Subscribing to store', { state: store.state });
 
-    console.log('🍞 Toast: Subscribing to store, current state:', store.state);
-
-    // Subscribe to updates changes
-    this.unsubscribeUpdates = store.onChange('updates', () => {
-      console.log('🍞 Toast: Updates changed, checking for new update...');
+    this.subscriptions.subscribe(store, 'updates', () => {
+      log.debug('Updates changed, checking for new update...');
       this.checkForNewUpdate(store.state.updates);
     });
 
@@ -117,48 +95,49 @@ export class ChangebotToast {
   }
 
   private checkForNewUpdate(updates: Update[]) {
-    const result = findHighlightedUpdate(updates, 'toast', this.scope, this.currentUpdate?.id, '🍞 Toast');
+    checkForHighlightedUpdate(
+      updates,
+      'toast',
+      this.scope,
+      this.currentUpdate?.id,
+      {
+        onShow: update => {
+          this.currentUpdate = update;
+          this.isVisible = true;
+          this.setupAutoDismiss();
+        },
+        onHide: () => {
+          this.isVisible = false;
+          this.currentUpdate = undefined;
+        },
+      },
+      '🍞 Toast'
+    );
+  }
 
-    if (result.shouldShow && result.newUpdate) {
-      this.currentUpdate = result.newUpdate;
-      this.isVisible = true;
-
-      // Setup auto-dismiss if configured
-      if (this.autoDismiss) {
-        if (this.autoDismissTimer) {
-          clearTimeout(this.autoDismissTimer);
-        }
-        this.autoDismissTimer = setTimeout(() => {
-          this.handleDismiss();
-        }, this.autoDismiss * 1000);
-      }
-    } else if (!result.newUpdate) {
-      this.isVisible = false;
-      this.currentUpdate = undefined;
+  private setupAutoDismiss() {
+    if (this.autoDismiss) {
+      this.clearAutoDismissTimer();
+      this.autoDismissTimer = setTimeout(() => {
+        this.handleDismiss();
+      }, this.autoDismiss * 1000);
     }
   }
 
-  private handleDismiss = () => {
-    // Clear auto-dismiss timer if active
+  private clearAutoDismissTimer() {
     if (this.autoDismissTimer) {
       clearTimeout(this.autoDismissTimer);
       this.autoDismissTimer = undefined;
     }
+  }
 
-    // Mark this update as viewed
+  private handleDismiss = () => {
+    this.clearAutoDismissTimer();
+
     if (this.currentUpdate) {
-      const updateTime = validatePublishedAt(this.currentUpdate.published_at, 'Toast', this.currentUpdate.title);
-
-      if (updateTime === null) {
-        console.error('Toast: Cannot mark update as viewed - invalid published_at');
-        return;
-      }
-
-      setLastViewedTime(this.scope || 'default', updateTime);
-      console.log('🍞 Toast: Marked update as viewed:', this.currentUpdate.title);
+      markUpdateAsViewed(this.currentUpdate, this.scope, log, 'Toast');
     }
 
-    // Hide toast
     this.isVisible = false;
   };
 
@@ -169,28 +148,13 @@ export class ChangebotToast {
     }
   };
 
-  /**
-   * Show the toast with a specific update
-   */
   @Method()
   async show(update: Update) {
     this.currentUpdate = update;
     this.isVisible = true;
-
-    // Setup auto-dismiss if configured
-    if (this.autoDismiss) {
-      if (this.autoDismissTimer) {
-        clearTimeout(this.autoDismissTimer);
-      }
-      this.autoDismissTimer = setTimeout(() => {
-        this.handleDismiss();
-      }, this.autoDismiss * 1000);
-    }
+    this.setupAutoDismiss();
   }
 
-  /**
-   * Dismiss the toast
-   */
   @Method()
   async dismiss() {
     this.handleDismiss();
@@ -212,38 +176,29 @@ export class ChangebotToast {
   }
 
   private updateContainerBounds = () => {
-    // Get the parent element (container) of the toast component
     const container = this.el.parentElement;
     if (!container) return;
 
-    // Get the bounding rect of the container
     const rect = container.getBoundingClientRect();
-
-    // Calculate offsets more clearly
     const leftOffset = rect.left;
     const rightOffset = window.innerWidth - rect.right;
     const topOffset = rect.top;
 
-    // Set CSS custom properties on the host element
-    // These will be inherited by the shadow DOM and can be used in CSS
     (this.el as HTMLElement).style.setProperty('--toast-container-left', `${leftOffset}px`);
     (this.el as HTMLElement).style.setProperty('--toast-container-right-offset', `${rightOffset}px`);
     (this.el as HTMLElement).style.setProperty('--toast-container-top', `${topOffset}px`);
   };
 
   private setupContainerTracking() {
-    // Get the parent element (container) of the toast component
     const container = this.el.parentElement;
     if (!container) return;
 
-    // Use ResizeObserver to track container size changes
     this.resizeObserver = new ResizeObserver(() => {
       this.updateContainerBounds();
     });
 
     this.resizeObserver.observe(container);
 
-    // Also update on window resize (for viewport changes)
     window.addEventListener('resize', this.updateContainerBounds);
     window.addEventListener('scroll', this.updateContainerBounds);
   }
@@ -311,7 +266,6 @@ export class ChangebotToast {
   }
 }
 
-// Type declaration for HTMLElement
 declare global {
   interface HTMLChangebotToastElement extends HTMLElement {
     scope?: string;

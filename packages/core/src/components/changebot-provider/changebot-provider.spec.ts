@@ -56,7 +56,10 @@ describe('changebot-provider', () => {
       const result = component.parseUserData();
 
       expect(result).toBeNull();
-      expect(console.error).toHaveBeenCalledWith(expect.stringContaining('Invalid userData JSON'), expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining('Invalid userData JSON'),
+        expect.objectContaining({ error: expect.any(Error) })
+      );
     });
   });
 

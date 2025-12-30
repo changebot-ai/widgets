@@ -1,8 +1,10 @@
 import { Component, Element, Prop, State, Watch, h } from '@stencil/core';
-import { dispatchAction, requestServices } from '../../utils/context';
+import { dispatchAction } from '../../utils/context';
 import { Services } from '../../types';
 import { Theme } from '../../utils/themes';
 import { createThemeManager, ThemeManager } from '../../utils/theme-manager';
+import { connectToProvider, SubscriptionManager } from '../../utils/provider-connection';
+import { logBadge as log } from '../../utils/logger';
 
 @Component({
   tag: 'changebot-badge',
@@ -23,7 +25,7 @@ export class ChangebotBadge {
   @State() activeTheme?: Theme;
 
   private services?: Services;
-  private unsubscribe?: () => void;
+  private subscriptions = new SubscriptionManager();
   private themeManager?: ThemeManager;
 
   @Watch('count')
@@ -34,16 +36,13 @@ export class ChangebotBadge {
   private setCount(count: number) {
     if (count !== undefined) {
       const newCount = Math.max(0, count);
-      console.log('📛 Badge: setCount called', {
+      log.debug('setCount called', {
         inputCount: count,
         finalCount: newCount,
         previousCount: this.newUpdatesCount,
         willUpdate: newCount !== this.newUpdatesCount,
       });
       this.newUpdatesCount = newCount;
-      console.log('📛 Badge: Count updated, badge will', this.newUpdatesCount === 0 ? 'be hidden' : `show ${this.newUpdatesCount}`);
-    } else {
-      console.log('📛 Badge: setCount called with undefined, ignoring');
     }
   }
 
@@ -51,7 +50,6 @@ export class ChangebotBadge {
   @Watch('light')
   @Watch('dark')
   onThemePropsChange() {
-    // Re-initialize theme manager when props change
     this.themeManager?.cleanup();
     this.themeManager = createThemeManager(this, theme => {
       this.activeTheme = theme;
@@ -59,7 +57,7 @@ export class ChangebotBadge {
   }
 
   async componentWillLoad() {
-    console.log('📛 Badge: componentWillLoad', {
+    log.debug('componentWillLoad', {
       scope: this.scope || 'default',
       hasCountProp: this.count !== undefined,
       countProp: this.count,
@@ -69,103 +67,67 @@ export class ChangebotBadge {
       this.activeTheme = theme;
     });
 
-    // Set data-scope attribute if scope is provided
-    if (this.scope) {
-      this.el.setAttribute('data-scope', this.scope);
-    }
-
     // If count prop is provided, use it directly (for testing)
     if (this.count !== undefined) {
-      console.log('📛 Badge: Using count prop (testing mode)', this.count);
+      log.debug('Using count prop (testing mode)', { count: this.count });
       this.setCount(this.count);
       return;
     }
 
-    // Request context from provider
-    console.log('📛 Badge: Requesting context with scope:', this.scope || 'default');
-
-    requestServices(this.el, this.scope, services => {
-      console.log('📛 Badge: Received services from provider', {
-        hasStore: !!services?.store,
-        hasActions: !!services?.actions,
-        storeState: services?.store?.state,
-      });
+    // Connect to provider
+    connectToProvider(this.el, this.scope, services => {
       this.services = services;
       this.subscribeToStore();
-    });
-
-    console.log('📛 Badge: Context request event dispatched');
+    }, log);
   }
 
   disconnectedCallback() {
-    if (this.unsubscribe) {
-      this.unsubscribe();
-    }
+    this.subscriptions.cleanup();
     this.themeManager?.cleanup();
   }
 
   public subscribeToStore() {
     if (!this.services?.store) {
-      console.log('📛 Badge: Cannot subscribe - no store available');
+      log.debug('Cannot subscribe - no store available');
       return;
     }
 
     const store = this.services.store;
 
-    console.log('📛 Badge: Subscribing to store, current state:', {
+    log.debug('Subscribing to store', {
       newUpdatesCount: store.state.newUpdatesCount,
       updatesLength: store.state.updates?.length || 0,
       lastViewed: store.state.lastViewed,
-      lastViewedFormatted: store.state.lastViewed ? new Date(store.state.lastViewed).toISOString() : null,
-      fullState: store.state,
     });
 
     // Set initial count from store
-    console.log('📛 Badge: Setting initial count from store:', store.state.newUpdatesCount);
     this.setCount(store.state.newUpdatesCount);
 
     // Subscribe to newUpdatesCount changes
-    const unsubscribe1 = store.onChange('newUpdatesCount', () => {
-      console.log('📛 Badge: newUpdatesCount changed in store', {
+    this.subscriptions.subscribe(store, 'newUpdatesCount', () => {
+      log.debug('newUpdatesCount changed', {
         newValue: store.state.newUpdatesCount,
         previousComponentValue: this.newUpdatesCount,
       });
       this.setCount(store.state.newUpdatesCount);
     });
 
-    // Also subscribe to updates and lastViewed changes to catch indirect newUpdatesCount updates
-    const unsubscribe2 = store.onChange('updates', () => {
-      console.log('📛 Badge: updates changed, reading newUpdatesCount from store', {
-        newValue: store.state.newUpdatesCount,
-        previousComponentValue: this.newUpdatesCount,
-      });
+    // Subscribe to updates changes (indirect newUpdatesCount updates)
+    this.subscriptions.subscribe(store, 'updates', () => {
+      log.debug('updates changed', { newValue: store.state.newUpdatesCount });
       this.setCount(store.state.newUpdatesCount);
     });
 
-    const unsubscribe3 = store.onChange('lastViewed', () => {
-      console.log('📛 Badge: lastViewed changed, reading newUpdatesCount from store', {
-        newValue: store.state.newUpdatesCount,
-        previousComponentValue: this.newUpdatesCount,
-      });
+    // Subscribe to lastViewed changes (indirect newUpdatesCount updates)
+    this.subscriptions.subscribe(store, 'lastViewed', () => {
+      log.debug('lastViewed changed', { newValue: store.state.newUpdatesCount });
       this.setCount(store.state.newUpdatesCount);
     });
 
-    // Combine unsubscribe functions
-    this.unsubscribe = () => {
-      unsubscribe1();
-      unsubscribe2();
-      unsubscribe3();
-    };
-
-    console.log('📛 Badge: Successfully subscribed to newUpdatesCount, updates, and lastViewed changes');
-  }
-
-  public setNewUpdatesCount(count: number) {
-    this.newUpdatesCount = count;
+    log.debug('Successfully subscribed to store changes');
   }
 
   private handleClick = () => {
-    // this.setCount(0);
     dispatchAction(this.el, 'openDisplay', undefined, this.scope);
   };
 

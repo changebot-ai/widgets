@@ -23,20 +23,11 @@ export namespace Components {
     }
     interface ChangebotBanner {
         "dark"?: Theme;
-        /**
-          * Dismiss the banner
-         */
         "dismiss": () => Promise<void>;
         "light"?: Theme;
         "scope"?: string;
-        /**
-          * Show the banner with a specific update
-         */
         "show": (update: Update) => Promise<void>;
         "theme"?: Theme;
-        /**
-          * Toggle expanded state
-         */
         "toggle": () => Promise<void>;
     }
     interface ChangebotPanel {
@@ -66,9 +57,6 @@ export namespace Components {
     interface ChangebotToast {
         "autoDismiss"?: number;
         "dark"?: Theme;
-        /**
-          * Dismiss the toast
-         */
         "dismiss": () => Promise<void>;
         "light"?: Theme;
         /**
@@ -76,9 +64,6 @@ export namespace Components {
          */
         "position": 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
         "scope"?: string;
-        /**
-          * Show the toast with a specific update
-         */
         "show": (update: Update) => Promise<void>;
         "theme"?: Theme;
     }

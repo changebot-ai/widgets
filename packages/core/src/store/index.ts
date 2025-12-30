@@ -1,6 +1,7 @@
 import { createStore } from '@stencil/store';
 import { StoreState, Update, Widget, Tag } from '../types';
 import { validatePublishedAt } from '../utils/date-utils';
+import { logStore as log } from '../utils/logger';
 
 export function getStorageKey(scope: string, property: string, userId?: string): string {
   if (userId) {
@@ -63,14 +64,14 @@ function extractWidget(data: ApiResponse): Widget | null {
 }
 
 function calculateNewUpdatesCount(updates: Update[], lastViewed: number | null): number {
-  console.log('🔢 Store: Calculating badge count', {
+  log.debug('Calculating badge count', {
     updatesLength: updates.length,
     lastViewed: lastViewed ? new Date(lastViewed).toISOString() : null,
     lastViewedTimestamp: lastViewed,
   });
 
   if (!lastViewed) {
-    console.log('🔢 Store: No lastViewed timestamp, returning count = 0');
+    log.debug('No lastViewed timestamp, returning count = 0');
     return 0;
   }
 
@@ -79,20 +80,18 @@ function calculateNewUpdatesCount(updates: Update[], lastViewed: number | null):
     if (updateTime === null) return false;
 
     const isNew = updateTime > lastViewed;
-    console.log('🔢 Store: Update comparison', {
+    log.debug('Update comparison', {
       title: update.title?.substring(0, 50) || 'No title',
       published_at: update.published_at,
       updateTime,
-      updateTimeFormatted: new Date(updateTime).toISOString(),
       lastViewed,
-      lastViewedFormatted: new Date(lastViewed).toISOString(),
       isNew,
     });
     return isNew;
   });
 
   const count = newUpdates.length;
-  console.log(`🔢 Store: Calculated badge count = ${count}`, {
+  log.debug(`Calculated badge count = ${count}`, {
     totalUpdates: updates.length,
     newUpdates: count,
   });
@@ -140,7 +139,7 @@ export function createScopedStore() {
 
         const data = await response.json();
 
-        console.log('📥 Store: Received data from API', {
+        log.debug('Received data from API', {
           hasPublications: !!data.publications,
           publicationsLength: data.publications?.length || 0,
           isArray: Array.isArray(data),
@@ -148,7 +147,7 @@ export function createScopedStore() {
 
         const updates = transformPublications(data);
 
-        console.log('📥 Store: Processed updates', {
+        log.debug('Processed updates', {
           count: updates.length,
           updates: updates.map(u => ({
             title: u.title?.substring(0, 50) || 'No title',
@@ -163,7 +162,7 @@ export function createScopedStore() {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load updates';
         store.state.error = errorMessage;
         store.state.isLoading = false;
-        console.warn('⚠️ Changebot widget: Could not load updates. Widget functionality will continue to work.', {
+        log.warn('Could not load updates. Widget functionality will continue to work.', {
           error: errorMessage,
           slug,
           url
@@ -183,20 +182,17 @@ export function createScopedStore() {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load mock updates';
         store.state.error = errorMessage;
         store.state.isLoading = false;
-        console.warn('⚠️ Changebot widget: Could not load mock updates.', {
-          error: errorMessage,
-        });
+        log.warn('Could not load mock updates.', { error: errorMessage });
       }
     },
 
     markViewed(timestamp?: number) {
       const now = timestamp ?? Date.now();
-      console.log('✅ Store: markViewed called', {
+      log.debug('markViewed called', {
         providedTimestamp: timestamp,
         finalTimestamp: now,
         finalFormatted: new Date(now).toISOString(),
         previousValue: store.state.lastViewed,
-        previousFormatted: store.state.lastViewed ? new Date(store.state.lastViewed).toISOString() : null,
       });
       store.state.lastViewed = now;
     },
@@ -224,23 +220,22 @@ export function createScopedStore() {
   };
 
   store.onChange('lastViewed', () => {
-    console.log('🔄 Store: lastViewed changed', {
+    log.debug('lastViewed changed', {
       newValue: store.state.lastViewed,
       newValueFormatted: store.state.lastViewed ? new Date(store.state.lastViewed).toISOString() : null,
       updatesLength: store.state.updates.length,
     });
     store.state.newUpdatesCount = calculateNewUpdatesCount(store.state.updates, store.state.lastViewed);
-    console.log('🔄 Store: newUpdatesCount updated to', store.state.newUpdatesCount);
+    log.debug('newUpdatesCount updated', { count: store.state.newUpdatesCount });
   });
 
   store.onChange('updates', () => {
-    console.log('🔄 Store: updates changed', {
+    log.debug('updates changed', {
       newLength: store.state.updates.length,
       lastViewed: store.state.lastViewed,
-      lastViewedFormatted: store.state.lastViewed ? new Date(store.state.lastViewed).toISOString() : null,
     });
     store.state.newUpdatesCount = calculateNewUpdatesCount(store.state.updates, store.state.lastViewed);
-    console.log('🔄 Store: newUpdatesCount updated to', store.state.newUpdatesCount);
+    log.debug('newUpdatesCount updated', { count: store.state.newUpdatesCount });
   });
 
   return {

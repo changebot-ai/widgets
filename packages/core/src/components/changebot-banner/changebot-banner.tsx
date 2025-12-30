@@ -1,11 +1,11 @@
 import { Component, Element, Prop, State, Watch, Method, h, Host } from '@stencil/core';
 import { Services, Update } from '../../types';
 import { Theme } from '../../utils/themes';
-import { requestServices } from '../../utils/context';
 import { createThemeManager, ThemeManager } from '../../utils/theme-manager';
-import { formatDisplayDate, validatePublishedAt } from '../../utils/date-utils';
-import { setLastViewedTime } from '../../utils/storage-utils';
-import { findHighlightedUpdate } from '../../utils/update-checker';
+import { connectToProvider, SubscriptionManager } from '../../utils/provider-connection';
+import { logBanner as log } from '../../utils/logger';
+import { formatDisplayDate } from '../../utils/date-utils';
+import { checkForHighlightedUpdate, markUpdateAsViewed } from '../../utils/highlight-consumer';
 
 @Component({
   tag: 'changebot-banner',
@@ -27,14 +27,13 @@ export class ChangebotBanner {
   @State() activeTheme?: Theme;
 
   private services?: Services;
-  private unsubscribeUpdates?: () => void;
+  private subscriptions = new SubscriptionManager();
   private themeManager?: ThemeManager;
 
   @Watch('theme')
   @Watch('light')
   @Watch('dark')
   onThemePropsChange() {
-    // Re-initialize theme manager when props change
     this.themeManager?.cleanup();
     this.themeManager = createThemeManager(this, theme => {
       this.activeTheme = theme;
@@ -46,29 +45,15 @@ export class ChangebotBanner {
       this.activeTheme = theme;
     });
 
-    // Set data-scope attribute if scope is provided
-    if (this.scope) {
-      this.el.setAttribute('data-scope', this.scope);
-    }
-
-    // Request context from provider
-    console.log('🎯 Banner: Requesting context with scope:', this.scope || 'default');
-
-    requestServices(this.el, this.scope, services => {
-      console.log('🎯 Banner: Received services from provider', {
-        hasStore: !!services?.store,
-        hasActions: !!services?.actions,
-        storeState: services?.store?.state,
-      });
+    // Connect to provider
+    connectToProvider(this.el, this.scope, services => {
       this.services = services;
       this.subscribeToStore();
-    });
+    }, log);
   }
 
   disconnectedCallback() {
-    if (this.unsubscribeUpdates) {
-      this.unsubscribeUpdates();
-    }
+    this.subscriptions.cleanup();
     this.themeManager?.cleanup();
   }
 
@@ -76,12 +61,10 @@ export class ChangebotBanner {
     if (!this.services?.store) return;
 
     const store = this.services.store;
+    log.debug('Subscribing to store', { state: store.state });
 
-    console.log('🎯 Banner: Subscribing to store, current state:', store.state);
-
-    // Subscribe to updates changes
-    this.unsubscribeUpdates = store.onChange('updates', () => {
-      console.log('🎯 Banner: Updates changed, checking for new update...');
+    this.subscriptions.subscribe(store, 'updates', () => {
+      log.debug('Updates changed, checking for new update...');
       this.checkForNewUpdate(store.state.updates);
     });
 
@@ -92,17 +75,25 @@ export class ChangebotBanner {
   }
 
   private checkForNewUpdate(updates: Update[]) {
-    const result = findHighlightedUpdate(updates, 'banner', this.scope, this.currentUpdate?.id, '🎯 Banner');
-
-    if (result.shouldShow && result.newUpdate) {
-      this.currentUpdate = result.newUpdate;
-      this.isVisible = true;
-      this.isExpanded = false; // Start collapsed
-    } else if (!result.newUpdate) {
-      this.isVisible = false;
-      this.currentUpdate = undefined;
-      this.isExpanded = false;
-    }
+    checkForHighlightedUpdate(
+      updates,
+      'banner',
+      this.scope,
+      this.currentUpdate?.id,
+      {
+        onShow: update => {
+          this.currentUpdate = update;
+          this.isVisible = true;
+          this.isExpanded = false; // Start collapsed
+        },
+        onHide: () => {
+          this.isVisible = false;
+          this.currentUpdate = undefined;
+          this.isExpanded = false;
+        },
+      },
+      '🎯 Banner'
+    );
   }
 
   private handleDismiss = (event?: MouseEvent | Event) => {
@@ -111,22 +102,13 @@ export class ChangebotBanner {
       event.stopPropagation();
     }
 
-    console.log('🎯 Banner: Dismiss button clicked');
+    log.debug('Dismiss button clicked');
 
     // Start dismissing animation
     this.isDismissing = true;
 
-    // Mark this update as viewed
     if (this.currentUpdate) {
-      const updateTime = validatePublishedAt(this.currentUpdate.published_at, 'Banner', this.currentUpdate.title);
-
-      if (updateTime === null) {
-        console.error('Banner: Cannot mark update as viewed - invalid published_at');
-        return;
-      }
-
-      setLastViewedTime(this.scope || 'default', updateTime);
-      console.log('🎯 Banner: Marked update as viewed:', this.currentUpdate.title);
+      markUpdateAsViewed(this.currentUpdate, this.scope, log, 'Banner');
     }
 
     // Wait for animation to complete, then hide banner
@@ -151,9 +133,6 @@ export class ChangebotBanner {
     }
   };
 
-  /**
-   * Show the banner with a specific update
-   */
   @Method()
   async show(update: Update) {
     this.currentUpdate = update;
@@ -161,26 +140,18 @@ export class ChangebotBanner {
     this.isExpanded = false;
   }
 
-  /**
-   * Dismiss the banner
-   */
   @Method()
   async dismiss() {
     this.handleDismiss(new Event('dismiss'));
   }
 
-  /**
-   * Toggle expanded state
-   */
   @Method()
   async toggle() {
     this.handleToggle();
   }
 
   private getFirstSentence(html: string): string {
-    // Remove HTML tags
     const text = html.replace(/<[^>]*>/g, '');
-    // Find the first sentence (ending with . ! ? or end of string)
     const match = text.match(/^[^.!?]+[.!?]*/);
     return match ? match[0].trim() : text;
   }
@@ -261,7 +232,6 @@ export class ChangebotBanner {
   }
 }
 
-// Type declaration for HTMLElement
 declare global {
   interface HTMLChangebotBannerElement extends HTMLElement {
     scope?: string;

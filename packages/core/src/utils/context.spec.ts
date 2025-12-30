@@ -1,7 +1,7 @@
-import { requestContext, dispatchAction } from './context';
+import { requestServices, dispatchAction } from './context';
 
 describe('context utilities', () => {
-  describe('requestContext', () => {
+  describe('requestServices', () => {
     let element: HTMLElement;
     let eventSpy: jest.SpyInstance;
 
@@ -15,7 +15,8 @@ describe('context utilities', () => {
     });
 
     it('should dispatch a changebot:context-request event with correct details', () => {
-      requestContext(element, 'store', 'default');
+      const callback = jest.fn();
+      requestServices(element, 'default', callback);
 
       expect(eventSpy).toHaveBeenCalledTimes(1);
       const event = eventSpy.mock.calls[0][0] as CustomEvent;
@@ -23,47 +24,40 @@ describe('context utilities', () => {
       expect(event.type).toBe('changebot:context-request');
       expect(event.bubbles).toBe(true);
       expect(event.composed).toBe(true);
-      expect(event.detail.key).toBe('store');
       expect(event.detail.scope).toBe('default');
-      expect(typeof event.detail.provide).toBe('function');
+      expect(event.detail.callback).toBe(callback);
     });
 
-    it('should use default scope when not provided', () => {
-      requestContext(element, 'config');
+    it('should use default scope when undefined is provided', () => {
+      const callback = jest.fn();
+      requestServices(element, undefined, callback);
 
       const event = eventSpy.mock.calls[0][0] as CustomEvent;
       expect(event.detail.scope).toBe('default');
     });
 
-    it('should return a promise that resolves with provided value', async () => {
-      const mockStore = { state: { updates: [] } };
-
-      const promise = requestContext(element, 'store');
+    it('should use custom scope when provided', () => {
+      const callback = jest.fn();
+      requestServices(element, 'custom-scope', callback);
 
       const event = eventSpy.mock.calls[0][0] as CustomEvent;
-      event.detail.provide(mockStore);
-
-      const result = await promise;
-      expect(result).toBe(mockStore);
+      expect(event.detail.scope).toBe('custom-scope');
     });
 
-    it('should handle multiple concurrent requests', async () => {
-      const mockStore = { state: { updates: [] } };
-      const mockConfig = { endpoint: 'http://api.test' };
+    it('should invoke callback when provider responds', () => {
+      const callback = jest.fn();
+      const mockServices = {
+        store: { state: { updates: [] } },
+        actions: {},
+        config: {},
+      };
 
-      const promise1 = requestContext(element, 'store');
-      const promise2 = requestContext(element, 'config');
+      requestServices(element, 'default', callback);
 
-      const event1 = eventSpy.mock.calls[0][0] as CustomEvent;
-      const event2 = eventSpy.mock.calls[1][0] as CustomEvent;
+      const event = eventSpy.mock.calls[0][0] as CustomEvent;
+      event.detail.callback(mockServices);
 
-      event1.detail.provide(mockStore);
-      event2.detail.provide(mockConfig);
-
-      const [result1, result2] = await Promise.all([promise1, promise2]);
-
-      expect(result1).toBe(mockStore);
-      expect(result2).toBe(mockConfig);
+      expect(callback).toHaveBeenCalledWith(mockServices);
     });
   });
 
@@ -128,28 +122,31 @@ describe('context utilities', () => {
   });
 
   describe('integration', () => {
-    it('should work with document-level listeners', async () => {
+    it('should work with document-level listeners', () => {
       const element = document.createElement('div');
       document.body.appendChild(element);
 
-      const mockStore = { state: { count: 0 } };
+      const mockServices = {
+        store: { state: { count: 0 } },
+        actions: {},
+        config: {},
+      };
       let capturedEvent: CustomEvent | null = null;
+      const callback = jest.fn();
 
       const listener = (event: Event) => {
         capturedEvent = event as CustomEvent;
-        if (capturedEvent.detail.key === 'store') {
-          capturedEvent.detail.provide(mockStore);
-          event.stopPropagation();
-        }
+        capturedEvent.detail.callback(mockServices);
+        event.stopPropagation();
       };
 
       document.addEventListener('changebot:context-request', listener, true);
 
-      const result = await requestContext(element, 'store');
+      requestServices(element, 'default', callback);
 
-      expect(result).toBe(mockStore);
+      expect(callback).toHaveBeenCalledWith(mockServices);
       expect(capturedEvent).not.toBeNull();
-      expect(capturedEvent?.detail.key).toBe('store');
+      expect(capturedEvent?.detail.scope).toBe('default');
 
       document.removeEventListener('changebot:context-request', listener, true);
       document.body.removeChild(element);

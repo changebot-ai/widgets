@@ -347,15 +347,18 @@ describe('changebot-panel', () => {
   it('cleans up store subscriptions on disconnect', async () => {
     const unsubscribeIsOpen = jest.fn();
     const unsubscribeUpdates = jest.fn();
+    const unsubscribeWidget = jest.fn();
     const mockStore = {
       state: {
         isOpen: false,
         updates: [],
+        widget: null,
         mode: 'drawer-right'
       },
       onChange: jest.fn()
         .mockReturnValueOnce(unsubscribeIsOpen)
         .mockReturnValueOnce(unsubscribeUpdates)
+        .mockReturnValueOnce(unsubscribeWidget)
     };
 
     const page = await newSpecPage({
@@ -372,6 +375,7 @@ describe('changebot-panel', () => {
 
     expect(unsubscribeIsOpen).toHaveBeenCalled();
     expect(unsubscribeUpdates).toHaveBeenCalled();
+    expect(unsubscribeWidget).toHaveBeenCalled();
   });
 
   // ARIA and accessibility tests
