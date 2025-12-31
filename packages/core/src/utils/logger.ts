@@ -155,3 +155,33 @@ export const logRegistry = {
   warn: (msg: string, data?: LogData) => logger.warn('⚠️ Registry', msg, data),
   error: (msg: string, data?: LogData) => logger.error('Registry', msg, data),
 };
+
+/**
+ * Toggle debug logging on/off.
+ * Call from browser console: window.Changebot.toggleDebug()
+ */
+function toggleDebug(): void {
+  if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+    console.error('Debug toggle requires browser environment with localStorage');
+    return;
+  }
+
+  const currentState = localStorage.getItem('changebot:debug') === 'true';
+  const newState = !currentState;
+
+  localStorage.setItem('changebot:debug', newState.toString());
+  (window as any).__CHANGEBOT_DEBUG__ = newState;
+
+  console.log(`%c🔍 Changebot Debug ${newState ? 'ENABLED' : 'DISABLED'}`, 'font-weight: bold; font-size: 14px;');
+  console.log(`%cReloading page to apply changes...`, 'color: #888;');
+
+  setTimeout(() => {
+    window.location.reload();
+  }, 500);
+}
+
+// Expose debug utilities on window.Changebot namespace
+if (typeof window !== 'undefined') {
+  (window as any).Changebot = (window as any).Changebot || {};
+  (window as any).Changebot.toggleDebug = toggleDebug;
+}
