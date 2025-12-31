@@ -1,21 +1,67 @@
 /**
  * Logger utility for Changebot widgets
  *
- * Provides consistent logging with emoji prefixes.
- * Can be disabled with a single line change.
+ * Logging can be enabled at runtime via:
+ * - localStorage.setItem('changebot:debug', 'true')
+ * - window.__CHANGEBOT_DEBUG__ = true
+ *
+ * Debug logs are disabled by default in production.
  */
 
-// Set to false to disable all debug logging
-const LOGGING_ENABLED = true;
-
 type LogData = Record<string, unknown>;
+
+// Cache the debug check to avoid repeated localStorage access
+let debugCached: boolean | null = null;
+let debugCacheTime = 0;
+const CACHE_DURATION = 5000; // Re-check every 5 seconds
+
+/**
+ * Check if debug mode is enabled.
+ */
+function isDebugEnabled(): boolean {
+  // Check window flag first (for programmatic control)
+  if (typeof window !== 'undefined' && (window as any).__CHANGEBOT_DEBUG__) {
+    return true;
+  }
+
+  // Check localStorage (survives page reloads)
+  try {
+    if (typeof localStorage !== 'undefined') {
+      return localStorage.getItem('changebot:debug') === 'true';
+    }
+  } catch {
+    // localStorage not available (private mode, restricted context)
+  }
+
+  // Default: disabled
+  return false;
+}
+
+/**
+ * Check if logging should occur (cached for performance).
+ */
+function shouldLog(): boolean {
+  const now = Date.now();
+  if (debugCached === null || now - debugCacheTime > CACHE_DURATION) {
+    debugCached = isDebugEnabled();
+    debugCacheTime = now;
+  }
+  return debugCached;
+}
+
+/**
+ * Force refresh of debug cache (call after changing debug setting).
+ */
+export function refreshDebugSetting(): void {
+  debugCached = null;
+}
 
 export const logger = {
   /**
    * Debug log - for development tracing
    */
   debug: (prefix: string, message: string, data?: LogData): void => {
-    if (LOGGING_ENABLED) {
+    if (shouldLog()) {
       if (data) {
         console.log(`${prefix}: ${message}`, data);
       } else {
@@ -28,7 +74,7 @@ export const logger = {
    * Info log - for important state changes
    */
   info: (prefix: string, message: string, data?: LogData): void => {
-    if (LOGGING_ENABLED) {
+    if (shouldLog()) {
       if (data) {
         console.log(`${prefix}: ${message}`, data);
       } else {
@@ -38,7 +84,7 @@ export const logger = {
   },
 
   /**
-   * Warning log - always shown regardless of LOGGING_ENABLED
+   * Warning log - always shown regardless of debug setting
    */
   warn: (prefix: string, message: string, data?: LogData): void => {
     if (data) {
@@ -49,7 +95,7 @@ export const logger = {
   },
 
   /**
-   * Error log - always shown regardless of LOGGING_ENABLED
+   * Error log - always shown regardless of debug setting
    */
   error: (prefix: string, message: string, data?: LogData): void => {
     if (data) {
