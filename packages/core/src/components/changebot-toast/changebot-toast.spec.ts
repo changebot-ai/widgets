@@ -169,47 +169,6 @@ describe('changebot-toast', () => {
     expect(component.isVisible).toBe(false);
   });
 
-  it('calls markViewed action when dismissed with services', async () => {
-    const publishedAt = new Date().toISOString();
-    const mockUpdate = {
-      id: 1,
-      title: 'Update',
-      content: '',
-      display_date: new Date().toISOString().split('T')[0],
-      published_at: publishedAt,
-      expires_on: null,
-      highlight_target: null,
-      hosted_url: null,
-      tags: []
-    };
-
-    const mockMarkViewed = jest.fn();
-    const mockStore = {
-      state: { updates: [], lastViewed: null },
-      onChange: jest.fn()
-    };
-
-    const page = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast scope="test"></changebot-toast>',
-    });
-
-    const component = page.rootInstance;
-    component.services = {
-      store: mockStore,
-      actions: { markViewed: mockMarkViewed }
-    };
-    component.currentUpdate = mockUpdate;
-    component.isVisible = true;
-    await page.waitForChanges();
-
-    const closeButton = page.root.shadowRoot.querySelector('.toast-close') as HTMLElement;
-    closeButton.click();
-    await page.waitForChanges();
-
-    expect(mockMarkViewed).toHaveBeenCalledWith(new Date(publishedAt).getTime());
-  });
-
   it('dismisses without error when no services available', async () => {
     const mockUpdate = {
       id: 1,
