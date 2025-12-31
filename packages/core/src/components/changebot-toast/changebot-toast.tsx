@@ -5,7 +5,7 @@ import { Theme } from '../../utils/themes';
 import { createThemeManager, ThemeManager } from '../../utils/theme-manager';
 import { logToast as log } from '../../utils/logger';
 import { formatDisplayDate } from '../../utils/date-utils';
-import { checkForHighlightedUpdate, markUpdateAsViewed } from '../../utils/highlight-consumer';
+import { checkForHighlightedUpdate } from '../../utils/highlight-consumer';
 
 @Component({
   tag: 'changebot-toast',
@@ -158,11 +158,6 @@ export class ChangebotToast {
 
   private handleDismiss = () => {
     this.clearAutoDismissTimer();
-
-    if (this.currentUpdate && this.services?.actions) {
-      markUpdateAsViewed(this.currentUpdate, this.services.actions, log, 'Toast');
-    }
-
     this.isVisible = false;
   };
 
