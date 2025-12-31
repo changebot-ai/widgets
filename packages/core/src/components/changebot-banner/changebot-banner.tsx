@@ -5,7 +5,7 @@ import { Theme } from '../../utils/themes';
 import { createThemeManager, ThemeManager } from '../../utils/theme-manager';
 import { logBanner as log } from '../../utils/logger';
 import { formatDisplayDate } from '../../utils/date-utils';
-import { checkForHighlightedUpdate, markUpdateAsViewed } from '../../utils/highlight-consumer';
+import { checkForHighlightedUpdate } from '../../utils/highlight-consumer';
 
 @Component({
   tag: 'changebot-banner',
@@ -131,10 +131,6 @@ export class ChangebotBanner {
 
     // Start dismissing animation
     this.isDismissing = true;
-
-    if (this.currentUpdate && this.services?.actions) {
-      markUpdateAsViewed(this.currentUpdate, this.services.actions, log, 'Banner');
-    }
 
     // Wait for animation to complete, then hide banner
     setTimeout(() => {
