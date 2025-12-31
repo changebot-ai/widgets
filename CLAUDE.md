@@ -61,6 +61,15 @@ Demo pages showcase component usage and are served by the development server. To
 
 Demo pages are copied from `src/` to `www/` during build. The dev server watches `src/` for changes to existing files but requires a restart to detect new files.
 
+### Available Demo Pages
+
+When running `pnpm start`, the dev server serves at `http://localhost:<port>` (port varies, commonly 3333, 3335, or 3336) with these demo pages:
+
+- **Vanilla JS** (`/vanilla-demo.html`) - Plain JavaScript with all testing controls. Uses local build with mock data.
+- **React** (`/react-demo.html`) - React 18 integration demo. Uses Composition API with refs.
+- **Vue 3** (`/vue-demo.html`) - Vue 3 Composition API demo. Uses ref/reactive for state.
+- **Production (CDN)** (`/production-demo.html`) - Loads from CDN with real API. Tests deployed widgets.
+
 ### Component Structure
 
 Components live in `packages/core/src/components/[component-name]/`:
