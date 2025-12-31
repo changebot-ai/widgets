@@ -1,5 +1,23 @@
 import { newE2EPage } from '@stencil/core/testing';
 
+/**
+ * TECH DEBT: Timing-based delays
+ *
+ * This file uses setTimeout delays (e.g., `await new Promise(resolve => setTimeout(resolve, 300))`)
+ * for async operations. This is a known tech debt item that can cause flaky tests on slow CI runners.
+ *
+ * Preferred approach would be to use condition-based polling:
+ *
+ *   async function waitForPanelOpen(page) {
+ *     await page.waitForFunction(() => {
+ *       const panel = document.querySelector('changebot-panel');
+ *       return panel?.shadowRoot?.querySelector('.panel--open');
+ *     }, { timeout: 5000 });
+ *   }
+ *
+ * Or use Stencil's built-in waitForChanges with proper state checks.
+ */
+
 describe('Integration Tests - Full System', () => {
   describe('Provider-Badge-Drawer Integration', () => {
     it('should allow badge and drawer to communicate through provider', async () => {
