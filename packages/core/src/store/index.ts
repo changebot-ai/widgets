@@ -111,7 +111,7 @@ export function createScopedStore() {
   });
 
   const scopedActions = {
-    async loadUpdates(slug?: string, url?: string) {
+    async loadUpdates(slug?: string, url?: string, signal?: AbortSignal) {
       store.state.isLoading = true;
       store.state.error = null;
 
@@ -131,6 +131,7 @@ export function createScopedStore() {
             'Accept': 'application/json',
           },
           mode: 'cors',
+          signal,
         });
 
         if (!response.ok) {
@@ -159,6 +160,13 @@ export function createScopedStore() {
         store.state.updates = updates;
         store.state.isLoading = false;
       } catch (error) {
+        // Ignore abort errors - component was unmounted
+        if (error instanceof Error && error.name === 'AbortError') {
+          log.debug('Fetch aborted');
+          store.state.isLoading = false;
+          return;
+        }
+
         const errorMessage = error instanceof Error ? error.message : 'Failed to load updates';
         store.state.error = errorMessage;
         store.state.isLoading = false;

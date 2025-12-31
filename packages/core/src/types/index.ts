@@ -41,7 +41,8 @@ export interface StoreConfig {
 }
 
 export interface StoreActions {
-  loadUpdates: () => Promise<void>;
+  loadUpdates: (slug?: string, url?: string, signal?: AbortSignal) => Promise<void>;
+  loadMockUpdates: (data: unknown) => void;
   markViewed: (timestamp?: number) => void;
   markAllViewed: () => void;
   openDisplay: () => void;
