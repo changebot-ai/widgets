@@ -4,6 +4,7 @@ import { registerStore, unregisterStore } from '../../store/registry';
 import { createAPI } from '../../utils/api';
 import { VERSION } from '../../utils/version';
 import { logProvider as log } from '../../utils/logger';
+import { safeStorage } from '../../utils/safe-storage';
 
 @Component({
   tag: 'changebot-provider',
@@ -22,6 +23,7 @@ export class ChangebotProvider {
 
   private scopedStore = createScopedStore();
   private api = createAPI();
+  private abortController?: AbortController;
 
   private services = {
     store: this.scopedStore.store,
@@ -45,6 +47,9 @@ export class ChangebotProvider {
       hasMockData: !!this.mockData,
     });
 
+    // Create abort controller for this provider instance
+    this.abortController = new AbortController();
+
     this.services.config = {
       url: this.url,
       slug: this.slug,
@@ -56,22 +61,31 @@ export class ChangebotProvider {
 
     this.hydrateLastViewed();
 
+    // Register store IMMEDIATELY so consumers can connect
+    // Store starts with empty data - consumers handle this gracefully:
+    // - Badge: hidden when count=0 (already works)
+    // - Panel: shows loading state if opened while loading
+    // - Toast/Banner: don't render when no highlighted update (already works)
+    registerStore(this.scope, this.services);
+    log.debug('Registered store in registry', { scope: this.scope });
+
+    // Load data in background - don't await (non-blocking)
+    // When data arrives, store updates and consumers react via subscriptions
     if (this.mockData) {
       log.debug('Loading mock data');
       this.loadMockData();
     } else if (this.url || this.slug) {
       log.debug('Loading updates from API', { slug: this.slug, url: this.url });
-      await this.loadUpdates();
+      void this.loadUpdates(); // Fire and forget
     } else {
       log.debug('No slug, url, or mock data provided - skipping update load');
     }
-
-    // Register store in registry after data is loaded
-    registerStore(this.scope, this.services);
-    log.debug('Registered store in registry', { scope: this.scope });
   }
 
   disconnectedCallback() {
+    // Abort any pending requests
+    this.abortController?.abort();
+
     unregisterStore(this.scope);
     log.debug('Unregistered store from registry', { scope: this.scope });
   }
@@ -110,9 +124,20 @@ export class ChangebotProvider {
   }
 
   private async loadUpdates() {
+    // Check if aborted before starting
+    if (this.abortController?.signal.aborted) {
+      log.debug('Load updates aborted before starting');
+      return;
+    }
+
     try {
-      await this.scopedStore.actions.loadUpdates(this.slug, this.url);
+      await this.scopedStore.actions.loadUpdates(this.slug, this.url, this.abortController?.signal);
     } catch (error) {
+      // Ignore abort errors
+      if (error instanceof Error && error.name === 'AbortError') {
+        log.debug('Load updates aborted');
+        return;
+      }
       log.error('Failed to load updates', { error });
     }
   }
@@ -130,7 +155,7 @@ export class ChangebotProvider {
     if (!this.userId) return false;
 
     const key = getStorageKey(this.scope, 'lastApiSync', this.userId);
-    const lastSync = localStorage.getItem(key);
+    const lastSync = safeStorage.getItem(key);
 
     if (!lastSync) return true; // Never synced before
 
@@ -149,7 +174,7 @@ export class ChangebotProvider {
       userId: this.userId,
     });
 
-    const stored = localStorage.getItem(key);
+    const stored = safeStorage.getItem(key);
     const localValue = stored ? parseInt(stored, 10) : null;
 
     if (localValue) {
@@ -183,13 +208,19 @@ export class ChangebotProvider {
     this.scopedStore.actions.markViewed(timestamp);
 
     const key = getStorageKey(this.scope, 'lastViewed', this.userId);
-    localStorage.setItem(key, timestamp.toString());
+    safeStorage.setItem(key, timestamp.toString());
     log.debug('Updated localStorage', { key, value: timestamp });
   }
 
   private async syncFromApi(): Promise<void> {
+    // Check if aborted
+    if (this.abortController?.signal.aborted) return;
+
     log.debug('Fetching last_seen_at from API', { userId: this.userId });
     const data = await this.fetchUserTracking();
+
+    // Check if aborted after fetch
+    if (this.abortController?.signal.aborted) return;
 
     if (!data) {
       log.debug('Could not fetch last_seen_at from API, using localStorage value');
@@ -216,7 +247,7 @@ export class ChangebotProvider {
 
     // Update sync timestamp after successful sync
     const syncKey = getStorageKey(this.scope, 'lastApiSync', this.userId);
-    localStorage.setItem(syncKey, Date.now().toString());
+    safeStorage.setItem(syncKey, Date.now().toString());
   }
 
   private async setLastViewed(timestamp: number): Promise<void> {
