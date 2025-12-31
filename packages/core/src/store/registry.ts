@@ -11,6 +11,16 @@ import { logRegistry as log } from '../utils/logger';
 interface PendingStore {
   promise: Promise<Services>;
   resolve: (services: Services) => void;
+  reject: (error: Error) => void;
+  timeoutId?: ReturnType<typeof setTimeout>;
+}
+
+/**
+ * Result of waitForStore - includes cancel function for cleanup.
+ */
+export interface WaitForStoreResult {
+  promise: Promise<Services>;
+  cancel: () => void;
 }
 
 // Module-level registry - survives component lifecycle
@@ -29,6 +39,10 @@ export function registerStore(scope: string, services: Services): void {
   const pendingEntry = pending.get(scope);
   if (pendingEntry) {
     log.debug('Resolving pending waiters', { scope });
+    // Clear timeout before resolving
+    if (pendingEntry.timeoutId) {
+      clearTimeout(pendingEntry.timeoutId);
+    }
     pendingEntry.resolve(services);
     pending.delete(scope);
   }
@@ -49,42 +63,60 @@ export function unregisterStore(scope: string): void {
  *
  * @param scope - The scope identifier (default: 'default')
  * @param timeout - Maximum wait time in ms (default: 5000)
+ * @returns Object with promise and cancel function
  */
-export function waitForStore(scope: string = 'default', timeout: number = 5000): Promise<Services> {
+export function waitForStore(scope: string = 'default', timeout: number = 5000): WaitForStoreResult {
   // Return immediately if already registered
   const existing = registry.get(scope);
   if (existing) {
     log.debug('Store already registered, returning immediately', { scope });
-    return Promise.resolve(existing);
+    return {
+      promise: Promise.resolve(existing),
+      cancel: () => {}, // No-op for immediate resolution
+    };
   }
 
-  // Check if already waiting
+  // Check if already waiting - reuse the existing promise
   const existingPending = pending.get(scope);
   if (existingPending) {
     log.debug('Already waiting for store, reusing promise', { scope });
-    return existingPending.promise;
+    return {
+      promise: existingPending.promise,
+      cancel: () => {
+        // Individual cancellation doesn't affect shared promise
+        // The promise will still be fulfilled if provider registers
+      },
+    };
   }
 
   log.debug('Store not registered, waiting...', { scope, timeout });
 
-  // Create new pending entry
+  // Track cancellation state for this specific waiter
+  let cancelled = false;
+
+  // Create new pending entry with deferred promise pattern
   let resolvePromise: (services: Services) => void;
   let rejectPromise: (error: Error) => void;
 
   const promise = new Promise<Services>((resolve, reject) => {
-    resolvePromise = resolve;
-    rejectPromise = reject;
+    resolvePromise = (services) => {
+      if (!cancelled) resolve(services);
+    };
+    rejectPromise = (error) => {
+      if (!cancelled) reject(error);
+    };
   });
 
-  pending.set(scope, {
+  const pendingEntry: PendingStore = {
     promise,
     resolve: resolvePromise!,
-  });
+    reject: rejectPromise!,
+  };
 
   // Timeout handling
   if (timeout > 0) {
-    setTimeout(() => {
-      if (pending.has(scope)) {
+    pendingEntry.timeoutId = setTimeout(() => {
+      if (pending.has(scope) && !cancelled) {
         pending.delete(scope);
         const error = new Error(
           `Timeout waiting for provider with scope "${scope}". ` +
@@ -96,7 +128,23 @@ export function waitForStore(scope: string = 'default', timeout: number = 5000):
     }, timeout);
   }
 
-  return promise;
+  pending.set(scope, pendingEntry);
+
+  return {
+    promise,
+    cancel: () => {
+      cancelled = true;
+      if (pendingEntry.timeoutId) {
+        clearTimeout(pendingEntry.timeoutId);
+      }
+      // Remove from pending if this entry is still the current one
+      const current = pending.get(scope);
+      if (current === pendingEntry) {
+        pending.delete(scope);
+      }
+      log.debug('Cancelled wait for store', { scope });
+    },
+  };
 }
 
 /**
@@ -115,10 +163,16 @@ export function getStore(scope: string = 'default'): Services | undefined {
 }
 
 /**
- * Clear all stores (useful for testing).
+ * Clear all stores and pending waiters (useful for testing).
  */
 export function clearRegistry(): void {
   log.debug('Clearing registry');
+  // Clear any pending timeouts
+  for (const entry of pending.values()) {
+    if (entry.timeoutId) {
+      clearTimeout(entry.timeoutId);
+    }
+  }
   registry.clear();
   pending.clear();
 }
