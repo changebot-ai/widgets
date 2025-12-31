@@ -24,9 +24,11 @@ export class ChangebotPanel {
   @State() updates: Update[] = [];
   @State() widget: Widget | null = null;
   @State() activeTheme?: Theme;
+  @State() isLoading: boolean = false;
 
   private services?: Services;
   private subscriptionCleanups: (() => void)[] = [];
+  private waitForStoreCancel?: () => void;
   private panelElement?: HTMLDivElement;
   private firstFocusableElement?: HTMLElement;
   private lastFocusableElement?: HTMLElement;
@@ -58,7 +60,9 @@ export class ChangebotPanel {
 
   private async connectToProvider() {
     try {
-      this.services = await waitForStore(this.scope || 'default');
+      const { promise, cancel } = waitForStore(this.scope || 'default');
+      this.waitForStoreCancel = cancel;
+      this.services = await promise;
       log.debug('Connected to provider via registry', { scope: this.scope || 'default' });
       this.subscribeToStore();
     } catch (error) {
@@ -74,6 +78,9 @@ export class ChangebotPanel {
   }
 
   disconnectedCallback() {
+    // Cancel pending wait for store
+    this.waitForStoreCancel?.();
+
     this.subscriptionCleanups.forEach(cleanup => cleanup());
     this.subscriptionCleanups = [];
     this.themeManager?.cleanup();
@@ -111,10 +118,18 @@ export class ChangebotPanel {
       })
     );
 
+    this.subscriptionCleanups.push(
+      store.onChange('isLoading', () => {
+        log.debug('isLoading changed', { isLoading: store.state.isLoading });
+        this.isLoading = store.state.isLoading;
+      })
+    );
+
     // Set initial state
     this.isOpen = store.state.isOpen || false;
     this.updates = store.state.updates || [];
     this.widget = store.state.widget || null;
+    this.isLoading = store.state.isLoading || false;
   }
 
   @Method()
@@ -320,6 +335,16 @@ export class ChangebotPanel {
   }
 
   private renderContent() {
+    // Show loading state only when panel is open and data is loading
+    if (this.isLoading) {
+      return (
+        <div class="loading-state">
+          <div class="loading-spinner" />
+          <p>Loading updates...</p>
+        </div>
+      );
+    }
+
     if (this.updates.length === 0) {
       return (
         <div class="empty-state">

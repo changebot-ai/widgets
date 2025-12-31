@@ -329,17 +329,20 @@ describe('changebot-panel', () => {
     const unsubscribeIsOpen = jest.fn();
     const unsubscribeUpdates = jest.fn();
     const unsubscribeWidget = jest.fn();
+    const unsubscribeIsLoading = jest.fn();
     const mockStore = {
       state: {
         isOpen: false,
         updates: [],
         widget: null,
+        isLoading: false,
         mode: 'drawer-right'
       },
       onChange: jest.fn()
         .mockReturnValueOnce(unsubscribeIsOpen)
         .mockReturnValueOnce(unsubscribeUpdates)
         .mockReturnValueOnce(unsubscribeWidget)
+        .mockReturnValueOnce(unsubscribeIsLoading)
     };
 
     const page = await newSpecPage({
@@ -357,6 +360,7 @@ describe('changebot-panel', () => {
     expect(unsubscribeIsOpen).toHaveBeenCalled();
     expect(unsubscribeUpdates).toHaveBeenCalled();
     expect(unsubscribeWidget).toHaveBeenCalled();
+    expect(unsubscribeIsLoading).toHaveBeenCalled();
   });
 
   // ARIA and accessibility tests
