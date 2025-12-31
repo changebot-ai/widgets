@@ -35,6 +35,7 @@ export class ChangebotToast {
 
   private services?: Services;
   private subscriptionCleanups: (() => void)[] = [];
+  private waitForStoreCancel?: () => void;
   private themeManager?: ThemeManager;
   private autoDismissTimer?: ReturnType<typeof setTimeout>;
   private resizeObserver?: ResizeObserver;
@@ -65,7 +66,9 @@ export class ChangebotToast {
 
   private async connectToProvider() {
     try {
-      this.services = await waitForStore(this.scope || 'default');
+      const { promise, cancel } = waitForStore(this.scope || 'default');
+      this.waitForStoreCancel = cancel;
+      this.services = await promise;
       log.debug('Connected to provider via registry', { scope: this.scope || 'default' });
       this.subscribeToStore();
     } catch (error) {
@@ -82,6 +85,9 @@ export class ChangebotToast {
   }
 
   disconnectedCallback() {
+    // Cancel pending wait for store
+    this.waitForStoreCancel?.();
+
     this.subscriptionCleanups.forEach(cleanup => cleanup());
     this.subscriptionCleanups = [];
     this.themeManager?.cleanup();
