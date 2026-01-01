@@ -83,6 +83,10 @@
       background: linear-gradient(135deg, #f56565 0%, #c53030 100%);
     }
 
+    .demo-card.userid {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    }
+
     .demo-card h3 {
       margin: 0 0 8px 0;
       font-size: 18px;
@@ -166,6 +170,11 @@
       <a href="/production-demo.html" class="demo-card production">
         <h3>Production (CDN)</h3>
         <p>Loads from CDN with real API. Tests deployed widgets.</p>
+      </a>
+
+      <a href="/userid-demo.html" class="demo-card userid">
+        <h3>UserId Testing</h3>
+        <p>Test userId tracking with local mock server. Requires <code>pnpm run mock-server</code>.</p>
       </a>
     </div>
 

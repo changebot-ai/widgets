@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Changebot Mock Server - Admin</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+    }
+
+    .demo-header {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: white;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .demo-header h1 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .demo-header .badge-label {
+      font-size: 14px;
+      opacity: 0.9;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: monospace;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .control-section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .control-section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .control-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .control-row label {
+      min-width: 100px;
+      font-size: 13px;
+      color: #555;
+    }
+
+    .control-row select,
+    .control-row input[type="text"],
+    .control-row input[type="datetime-local"] {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      background: white;
+    }
+
+    .control-row .btn {
+      flex-shrink: 0;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #f97316;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #ea580c;
+    }
+
+    .btn-secondary {
+      background: #e9ecef;
+      color: #495057;
+    }
+
+    .btn-secondary:hover {
+      background: #dee2e6;
+    }
+
+    .btn-success {
+      background: #48bb78;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #38a169;
+    }
+
+    .btn-warning {
+      background: #ed8936;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #dd6b20;
+    }
+
+    .btn-danger {
+      background: #e53e3e;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c53030;
+    }
+
+    .info-box {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      color: #9a3412;
+    }
+
+    .info-box code {
+      background: #ffedd5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    .info-box a {
+      color: #ea580c;
+    }
+
+    .debug-panel {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 12px;
+      padding: 20px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 12px;
+      margin-top: 24px;
+    }
+
+    .debug-panel h3 {
+      color: #fab387;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .debug-row {
+      display: flex;
+      margin-bottom: 8px;
+    }
+
+    .debug-label {
+      color: #a6adc8;
+      min-width: 180px;
+    }
+
+    .debug-value {
+      color: #a6e3a1;
+    }
+
+    .debug-value.warning {
+      color: #f9e2af;
+    }
+
+    .debug-value.error {
+      color: #f38ba8;
+    }
+
+    .state-section {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #313244;
+    }
+
+    .state-section h4 {
+      color: #fab387;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+
+    .publication-item,
+    .user-item,
+    .log-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 6px;
+      font-size: 11px;
+      padding: 8px;
+      background: #313244;
+      border-radius: 4px;
+    }
+
+    .publication-item .id,
+    .user-item .id {
+      color: #6c7086;
+      min-width: 30px;
+    }
+
+    .publication-item .title,
+    .user-item .userId {
+      color: #cdd6f4;
+      flex: 1;
+    }
+
+    .publication-item .date,
+    .user-item .lastSeen {
+      color: #94e2d5;
+    }
+
+    .publication-item .target {
+      color: #f5c2e7;
+      min-width: 60px;
+    }
+
+    .log-item {
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .log-item .timestamp {
+      color: #6c7086;
+      font-size: 10px;
+    }
+
+    .log-item .method {
+      color: #89b4fa;
+    }
+
+    .log-item .method.GET {
+      color: #94e2d5;
+    }
+
+    .log-item .method.PATCH {
+      color: #f9e2af;
+    }
+
+    .log-item .path {
+      color: #cdd6f4;
+    }
+
+    .log-item .body {
+      color: #a6adc8;
+      font-size: 10px;
+    }
+
+    .empty-state {
+      color: #6c7086;
+      font-style: italic;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .status-indicator.online {
+      background: #a6e3a1;
+    }
+
+    .status-indicator.error {
+      background: #f38ba8;
+    }
+
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .two-column {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="demo-header">
+    <h1>Mock Server Admin</h1>
+    <span class="badge-label">http://localhost:3456</span>
+  </header>
+
+  <div class="container">
+    <div class="info-box">
+      <strong>Mock Server Running</strong> - Use this admin panel to configure mock API responses.
+      The widget demo page should use <code>url="http://localhost:3456"</code> to connect to this server.
+      <a href="/userid-demo.html" target="_blank">Open UserId Demo</a> (run from dev server on port 3333)
+    </div>
+
+    <div class="controls-grid">
+      <!-- Quick Scenarios -->
+      <div class="control-section">
+        <h3>Quick Scenarios</h3>
+        <p style="font-size: 13px; color: #666; margin-bottom: 12px;">
+          Pre-configured states for common testing scenarios
+        </p>
+        <div class="button-row">
+          <button class="btn btn-primary" onclick="applyScenario('newUser')">New User</button>
+          <button class="btn btn-secondary" onclick="applyScenario('returningUser')">Returning User</button>
+          <button class="btn btn-warning" onclick="applyScenario('manyUpdates')">Many Updates</button>
+          <button class="btn btn-danger" onclick="applyScenario('noUpdates')">No Updates</button>
+        </div>
+        <p style="font-size: 11px; color: #888; margin-top: 12px;">
+          <strong>New User:</strong> last_seen_at = null (5 updates, all unread)<br>
+          <strong>Returning User:</strong> last_seen_at = 7 days ago (3 unread)<br>
+          <strong>Many Updates:</strong> 20 updates, last_seen = 30 days ago<br>
+          <strong>No Updates:</strong> Empty publications list
+        </p>
+      </div>
+
+      <!-- User Tracking -->
+      <div class="control-section">
+        <h3>User Tracking</h3>
+        <div class="control-row">
+          <label>User ID:</label>
+          <input type="text" id="userId" value="test-user-123" />
+        </div>
+        <div class="control-row">
+          <label>Last Seen:</label>
+          <input type="datetime-local" id="lastSeen" />
+          <button class="btn btn-primary" onclick="setUserLastSeen()">Set</button>
+        </div>
+        <div class="button-row" style="margin-top: 8px;">
+          <button class="btn btn-secondary" onclick="setLastSeenPreset('now')">Now</button>
+          <button class="btn btn-secondary" onclick="setLastSeenPreset('1day')">1 Day Ago</button>
+          <button class="btn btn-secondary" onclick="setLastSeenPreset('7days')">7 Days Ago</button>
+          <button class="btn btn-secondary" onclick="setLastSeenPreset('30days')">30 Days Ago</button>
+          <button class="btn btn-danger" onclick="clearLastSeen()">Clear (null)</button>
+        </div>
+      </div>
+
+      <!-- Server Config -->
+      <div class="control-section">
+        <h3>Server Config</h3>
+        <div class="control-row">
+          <label>Response Delay:</label>
+          <select id="responseDelay" onchange="updateConfig()">
+            <option value="0">No delay</option>
+            <option value="500">500ms</option>
+            <option value="1000">1 second</option>
+            <option value="2000">2 seconds</option>
+            <option value="5000">5 seconds</option>
+          </select>
+        </div>
+        <div class="control-row">
+          <label>Error Mode:</label>
+          <select id="errorMode" onchange="updateConfig()">
+            <option value="none">No errors</option>
+            <option value="updates">Fail /updates</option>
+            <option value="users">Fail /users/*</option>
+            <option value="all">Fail all requests</option>
+          </select>
+        </div>
+        <p style="font-size: 11px; color: #888; margin-top: 8px;">
+          Use these to test loading states and error handling in the widget.
+        </p>
+      </div>
+
+      <!-- Actions -->
+      <div class="control-section">
+        <h3>Actions</h3>
+        <div class="button-row">
+          <button class="btn btn-secondary" onclick="refreshState()">Refresh State</button>
+          <button class="btn btn-warning" onclick="clearLog()">Clear Log</button>
+          <button class="btn btn-danger" onclick="resetServer()">Reset Server</button>
+        </div>
+        <p style="font-size: 11px; color: #888; margin-top: 12px;">
+          <strong>Refresh:</strong> Reload current server state<br>
+          <strong>Clear Log:</strong> Clear request history<br>
+          <strong>Reset:</strong> Reset to default state
+        </p>
+      </div>
+    </div>
+
+    <!-- State Display -->
+    <div class="two-column">
+      <div class="debug-panel">
+        <h3>Current Server State</h3>
+
+        <div class="debug-row">
+          <span class="debug-label">Status:</span>
+          <span class="debug-value" id="status">
+            <span class="status-indicator online"></span>Online
+          </span>
+        </div>
+        <div class="debug-row">
+          <span class="debug-label">Response Delay:</span>
+          <span class="debug-value" id="display-delay">0ms</span>
+        </div>
+        <div class="debug-row">
+          <span class="debug-label">Error Mode:</span>
+          <span class="debug-value" id="display-errorMode">none</span>
+        </div>
+
+        <div class="state-section">
+          <h4>Publications (<span id="pub-count">0</span>)</h4>
+          <div id="publications-list">
+            <span class="empty-state">Loading...</span>
+          </div>
+        </div>
+
+        <div class="state-section">
+          <h4>Users</h4>
+          <div id="users-list">
+            <span class="empty-state">No users tracked yet</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="debug-panel">
+        <h3>Request Log</h3>
+        <div id="request-log">
+          <span class="empty-state">No requests yet</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/admin/api';
+    let refreshInterval;
+
+    async function fetchState() {
+      try {
+        const res = await fetch(`${API_BASE}/state`);
+        return await res.json();
+      } catch (e) {
+        console.error('Failed to fetch state:', e);
+        return null;
+      }
+    }
+
+    async function refreshState() {
+      const state = await fetchState();
+      if (!state) {
+        document.getElementById('status').innerHTML =
+          '<span class="status-indicator error"></span>Offline';
+        return;
+      }
+
+      document.getElementById('status').innerHTML =
+        '<span class="status-indicator online"></span>Online';
+
+      // Config display
+      document.getElementById('display-delay').textContent = `${state.config.responseDelay}ms`;
+      document.getElementById('display-errorMode').textContent = state.config.errorMode;
+      document.getElementById('display-errorMode').className =
+        'debug-value' + (state.config.errorMode !== 'none' ? ' error' : '');
+
+      // Update form values
+      document.getElementById('responseDelay').value = state.config.responseDelay.toString();
+      document.getElementById('errorMode').value = state.config.errorMode;
+
+      // Publications
+      document.getElementById('pub-count').textContent = state.publications.length;
+      const pubList = document.getElementById('publications-list');
+      if (state.publications.length === 0) {
+        pubList.innerHTML = '<span class="empty-state">No publications</span>';
+      } else {
+        pubList.innerHTML = state.publications.map(p => `
+          <div class="publication-item">
+            <span class="id">#${p.id}</span>
+            <span class="title">${p.title}</span>
+            <span class="target">${p.highlight_target || '-'}</span>
+            <span class="date">${p.display_date}</span>
+          </div>
+        `).join('');
+      }
+
+      // Users
+      const usersList = document.getElementById('users-list');
+      const users = Object.values(state.users);
+      if (users.length === 0) {
+        usersList.innerHTML = '<span class="empty-state">No users tracked yet</span>';
+      } else {
+        usersList.innerHTML = users.map(u => `
+          <div class="user-item">
+            <span class="userId">${u.id}</span>
+            <span class="lastSeen">${u.last_seen_at ? new Date(u.last_seen_at).toLocaleString() : '(null)'}</span>
+          </div>
+        `).join('');
+      }
+
+      // Request log
+      const logList = document.getElementById('request-log');
+      if (!state.requestLog || state.requestLog.length === 0) {
+        logList.innerHTML = '<span class="empty-state">No requests yet</span>';
+      } else {
+        logList.innerHTML = state.requestLog.slice(0, 20).map(entry => `
+          <div class="log-item">
+            <span class="timestamp">${new Date(entry.timestamp).toLocaleTimeString()}</span>
+            <span>
+              <span class="method ${entry.method}">${entry.method}</span>
+              <span class="path">${entry.path}</span>
+            </span>
+            ${entry.body ? `<span class="body">${JSON.stringify(entry.body)}</span>` : ''}
+          </div>
+        `).join('');
+      }
+    }
+
+    async function applyScenario(name) {
+      await fetch(`${API_BASE}/scenario`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+      });
+      await refreshState();
+    }
+
+    async function setUserLastSeen() {
+      const userId = document.getElementById('userId').value;
+      const lastSeenInput = document.getElementById('lastSeen').value;
+      const last_seen_at = lastSeenInput ? new Date(lastSeenInput).toISOString() : null;
+
+      await fetch(`${API_BASE}/user`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, last_seen_at })
+      });
+      await refreshState();
+    }
+
+    function setLastSeenPreset(preset) {
+      const now = Date.now();
+      const day = 24 * 60 * 60 * 1000;
+      let date;
+
+      switch (preset) {
+        case 'now':
+          date = new Date(now);
+          break;
+        case '1day':
+          date = new Date(now - day);
+          break;
+        case '7days':
+          date = new Date(now - 7 * day);
+          break;
+        case '30days':
+          date = new Date(now - 30 * day);
+          break;
+      }
+
+      // Format for datetime-local input
+      const formatted = date.toISOString().slice(0, 16);
+      document.getElementById('lastSeen').value = formatted;
+      setUserLastSeen();
+    }
+
+    async function clearLastSeen() {
+      const userId = document.getElementById('userId').value;
+      await fetch(`${API_BASE}/user`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, last_seen_at: null })
+      });
+      document.getElementById('lastSeen').value = '';
+      await refreshState();
+    }
+
+    async function updateConfig() {
+      const responseDelay = parseInt(document.getElementById('responseDelay').value);
+      const errorMode = document.getElementById('errorMode').value;
+
+      await fetch(`${API_BASE}/config`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ responseDelay, errorMode })
+      });
+      await refreshState();
+    }
+
+    async function clearLog() {
+      await fetch(`${API_BASE}/log`, { method: 'DELETE' });
+      await refreshState();
+    }
+
+    async function resetServer() {
+      await fetch(`${API_BASE}/reset`, { method: 'POST' });
+      await refreshState();
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      refreshState();
+      // Auto-refresh every 2 seconds
+      refreshInterval = setInterval(refreshState, 2000);
+    });
+  </script>
+</body>
+
+</html>

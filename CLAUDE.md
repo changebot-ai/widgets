@@ -69,6 +69,7 @@ When running `pnpm start`, the dev server serves at `http://localhost:<port>` (p
 - **React** (`/react-demo.html`) - React 18 integration demo. Uses Composition API with refs.
 - **Vue 3** (`/vue-demo.html`) - Vue 3 Composition API demo. Uses ref/reactive for state.
 - **Production (CDN)** (`/production-demo.html`) - Loads from CDN with real API. Tests deployed widgets.
+- **UserId Testing** (`/userid-demo.html`) - Tests userId tracking with local mock server. Requires `pnpm run mock-server` (port 3456).
 
 ### Component Structure
 

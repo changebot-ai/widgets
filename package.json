@@ -6,7 +6,9 @@
   "scripts": {
     "build": "pnpm --filter @changebot/core run build && pnpm --filter @changebot/widgets-react run build && pnpm --filter @changebot/widgets-vue run build",
     "start": "pnpm --filter @changebot/core run start",
-    "test": "pnpm --filter @changebot/core run test"
+    "test": "pnpm --filter @changebot/core run test",
+    "mock-server": "pnpm --filter @changebot/mock-server run start",
+    "mock-server:dev": "pnpm --filter @changebot/mock-server run dev"
   },
   "devDependencies": {},
   "license": "Apache-2.0",

@@ -1,0 +1,837 @@
+<!doctype html>
+<html dir="ltr" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UserId Demo - Changebot Widgets</title>
+
+  <script type="module" src="/build/widgets.esm.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+    }
+
+    .demo-header {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: white;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .demo-header h1 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .demo-header .badge-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .demo-header .badge-label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .control-section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .control-section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .control-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .control-row label {
+      min-width: 100px;
+      font-size: 13px;
+      color: #555;
+    }
+
+    .control-row select,
+    .control-row input[type="text"],
+    .control-row input[type="datetime-local"] {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      background: white;
+    }
+
+    .control-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .control-row .btn {
+      flex-shrink: 0;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #f97316;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #ea580c;
+    }
+
+    .btn-secondary {
+      background: #e9ecef;
+      color: #495057;
+    }
+
+    .btn-secondary:hover {
+      background: #dee2e6;
+    }
+
+    .btn-success {
+      background: #48bb78;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #38a169;
+    }
+
+    .btn-warning {
+      background: #ed8936;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #dd6b20;
+    }
+
+    .btn-danger {
+      background: #e53e3e;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c53030;
+    }
+
+    .info-box {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      color: #9a3412;
+    }
+
+    .info-box code {
+      background: #ffedd5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    .info-box a {
+      color: #ea580c;
+    }
+
+    .info-box.error {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: #991b1b;
+    }
+
+    .info-box.success {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+      color: #166534;
+    }
+
+    .debug-panel {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 12px;
+      padding: 20px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 12px;
+      margin-top: 24px;
+    }
+
+    .debug-panel h3 {
+      color: #fab387;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .debug-row {
+      display: flex;
+      margin-bottom: 8px;
+    }
+
+    .debug-label {
+      color: #a6adc8;
+      min-width: 200px;
+    }
+
+    .debug-value {
+      color: #a6e3a1;
+    }
+
+    .debug-value.warning {
+      color: #f9e2af;
+    }
+
+    .debug-value.error {
+      color: #f38ba8;
+    }
+
+    .mock-data-info {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #313244;
+    }
+
+    .mock-data-info h4 {
+      color: #fab387;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+
+    .mock-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 6px;
+      font-size: 11px;
+    }
+
+    .mock-item .id {
+      color: #6c7086;
+      min-width: 30px;
+    }
+
+    .mock-item .title {
+      color: #cdd6f4;
+      flex: 1;
+    }
+
+    .mock-item .date {
+      color: #94e2d5;
+    }
+
+    .mock-item .target {
+      color: #f5c2e7;
+      min-width: 60px;
+    }
+
+    #badge-container {
+      display: inline-block;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .status-indicator.online {
+      background: #a6e3a1;
+    }
+
+    .status-indicator.offline {
+      background: #f38ba8;
+    }
+
+    .status-indicator.loading {
+      background: #f9e2af;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Provider using mock server URL -->
+  <changebot-provider id="provider" scope="userid-demo" base-url="http://localhost:3456"></changebot-provider>
+
+  <!-- Banner (conditionally shown) -->
+  <div id="banner-container">
+    <changebot-banner id="banner" scope="userid-demo" position="top"></changebot-banner>
+  </div>
+
+  <header class="demo-header">
+    <h1>UserId Demo</h1>
+    <div class="badge-wrapper">
+      <span class="badge-label">Updates:</span>
+      <div id="badge-container">
+        <changebot-badge id="badge" scope="userid-demo" show-count="true"></changebot-badge>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Connection Info Box -->
+    <div class="info-box" id="connection-status">
+      <strong>Checking connection...</strong>
+    </div>
+
+    <div class="controls-grid">
+      <!-- User Identity -->
+      <div class="control-section">
+        <h3>User Identity</h3>
+        <div class="control-row">
+          <label>User ID:</label>
+          <input type="text" id="userId" value="test-user-123" />
+          <button class="btn btn-primary" onclick="changeUserId()">Apply</button>
+        </div>
+        <div class="control-row">
+          <label>User Data:</label>
+          <input type="text" id="userData" placeholder='{"email": "user@example.com"}' />
+        </div>
+        <p style="font-size: 11px; color: #888; margin-top: 8px;">
+          Change the User ID and click Apply to test different user scenarios.
+          User data is sent with PATCH requests.
+        </p>
+      </div>
+
+      <!-- Theme Controls -->
+      <div class="control-section">
+        <h3>Theme</h3>
+        <div class="control-row">
+          <label>Mode:</label>
+          <select id="themeMode" onchange="updateTheme()">
+            <option value="fixed">Fixed Theme</option>
+            <option value="auto">Light/Dark Auto</option>
+          </select>
+        </div>
+        <div class="control-row" id="fixedThemeRow">
+          <label>Theme:</label>
+          <select id="fixedTheme" onchange="updateTheme()">
+            <optgroup label="Light Themes">
+              <option value="catppuccin-latte">Catppuccin Latte</option>
+              <option value="gruvbox-light">Gruvbox Light</option>
+              <option value="solarized-light">Solarized Light</option>
+              <option value="everforest-light">Everforest Light</option>
+              <option value="frost">Frost</option>
+            </optgroup>
+            <optgroup label="Dark Themes">
+              <option value="catppuccin-frappe">Catppuccin Frappe</option>
+              <option value="catppuccin-macchiato">Catppuccin Macchiato</option>
+              <option value="catppuccin-mocha" selected>Catppuccin Mocha</option>
+              <option value="gruvbox-dark">Gruvbox Dark</option>
+              <option value="dracula">Dracula</option>
+              <option value="nord">Nord</option>
+              <option value="solarized-dark">Solarized Dark</option>
+              <option value="everforest-dark">Everforest Dark</option>
+              <option value="tokyo-night">Tokyo Night</option>
+              <option value="cyberpunk">Cyberpunk</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="control-row" id="lightThemeRow" style="display: none;">
+          <label>Light Theme:</label>
+          <select id="lightTheme" onchange="updateTheme()">
+            <option value="catppuccin-latte" selected>Catppuccin Latte</option>
+            <option value="gruvbox-light">Gruvbox Light</option>
+            <option value="solarized-light">Solarized Light</option>
+            <option value="everforest-light">Everforest Light</option>
+            <option value="frost">Frost</option>
+          </select>
+        </div>
+        <div class="control-row" id="darkThemeRow" style="display: none;">
+          <label>Dark Theme:</label>
+          <select id="darkTheme" onchange="updateTheme()">
+            <option value="catppuccin-frappe">Catppuccin Frappe</option>
+            <option value="catppuccin-macchiato">Catppuccin Macchiato</option>
+            <option value="catppuccin-mocha" selected>Catppuccin Mocha</option>
+            <option value="gruvbox-dark">Gruvbox Dark</option>
+            <option value="dracula">Dracula</option>
+            <option value="nord">Nord</option>
+            <option value="solarized-dark">Solarized Dark</option>
+            <option value="everforest-dark">Everforest Dark</option>
+            <option value="tokyo-night">Tokyo Night</option>
+            <option value="cyberpunk">Cyberpunk</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Component Visibility -->
+      <div class="control-section">
+        <h3>Components</h3>
+        <div class="control-row">
+          <input type="checkbox" id="showBadge" checked onchange="toggleComponent('badge')" />
+          <label>Badge</label>
+          <input type="checkbox" id="badgeShowCount" checked onchange="updateBadge()" style="margin-left: auto;" />
+          <label style="min-width: auto;">Show Count</label>
+        </div>
+        <div class="control-row">
+          <input type="checkbox" id="showPanel" checked onchange="toggleComponent('panel')" />
+          <label>Panel</label>
+          <select id="panelMode" onchange="updatePanel()" style="margin-left: auto; flex: none; width: 140px;">
+            <option value="drawer-right" selected>Drawer Right</option>
+            <option value="drawer-left">Drawer Left</option>
+            <option value="modal">Modal</option>
+          </select>
+        </div>
+        <div class="control-row">
+          <input type="checkbox" id="showBanner" checked onchange="toggleComponent('banner')" />
+          <label>Banner</label>
+          <select id="bannerPosition" onchange="updateBanner()" style="margin-left: auto; flex: none; width: 140px;">
+            <option value="top" selected>Top</option>
+            <option value="bottom">Bottom</option>
+          </select>
+        </div>
+        <div class="control-row">
+          <input type="checkbox" id="showToast" checked onchange="toggleComponent('toast')" />
+          <label>Toast</label>
+          <select id="toastPosition" onchange="updateToast()" style="margin-left: auto; flex: none; width: 140px;">
+            <option value="bottom-right" selected>Bottom Right</option>
+            <option value="bottom-left">Bottom Left</option>
+            <option value="top-right">Top Right</option>
+            <option value="top-left">Top Left</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="control-section">
+        <h3>Actions</h3>
+        <div class="button-row">
+          <button class="btn btn-primary" onclick="openPanel()">Open Panel</button>
+          <button class="btn btn-success" onclick="showToast()">Show Toast</button>
+          <button class="btn btn-warning" onclick="showBanner()">Show Banner</button>
+        </div>
+        <div class="button-row" style="margin-top: 12px;">
+          <button class="btn btn-secondary" onclick="refreshDebug()">Refresh Debug</button>
+          <button class="btn btn-secondary" onclick="clearLocalStorage()">Clear localStorage</button>
+          <button class="btn btn-danger" onclick="resetAll()">Reset All</button>
+        </div>
+        <div class="button-row" style="margin-top: 12px;">
+          <a class="btn btn-warning" href="http://localhost:3456/admin" target="_blank">Open Admin Panel</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Debug Panel -->
+    <div class="debug-panel">
+      <h3>Debug Info</h3>
+
+      <div class="debug-row">
+        <span class="debug-label">Mock Server Status:</span>
+        <span class="debug-value" id="debug-server-status">
+          <span class="status-indicator loading"></span>Checking...
+        </span>
+      </div>
+      <div class="debug-row">
+        <span class="debug-label">API URL:</span>
+        <span class="debug-value">http://localhost:3456</span>
+      </div>
+      <div class="debug-row">
+        <span class="debug-label">User ID:</span>
+        <span class="debug-value" id="debug-userid">test-user-123</span>
+      </div>
+
+      <div class="mock-data-info">
+        <h4>Local State</h4>
+        <div class="debug-row">
+          <span class="debug-label">localStorage Key:</span>
+          <span class="debug-value" id="debug-storage-key">-</span>
+        </div>
+        <div class="debug-row">
+          <span class="debug-label">lastViewed (localStorage):</span>
+          <span class="debug-value" id="debug-lastviewed-local">-</span>
+        </div>
+        <div class="debug-row">
+          <span class="debug-label">lastApiSync (localStorage):</span>
+          <span class="debug-value" id="debug-last-api-sync">-</span>
+        </div>
+      </div>
+
+      <div class="mock-data-info">
+        <h4>Server State (from Mock Server)</h4>
+        <div class="debug-row">
+          <span class="debug-label">last_seen_at (API):</span>
+          <span class="debug-value" id="debug-lastseen-api">-</span>
+        </div>
+        <div class="debug-row">
+          <span class="debug-label">Publications Count:</span>
+          <span class="debug-value" id="debug-pub-count">-</span>
+        </div>
+        <div class="debug-row">
+          <span class="debug-label">Calculated New Updates:</span>
+          <span class="debug-value" id="debug-new-count">-</span>
+        </div>
+      </div>
+
+      <div class="mock-data-info">
+        <h4>Publications from Server</h4>
+        <div id="publications-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel Component -->
+  <div id="panel-container">
+    <changebot-panel id="panel" scope="userid-demo" mode="drawer-right"></changebot-panel>
+  </div>
+
+  <!-- Toast Component -->
+  <div id="toast-container">
+    <changebot-toast id="toast" scope="userid-demo" position="bottom-right"></changebot-toast>
+  </div>
+
+  <script>
+    const SCOPE = 'userid-demo';
+    const MOCK_SERVER = 'http://localhost:3456';
+    let serverState = null;
+
+    // Initialize provider with user props
+    function initProvider() {
+      const provider = document.getElementById('provider');
+      const userId = document.getElementById('userId').value;
+      const userData = document.getElementById('userData').value;
+
+      provider.setAttribute('user-id', userId);
+      if (userData) {
+        provider.setAttribute('user-data', userData);
+      }
+
+      // Apply theme
+      updateTheme();
+    }
+
+    function changeUserId() {
+      const userId = document.getElementById('userId').value;
+      const userData = document.getElementById('userData').value;
+      const provider = document.getElementById('provider');
+
+      provider.setAttribute('user-id', userId);
+      if (userData) {
+        provider.setAttribute('user-data', userData);
+      }
+
+      // Clear localStorage for old user and reload
+      clearLocalStorage();
+      location.reload();
+    }
+
+    function clearLocalStorage() {
+      const userId = document.getElementById('userId').value;
+      // Clear all changebot keys for this scope
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(`changebot:`) && key.includes(SCOPE)) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+    }
+
+    // Check mock server connection
+    async function checkServerConnection() {
+      const statusBox = document.getElementById('connection-status');
+      const debugStatus = document.getElementById('debug-server-status');
+
+      try {
+        const res = await fetch(`${MOCK_SERVER}/admin/api/state`);
+        if (res.ok) {
+          serverState = await res.json();
+          statusBox.className = 'info-box success';
+          statusBox.innerHTML = `
+            <strong>Connected to Mock Server</strong> at <code>${MOCK_SERVER}</code>.
+            <a href="${MOCK_SERVER}/admin" target="_blank">Open Admin Panel</a> to configure responses.
+          `;
+          debugStatus.innerHTML = '<span class="status-indicator online"></span>Connected';
+          return true;
+        }
+      } catch (e) {
+        // Connection failed
+      }
+
+      statusBox.className = 'info-box error';
+      statusBox.innerHTML = `
+        <strong>Mock Server Not Running</strong> - Start it with <code>pnpm run mock-server</code> from the widgets directory.
+        The widget will not work without the mock server.
+      `;
+      debugStatus.innerHTML = '<span class="status-indicator offline"></span>Offline';
+      debugStatus.className = 'debug-value error';
+      return false;
+    }
+
+    // Fetch state from mock server for debug display
+    async function fetchServerState() {
+      try {
+        const res = await fetch(`${MOCK_SERVER}/admin/api/state`);
+        if (res.ok) {
+          serverState = await res.json();
+          return serverState;
+        }
+      } catch (e) {
+        console.warn('Could not fetch mock server state:', e);
+      }
+      return null;
+    }
+
+    // Theme Controls
+    function updateTheme() {
+      const mode = document.getElementById('themeMode').value;
+      const fixedRow = document.getElementById('fixedThemeRow');
+      const lightRow = document.getElementById('lightThemeRow');
+      const darkRow = document.getElementById('darkThemeRow');
+
+      if (mode === 'fixed') {
+        fixedRow.style.display = 'flex';
+        lightRow.style.display = 'none';
+        darkRow.style.display = 'none';
+
+        const theme = document.getElementById('fixedTheme').value;
+        applyThemeToComponents(theme, null, null);
+      } else {
+        fixedRow.style.display = 'none';
+        lightRow.style.display = 'flex';
+        darkRow.style.display = 'flex';
+
+        const light = document.getElementById('lightTheme').value;
+        const dark = document.getElementById('darkTheme').value;
+        applyThemeToComponents(null, light, dark);
+      }
+    }
+
+    function applyThemeToComponents(fixed, light, dark) {
+      const components = ['badge', 'panel', 'banner', 'toast'];
+
+      components.forEach(comp => {
+        const el = document.getElementById(comp);
+        if (el) {
+          if (fixed) {
+            el.setAttribute('theme', fixed);
+            el.removeAttribute('light');
+            el.removeAttribute('dark');
+          } else {
+            el.removeAttribute('theme');
+            el.setAttribute('light', light);
+            el.setAttribute('dark', dark);
+          }
+        }
+      });
+    }
+
+    // Component Visibility
+    function toggleComponent(comp) {
+      const checkbox = document.getElementById('show' + comp.charAt(0).toUpperCase() + comp.slice(1));
+      const container = document.getElementById(comp + '-container');
+
+      if (container) {
+        container.style.display = checkbox.checked ? (comp === 'badge' ? 'inline-block' : 'block') : 'none';
+      }
+    }
+
+    function updateBadge() {
+      const badge = document.getElementById('badge');
+      const showCount = document.getElementById('badgeShowCount').checked;
+      if (badge) {
+        badge.setAttribute('show-count', showCount.toString());
+      }
+    }
+
+    function updatePanel() {
+      const panel = document.getElementById('panel');
+      const mode = document.getElementById('panelMode').value;
+      if (panel) {
+        panel.setAttribute('mode', mode);
+      }
+    }
+
+    function updateBanner() {
+      const banner = document.getElementById('banner');
+      const position = document.getElementById('bannerPosition').value;
+      if (banner) {
+        banner.setAttribute('position', position);
+      }
+    }
+
+    function updateToast() {
+      const toast = document.getElementById('toast');
+      const position = document.getElementById('toastPosition').value;
+      if (toast) {
+        toast.setAttribute('position', position);
+      }
+    }
+
+    // Actions
+    function openPanel() {
+      document.dispatchEvent(new CustomEvent('changebot:action', {
+        detail: { type: 'openDisplay', scope: SCOPE },
+        bubbles: true,
+        composed: true
+      }));
+    }
+
+    async function showToast() {
+      const toast = document.getElementById('toast');
+      if (toast && toast.show && serverState && serverState.publications.length > 1) {
+        await toast.show(serverState.publications[1]);
+      }
+    }
+
+    async function showBanner() {
+      const banner = document.getElementById('banner');
+      if (banner && banner.show && serverState && serverState.publications.length > 0) {
+        await banner.show(serverState.publications[0]);
+      }
+    }
+
+    function resetAll() {
+      clearLocalStorage();
+      location.reload();
+    }
+
+    // Debug
+    async function refreshDebug() {
+      const userId = document.getElementById('userId').value;
+      const storageKeyBase = `changebot:lastViewed:${SCOPE}`;
+      const storageKeyWithUser = `${storageKeyBase}:${userId}`;
+      const syncKey = `changebot:lastApiSync:${SCOPE}:${userId}`;
+
+      document.getElementById('debug-userid').textContent = userId;
+      document.getElementById('debug-storage-key').textContent = storageKeyWithUser;
+
+      // Check both possible localStorage keys
+      let localValue = localStorage.getItem(storageKeyWithUser) || localStorage.getItem(storageKeyBase);
+      if (localValue) {
+        const date = new Date(parseInt(localValue));
+        document.getElementById('debug-lastviewed-local').textContent = date.toLocaleString();
+        document.getElementById('debug-lastviewed-local').className = 'debug-value';
+      } else {
+        document.getElementById('debug-lastviewed-local').textContent = '(not set)';
+        document.getElementById('debug-lastviewed-local').className = 'debug-value warning';
+      }
+
+      // Last API sync
+      const lastSync = localStorage.getItem(syncKey);
+      if (lastSync) {
+        const syncDate = new Date(parseInt(lastSync));
+        document.getElementById('debug-last-api-sync').textContent = syncDate.toLocaleString();
+      } else {
+        document.getElementById('debug-last-api-sync').textContent = '(never synced)';
+        document.getElementById('debug-last-api-sync').className = 'debug-value warning';
+      }
+
+      // Fetch from mock server
+      const state = await fetchServerState();
+      if (state) {
+        const user = state.users[userId];
+        const lastSeenApi = user?.last_seen_at;
+
+        document.getElementById('debug-lastseen-api').textContent =
+          lastSeenApi ? new Date(lastSeenApi).toLocaleString() : '(null)';
+        document.getElementById('debug-lastseen-api').className =
+          'debug-value' + (lastSeenApi ? '' : ' warning');
+
+        document.getElementById('debug-pub-count').textContent = state.publications.length;
+
+        // Calculate new count
+        let newCount = 0;
+        if (lastSeenApi) {
+          const lastSeenTime = new Date(lastSeenApi).getTime();
+          newCount = state.publications.filter(p =>
+            new Date(p.published_at).getTime() > lastSeenTime
+          ).length;
+        } else {
+          newCount = 0; // null means new user, badge shows 0 initially
+        }
+        document.getElementById('debug-new-count').textContent = newCount;
+
+        // Publications list
+        const pubList = document.getElementById('publications-list');
+        if (state.publications.length === 0) {
+          pubList.innerHTML = '<span style="color: #6c7086; font-style: italic;">No publications</span>';
+        } else {
+          pubList.innerHTML = state.publications.map(p => `
+            <div class="mock-item">
+              <span class="id">#${p.id}</span>
+              <span class="title">${p.title}</span>
+              <span class="target">${p.highlight_target || '-'}</span>
+              <span class="date">${p.display_date}</span>
+            </div>
+          `).join('');
+        }
+      }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      const connected = await checkServerConnection();
+      if (connected) {
+        initProvider();
+        await refreshDebug();
+
+        // Auto-refresh debug every 3 seconds
+        setInterval(refreshDebug, 3000);
+      }
+    });
+  </script>
+</body>
+
+</html>
