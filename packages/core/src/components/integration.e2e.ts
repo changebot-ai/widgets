@@ -1,4 +1,4 @@
-import { newE2EPage } from '@stencil/core/testing';
+import { newE2EPage, E2EPage } from '@stencil/core/testing';
 
 /**
  * TECH DEBT: Timing-based delays
@@ -444,6 +444,255 @@ describe('Integration Tests - Full System', () => {
       const drawer = await page.find('changebot-panel >>> .panel');
       const className = await drawer.getProperty('className');
       expect(className).toContain('theme--catppuccin-mocha');
+    });
+  });
+
+  describe('UserId Tracking - New User Journey', () => {
+    const API_BASE = 'https://api.changebot.ai/v1/widgets/test-widget';
+    const USER_ID = 'new-user-123';
+    const SCOPE = 'userid-test';
+
+    // Helper to create publications with dynamic timestamps
+    function createInitialPublications(beforeTimestamp: string) {
+      // Publication that existed before the user's first visit
+      const oldDate = new Date(new Date(beforeTimestamp).getTime() - 24 * 60 * 60 * 1000); // 1 day before
+      return [
+        {
+          id: 1,
+          title: 'Old Update',
+          content: '<p>This existed before the user visited</p>',
+          display_date: oldDate.toISOString().split('T')[0],
+          published_at: oldDate.toISOString(),
+          tags: [],
+        },
+      ];
+    }
+
+    function createPublicationsWithNewUpdate(afterTimestamp: string, initialPubs: any[]) {
+      // New publication that was published after the user's first visit
+      // Use just 1ms offset so it's after firstVisit but before the test clicks happen
+      const newDate = new Date(new Date(afterTimestamp).getTime() + 1); // 1ms after
+      return [
+        {
+          id: 2,
+          title: 'New Update',
+          content: '<p>This was published after user first visit</p>',
+          display_date: newDate.toISOString().split('T')[0],
+          published_at: newDate.toISOString(),
+          tags: [],
+        },
+        ...initialPubs,
+      ];
+    }
+
+    /**
+     * Injects a fetch mock into the browser context before the component loads.
+     * This is necessary because Stencil's newE2EPage already sets up request
+     * interception, preventing us from adding custom Puppeteer interceptors.
+     * See: https://github.com/ionic-team/stencil/issues/2434
+     */
+    async function injectFetchMock(
+      page: E2EPage,
+      options: {
+        publications: any[];
+        userLastSeenAt: string | null;
+      },
+    ): Promise<{ getPatchedData: () => Promise<any> }> {
+      // Inject mock before page content is set
+      await page.evaluateOnNewDocument(
+        (apiBase, userId, publications, userLastSeenAt) => {
+          // Store patched data for retrieval
+          (window as any).__patchedUserData = null;
+
+          const originalFetch = window.fetch;
+          window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+            const url = typeof input === 'string' ? input : input.toString();
+            const method = init?.method || 'GET';
+
+            // Mock GET /updates
+            if (url === `${apiBase}/updates` && method === 'GET') {
+              return new Response(JSON.stringify(publications), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+              });
+            }
+
+            // Mock GET /users/:userId
+            if (url === `${apiBase}/users/${encodeURIComponent(userId)}` && method === 'GET') {
+              return new Response(
+                JSON.stringify({
+                  id: userId,
+                  last_seen_at: userLastSeenAt,
+                }),
+                {
+                  status: 200,
+                  headers: { 'Content-Type': 'application/json' },
+                },
+              );
+            }
+
+            // Mock PATCH /users/:userId
+            if (url === `${apiBase}/users/${encodeURIComponent(userId)}` && method === 'PATCH') {
+              const body = init?.body ? JSON.parse(init.body as string) : null;
+              (window as any).__patchedUserData = body;
+              return new Response(JSON.stringify({ success: true }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+              });
+            }
+
+            // Pass through other requests
+            return originalFetch(input, init);
+          };
+        },
+        API_BASE,
+        USER_ID,
+        options.publications,
+        options.userLastSeenAt,
+      );
+
+      return {
+        getPatchedData: async () => {
+          return page.evaluate(() => (window as any).__patchedUserData);
+        },
+      };
+    }
+
+    it('should show no badge count on first visit for new user, then show 1 after new update, then clear after viewing', async () => {
+      // Create initial publications dated before "now"
+      const testStartTime = new Date().toISOString();
+      const initialPublications = createInitialPublications(testStartTime);
+
+      // ============================================
+      // VISIT 1: New user visits for the first time
+      // ============================================
+      let page = await newE2EPage();
+
+      const { getPatchedData: getPatchedData1 } = await injectFetchMock(page, {
+        publications: initialPublications,
+        userLastSeenAt: null, // New user - never seen before
+      });
+
+      await page.setContent(`
+        <changebot-provider slug="test-widget" scope="${SCOPE}" user-id="${USER_ID}" />
+        <changebot-badge scope="${SCOPE}" />
+        <changebot-panel scope="${SCOPE}" />
+      `);
+
+      await page.waitForChanges();
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Badge should be hidden (count = 0) because new user hasn't seen anything yet
+      // and their last_seen_at gets set to "now" on first sync
+      let badge = await page.find('changebot-badge >>> .badge');
+      let badgeClasses = await badge.getProperty('className');
+      expect(badgeClasses).toContain('badge--hidden');
+
+      // Verify the API was called to set their initial last_seen_at
+      const patchedData1 = await getPatchedData1();
+      expect(patchedData1).not.toBeNull();
+      expect(patchedData1.last_seen_at).toBeDefined();
+      const firstVisitTimestamp = patchedData1.last_seen_at;
+
+      // User does NOT click/open the panel - they just leave
+      await page.close();
+
+      // ============================================
+      // VISIT 2: User returns after a new update was published
+      // ============================================
+      // Create publications with a new update published AFTER the user's first visit
+      const publicationsWithNewUpdate = createPublicationsWithNewUpdate(firstVisitTimestamp, initialPublications);
+
+      page = await newE2EPage();
+
+      const { getPatchedData: getPatchedData2 } = await injectFetchMock(page, {
+        publications: publicationsWithNewUpdate, // Now includes the new update
+        userLastSeenAt: firstVisitTimestamp, // Their last_seen_at from first visit
+      });
+
+      await page.setContent(`
+        <changebot-provider slug="test-widget" scope="${SCOPE}" user-id="${USER_ID}" />
+        <changebot-badge scope="${SCOPE}" />
+        <changebot-panel scope="${SCOPE}" />
+      `);
+
+      await page.waitForChanges();
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Badge should show count of 1 (one new update since their last visit)
+      badge = await page.find('changebot-badge >>> .badge');
+      badgeClasses = await badge.getProperty('className');
+      expect(badgeClasses).not.toContain('badge--hidden');
+
+      const countElement = await page.find('changebot-badge >>> .badge__count');
+      const countText = await countElement.textContent;
+      expect(countText).toBe('1');
+
+      // User clicks to open the panel
+      const badgeButton = await page.find('changebot-badge >>> .badge');
+      await badgeButton.click();
+
+      await page.waitForChanges();
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      await page.waitForChanges(); // Wait again for reactive updates
+
+      // Panel should be open
+      const panel = await page.find('changebot-panel >>> .panel');
+      const panelClasses = await panel.getProperty('className');
+      expect(panelClasses).toContain('panel--open');
+
+      // Wait for the store to recalculate and badge to update
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      await page.waitForChanges();
+
+      // Badge should now be hidden (count cleared after viewing)
+      badge = await page.find('changebot-badge >>> .badge');
+      badgeClasses = await badge.getProperty('className');
+      expect(badgeClasses).toContain('badge--hidden');
+
+      // Verify last_seen_at was updated via PATCH
+      const patchedData2 = await getPatchedData2();
+      expect(patchedData2).not.toBeNull();
+      const secondVisitTimestamp = patchedData2.last_seen_at;
+      expect(new Date(secondVisitTimestamp).getTime()).toBeGreaterThan(new Date(firstVisitTimestamp).getTime());
+
+      // User closes the panel
+      await page.keyboard.press('Escape');
+      await page.waitForChanges();
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      // Badge should still be hidden after closing
+      badge = await page.find('changebot-badge >>> .badge');
+      badgeClasses = await badge.getProperty('className');
+      expect(badgeClasses).toContain('badge--hidden');
+
+      await page.close();
+
+      // ============================================
+      // VISIT 3: User returns again (no new updates)
+      // ============================================
+      page = await newE2EPage();
+
+      await injectFetchMock(page, {
+        publications: publicationsWithNewUpdate, // Same publications
+        userLastSeenAt: secondVisitTimestamp, // Their updated last_seen_at
+      });
+
+      await page.setContent(`
+        <changebot-provider slug="test-widget" scope="${SCOPE}" user-id="${USER_ID}" />
+        <changebot-badge scope="${SCOPE}" />
+        <changebot-panel scope="${SCOPE}" />
+      `);
+
+      await page.waitForChanges();
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Badge should still be hidden (no new updates since last view)
+      badge = await page.find('changebot-badge >>> .badge');
+      badgeClasses = await badge.getProperty('className');
+      expect(badgeClasses).toContain('badge--hidden');
+
+      await page.close();
     });
   });
 
