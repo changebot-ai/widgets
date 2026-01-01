@@ -9,13 +9,13 @@ describe('changebot-provider', () => {
     expect(element).toHaveClass('hydrated');
   });
 
-  it('renders with url prop', async () => {
+  it('renders with baseUrl prop', async () => {
     const page = await newE2EPage();
-    await page.setContent('<changebot-provider url="https://api.example.com/updates" />');
+    await page.setContent('<changebot-provider base-url="https://api.example.com" />');
 
     const element = await page.find('changebot-provider');
     expect(element).toHaveClass('hydrated');
-    expect(await element.getProperty('url')).toBe('https://api.example.com/updates');
+    expect(await element.getProperty('baseUrl')).toBe('https://api.example.com');
   });
 
   it('renders with slug prop', async () => {

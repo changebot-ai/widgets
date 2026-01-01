@@ -15,7 +15,7 @@ import { safeStorage } from '../../utils/safe-storage';
 export class ChangebotProvider {
   @Element() el: HTMLElement;
 
-  @Prop() url?: string;
+  @Prop() baseUrl?: string;
   @Prop() slug?: string;
   @Prop() scope: string = 'default';
   @Prop() mockData?: string;
@@ -29,7 +29,7 @@ export class ChangebotProvider {
   private services = {
     store: this.scopedStore.store,
     config: {
-      url: this.url,
+      baseUrl: this.baseUrl,
       slug: this.slug,
       scope: this.scope || 'default',
     },
@@ -44,7 +44,7 @@ export class ChangebotProvider {
     log.debug('componentWillLoad', {
       scope: this.scope,
       slug: this.slug,
-      url: this.url,
+      baseUrl: this.baseUrl,
       userId: this.userId,
       hasMockData: !!this.mockData,
     });
@@ -53,13 +53,13 @@ export class ChangebotProvider {
     this.abortController = new AbortController();
 
     this.services.config = {
-      url: this.url,
+      baseUrl: this.baseUrl,
       slug: this.slug,
       scope: this.scope,
     };
 
-    // Initialize API client with slug or url
-    this.api = createAPI(this.url || this.slug);
+    // Initialize API client with slug or baseUrl (slug takes precedence)
+    this.api = createAPI(this.slug || this.baseUrl);
 
     this.hydrateLastViewed();
 
@@ -76,11 +76,11 @@ export class ChangebotProvider {
     if (this.mockData) {
       log.debug('Loading mock data');
       this.loadMockData();
-    } else if (this.url || this.slug) {
-      log.debug('Loading updates from API', { slug: this.slug, url: this.url });
+    } else if (this.slug || this.baseUrl) {
+      log.debug('Loading updates from API', { slug: this.slug, baseUrl: this.baseUrl });
       void this.loadUpdates(); // Fire and forget
     } else {
-      log.debug('No slug, url, or mock data provided - skipping update load');
+      log.debug('No slug, baseUrl, or mock data provided - skipping update load');
     }
   }
 
@@ -170,7 +170,7 @@ export class ChangebotProvider {
     }
 
     try {
-      await this.scopedStore.actions.loadUpdates(this.slug, this.url, this.abortController?.signal);
+      await this.scopedStore.actions.loadUpdates(this.slug, this.baseUrl, this.abortController?.signal);
     } catch (error) {
       // Ignore abort errors
       if (error instanceof Error && error.name === 'AbortError') {

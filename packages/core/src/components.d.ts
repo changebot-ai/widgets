@@ -44,13 +44,13 @@ export namespace Components {
         "theme"?: Theme;
     }
     interface ChangebotProvider {
+        "baseUrl"?: string;
         "mockData"?: string;
         /**
           * @default 'default'
          */
         "scope": string;
         "slug"?: string;
-        "url"?: string;
         "userData"?: string;
         "userId"?: string;
     }
@@ -136,13 +136,13 @@ declare namespace LocalJSX {
         "theme"?: Theme;
     }
     interface ChangebotProvider {
+        "baseUrl"?: string;
         "mockData"?: string;
         /**
           * @default 'default'
          */
         "scope"?: string;
         "slug"?: string;
-        "url"?: string;
         "userData"?: string;
         "userId"?: string;
     }

@@ -149,7 +149,7 @@ This library uses a provider-consumer pattern for sharing state between componen
 
 The following props are for internal testing purposes only and should **not** be documented in public-facing documentation (README files, NPM docs, etc.):
 
-- `url` (changebot-provider) - Custom API endpoint URL for testing purposes
+- `baseUrl` (changebot-provider) - Base URL for custom API endpoint (e.g., `http://localhost:3456`). The widget appends paths like `/updates` and `/users/:userId` to this base.
 - `mockData` (changebot-provider) - JSON string for loading mock data directly (for demos and testing when API is unavailable)
 
 These props should be omitted from all customer-facing documentation.

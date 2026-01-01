@@ -41,7 +41,7 @@ export interface StoreConfig {
 }
 
 export interface StoreActions {
-  loadUpdates: (slug?: string, url?: string, signal?: AbortSignal) => Promise<void>;
+  loadUpdates: (slug?: string, baseUrl?: string, signal?: AbortSignal) => Promise<void>;
   loadMockUpdates: (data: unknown) => void;
   markViewed: (timestamp?: number) => void;
   markAllViewed: () => void;
@@ -62,7 +62,7 @@ export interface StencilStore<T> {
 }
 
 export interface ProviderConfig {
-  url?: string;
+  baseUrl?: string;
   slug?: string;
   scope: string;
 }

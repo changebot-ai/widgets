@@ -111,7 +111,7 @@ export function createScopedStore() {
   });
 
   const scopedActions = {
-    async loadUpdates(slug?: string, url?: string, signal?: AbortSignal) {
+    async loadUpdates(slug?: string, baseUrl?: string, signal?: AbortSignal) {
       store.state.isLoading = true;
       store.state.error = null;
 
@@ -119,10 +119,11 @@ export function createScopedStore() {
         let apiUrl: string;
         if (slug) {
           apiUrl = `https://api.changebot.ai/v1/widgets/${slug}/updates`;
-        } else if (url) {
-          apiUrl = url;
+        } else if (baseUrl) {
+          // Remove trailing slash if present, then append /updates
+          apiUrl = baseUrl.replace(/\/$/, '') + '/updates';
         } else {
-          throw new Error('Either slug or url must be provided');
+          throw new Error('Either slug or baseUrl must be provided');
         }
 
         const response = await fetch(apiUrl, {
@@ -173,7 +174,7 @@ export function createScopedStore() {
         log.warn('Could not load updates. Widget functionality will continue to work.', {
           error: errorMessage,
           slug,
-          url
+          baseUrl
         });
       }
     },
