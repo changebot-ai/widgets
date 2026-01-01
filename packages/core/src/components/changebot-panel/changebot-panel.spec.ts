@@ -227,19 +227,19 @@ describe('changebot-panel', () => {
   });
 
   // Close interaction tests
-  it('calls closeDisplay action on close button click', async () => {
+  it('calls display.close on close button click', async () => {
     const page = await newSpecPage({
       components: [ChangebotPanel],
       html: '<changebot-panel></changebot-panel>',
     });
 
     const component = page.rootInstance;
-    const mockCloseDisplay = jest.fn();
+    const mockClose = jest.fn();
 
-    // Mock services with actions
+    // Mock services with display
     component.services = {
       store: { state: {} },
-      actions: { closeDisplay: mockCloseDisplay }
+      display: { open: jest.fn(), close: mockClose }
     };
     component.isOpen = true;
 
@@ -248,23 +248,23 @@ describe('changebot-panel', () => {
     const closeButton = page.root.shadowRoot.querySelector('.close-button') as HTMLElement;
     if (closeButton) {
       closeButton.click();
-      expect(mockCloseDisplay).toHaveBeenCalled();
+      expect(mockClose).toHaveBeenCalled();
     }
   });
 
-  it('calls closeDisplay action on ESC key', async () => {
+  it('calls display.close on ESC key', async () => {
     const page = await newSpecPage({
       components: [ChangebotPanel],
       html: '<changebot-panel></changebot-panel>',
     });
 
     const component = page.rootInstance;
-    const mockCloseDisplay = jest.fn();
+    const mockClose = jest.fn();
 
-    // Mock services with actions
+    // Mock services with display
     component.services = {
       store: { state: {} },
-      actions: { closeDisplay: mockCloseDisplay }
+      display: { open: jest.fn(), close: mockClose }
     };
     component.isOpen = true;
 
@@ -274,7 +274,7 @@ describe('changebot-panel', () => {
     const escEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
     document.dispatchEvent(escEvent);
 
-    expect(mockCloseDisplay).toHaveBeenCalled();
+    expect(mockClose).toHaveBeenCalled();
   });
 
   it('closes directly when no provider (standalone mode)', async () => {
@@ -300,8 +300,8 @@ describe('changebot-panel', () => {
     }
   });
 
-  it('calls closeDisplay action on backdrop click (modal only)', async () => {
-    const mockCloseDisplay = jest.fn();
+  it('calls display.close on backdrop click (modal only)', async () => {
+    const mockClose = jest.fn();
 
     const page = await newSpecPage({
       components: [ChangebotPanel],
@@ -311,7 +311,7 @@ describe('changebot-panel', () => {
     const component = page.rootInstance;
     component.services = {
       store: { state: {} },
-      actions: { closeDisplay: mockCloseDisplay }
+      display: { open: jest.fn(), close: mockClose }
     };
     component.isOpen = true;
 
@@ -320,7 +320,7 @@ describe('changebot-panel', () => {
     const backdrop = page.root.shadowRoot.querySelector('.backdrop') as HTMLElement;
     if (backdrop) {
       backdrop.click();
-      expect(mockCloseDisplay).toHaveBeenCalled();
+      expect(mockClose).toHaveBeenCalled();
     }
   });
 

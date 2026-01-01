@@ -135,7 +135,7 @@ export class ChangebotPanel {
   @Method()
   async open() {
     if (this.services) {
-      this.services.openAndMarkViewed();
+      this.services.display.open();
     } else {
       log.warn('Cannot open panel - no services available');
     }
@@ -143,8 +143,8 @@ export class ChangebotPanel {
 
   @Method()
   async close() {
-    if (this.services?.actions) {
-      this.services.actions.closeDisplay();
+    if (this.services?.display) {
+      this.services.display.close();
     } else {
       log.warn('Cannot close panel - no services available');
       this.isOpen = false;
@@ -178,8 +178,8 @@ export class ChangebotPanel {
    */
   private closePanel = () => {
     try {
-      if (this.services?.actions) {
-        this.services.actions.closeDisplay();
+      if (this.services?.display) {
+        this.services.display.close();
       }
     } catch (error) {
       log.warn('Failed to close panel', { error });

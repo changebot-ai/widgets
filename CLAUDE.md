@@ -115,7 +115,8 @@ This library uses a provider-consumer pattern for sharing state between componen
 
 - **Provider placement**: The `<changebot-provider>` listens at the document level and does NOT require consumer components to be nested inside it. Components can be placed anywhere on the page.
 - **Scope-based communication**: Multiple providers can coexist using the `scope` prop for isolation.
-- **Event-based**: Uses CustomEvents (`changebot:context-request`, `changebot:action`) for framework-agnostic communication.
+- **Store registry**: Components connect to providers via a module-level registry (`waitForStore(scope)`)
+- **Event-based actions**: External code uses `changebot:action` CustomEvents to trigger actions (openDisplay, closeDisplay, toggleDisplay, markViewed, markAllViewed)
 
 **Correct usage examples:**
 ```html
@@ -157,10 +158,26 @@ These props should be omitted from all customer-facing documentation.
 
 Uses `@stencil/store` with scope-based stores for multi-provider support:
 
-- `createScopedStore(scope)` creates isolated stores per provider instance
+- `createScopedStore()` creates isolated stores per provider instance
 - Store state: `updates`, `widget`, `lastViewed`, `isOpen`, `newUpdatesCount`, `isLoading`, `error`
-- Actions: `loadUpdates()`, `markViewed()`, `openDisplay()`, `closeDisplay()`, etc.
 - Reactive subscriptions via `store.onChange(property, callback)`
+
+### Services Interface
+
+Consumer components receive a `services` object from the provider with this interface:
+
+```typescript
+interface Services {
+  store: { state, onChange };  // Read-only state access with subscriptions
+  display: {
+    open: () => void;   // Opens panel AND marks as viewed (persists to localStorage/API)
+    close: () => void;  // Closes the panel
+  };
+  config: { url, slug, scope };
+}
+```
+
+**Key design principle**: All display operations go through `services.display`, ensuring side effects (marking as viewed, API sync) are always applied consistently. Internal store actions are not exposed to consumers.
 
 ## Theme System
 

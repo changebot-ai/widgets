@@ -1,4 +1,5 @@
-import { Component, h, Prop, Element } from '@stencil/core';
+import { Component, h, Prop, Element, Listen } from '@stencil/core';
+import { ActionDetail } from '../../types';
 import { createScopedStore, getStorageKey } from '../../store';
 import { registerStore, unregisterStore } from '../../store/registry';
 import { createAPI } from '../../utils/api';
@@ -27,14 +28,15 @@ export class ChangebotProvider {
 
   private services = {
     store: this.scopedStore.store,
-    actions: this.scopedStore.actions,
     config: {
       url: this.url,
       slug: this.slug,
       scope: this.scope || 'default',
     },
-    // Provider-level actions that handle side effects (localStorage, API sync)
-    openAndMarkViewed: () => this.openAndMarkViewed(),
+    display: {
+      open: () => this.openAndMarkViewed(),
+      close: () => this.scopedStore.actions.closeDisplay(),
+    },
   };
 
   async componentWillLoad() {
@@ -88,6 +90,43 @@ export class ChangebotProvider {
 
     unregisterStore(this.scope);
     log.debug('Unregistered store from registry', { scope: this.scope });
+  }
+
+  @Listen('changebot:action', { target: 'document' })
+  handleAction(event: CustomEvent<ActionDetail>) {
+    const { type, scope } = event.detail;
+
+    // Only handle events for this provider's scope
+    if (scope && scope !== this.scope) {
+      return;
+    }
+
+    log.debug('Received action', { type, scope, myScope: this.scope });
+
+    switch (type) {
+      case 'openDisplay':
+        this.services.display.open();
+        break;
+      case 'closeDisplay':
+        this.services.display.close();
+        break;
+      case 'toggleDisplay':
+        if (this.scopedStore.store.state.isOpen) {
+          this.services.display.close();
+        } else {
+          this.services.display.open();
+        }
+        break;
+      case 'markViewed':
+        void this.markAsViewed();
+        break;
+      case 'markAllViewed':
+        this.scopedStore.actions.markAllViewed();
+        void this.markAsViewed();
+        break;
+      default:
+        log.debug('Unknown action type', { type });
+    }
   }
 
   private async markAsViewed() {

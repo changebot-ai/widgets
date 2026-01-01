@@ -67,16 +67,24 @@ export interface ProviderConfig {
   scope: string;
 }
 
+export interface DisplayControl {
+  /** Opens display and marks as viewed (persists to localStorage/API) */
+  open: () => void;
+  /** Closes the display */
+  close: () => void;
+}
+
 export interface Services {
   store: StencilStore<StoreState>;
   config: ProviderConfig;
-  actions: StoreActions;
-  /** Opens display and persists lastViewed to localStorage/API */
-  openAndMarkViewed: () => void;
+  /** Display control operations */
+  display: DisplayControl;
 }
 
-export interface ActionDetail<T = unknown> {
-  type: keyof StoreActions;
-  payload?: T;
+/** Action types that can be dispatched via changebot:action events */
+export type ActionType = 'openDisplay' | 'closeDisplay' | 'toggleDisplay' | 'markViewed' | 'markAllViewed';
+
+export interface ActionDetail {
+  type: ActionType;
   scope?: string;
 }

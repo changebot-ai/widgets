@@ -147,7 +147,7 @@ export class ChangebotBadge {
 
   private handleClick = () => {
     if (this.services) {
-      this.services.openAndMarkViewed();
+      this.services.display.open();
     } else {
       log.warn('Cannot open display - no services available');
     }

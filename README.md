@@ -625,9 +625,15 @@ document.addEventListener('changebot:lastViewed', event => {
 });
 ```
 
-#### `changebot:context-request`
+#### Available Action Types
 
-Internal event used by components to request services from the provider. Typically not used in application code.
+| Action Type | Description |
+|-------------|-------------|
+| `openDisplay` | Opens the panel and marks updates as viewed |
+| `closeDisplay` | Closes the panel |
+| `toggleDisplay` | Toggles the panel (opens with mark viewed, or closes) |
+| `markViewed` | Marks updates as viewed without opening panel |
+| `markAllViewed` | Marks all updates as viewed |
 
 ## Accessibility Features
 

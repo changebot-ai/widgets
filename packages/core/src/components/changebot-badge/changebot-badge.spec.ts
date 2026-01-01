@@ -147,8 +147,8 @@ describe('changebot-badge', () => {
     expect(mockStore.onChange).toHaveBeenCalledWith('newUpdatesCount', expect.any(Function));
   });
 
-  it('calls openAndMarkViewed on click when services available', async () => {
-    const mockOpenAndMarkViewed = jest.fn();
+  it('calls display.open on click when services available', async () => {
+    const mockOpen = jest.fn();
     const mockStore = {
       state: { updates: [], lastViewed: Date.now(), newUpdatesCount: 3 },
       onChange: jest.fn()
@@ -164,7 +164,7 @@ describe('changebot-badge', () => {
     // Simulate having services
     component.services = {
       store: mockStore,
-      openAndMarkViewed: mockOpenAndMarkViewed
+      display: { open: mockOpen, close: jest.fn() }
     };
 
     const badge = page.root.shadowRoot.querySelector('.badge') as HTMLElement;
@@ -172,7 +172,7 @@ describe('changebot-badge', () => {
 
     await page.waitForChanges();
 
-    expect(mockOpenAndMarkViewed).toHaveBeenCalled();
+    expect(mockOpen).toHaveBeenCalled();
   });
 
   it('handles click gracefully without services', async () => {
@@ -190,7 +190,7 @@ describe('changebot-badge', () => {
   });
 
   it('handles keyboard navigation with Enter key', async () => {
-    const mockOpenAndMarkViewed = jest.fn();
+    const mockOpen = jest.fn();
     const mockStore = {
       state: { updates: [], lastViewed: Date.now(), newUpdatesCount: 3 },
       onChange: jest.fn()
@@ -204,7 +204,7 @@ describe('changebot-badge', () => {
     const component = page.rootInstance;
     component.services = {
       store: mockStore,
-      openAndMarkViewed: mockOpenAndMarkViewed
+      display: { open: mockOpen, close: jest.fn() }
     };
 
     const badge = page.root.shadowRoot.querySelector('.badge') as HTMLElement;
@@ -213,11 +213,11 @@ describe('changebot-badge', () => {
 
     await page.waitForChanges();
 
-    expect(mockOpenAndMarkViewed).toHaveBeenCalled();
+    expect(mockOpen).toHaveBeenCalled();
   });
 
   it('handles keyboard navigation with Space key', async () => {
-    const mockOpenAndMarkViewed = jest.fn();
+    const mockOpen = jest.fn();
     const mockStore = {
       state: { updates: [], lastViewed: Date.now(), newUpdatesCount: 3 },
       onChange: jest.fn()
@@ -231,7 +231,7 @@ describe('changebot-badge', () => {
     const component = page.rootInstance;
     component.services = {
       store: mockStore,
-      openAndMarkViewed: mockOpenAndMarkViewed
+      display: { open: mockOpen, close: jest.fn() }
     };
 
     const badge = page.root.shadowRoot.querySelector('.badge') as HTMLElement;
@@ -240,7 +240,7 @@ describe('changebot-badge', () => {
 
     await page.waitForChanges();
 
-    expect(mockOpenAndMarkViewed).toHaveBeenCalled();
+    expect(mockOpen).toHaveBeenCalled();
   });
 
   it('cleans up store subscription on disconnect', async () => {
