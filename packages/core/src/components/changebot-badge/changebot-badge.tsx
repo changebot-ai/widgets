@@ -26,6 +26,7 @@ export class ChangebotBadge {
   private services?: Services;
   private subscriptionCleanups: (() => void)[] = [];
   private themeManager?: ThemeManager;
+  private instanceId = Math.random().toString(36).slice(2, 8);
 
   @Watch('count')
   onCountChange(newCount: number) {
@@ -57,6 +58,7 @@ export class ChangebotBadge {
 
   componentWillLoad() {
     log.debug('componentWillLoad', {
+      instanceId: this.instanceId,
       scope: this.scope || 'default',
       hasCountProp: this.count !== undefined,
       countProp: this.count,
@@ -96,6 +98,10 @@ export class ChangebotBadge {
   }
 
   disconnectedCallback() {
+    log.debug('disconnectedCallback', {
+      instanceId: this.instanceId,
+      scope: this.scope || 'default',
+    });
     this.subscriptionCleanups.forEach(cleanup => cleanup());
     this.subscriptionCleanups = [];
     this.themeManager?.cleanup();
