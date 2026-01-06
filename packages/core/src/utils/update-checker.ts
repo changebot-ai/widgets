@@ -4,6 +4,7 @@
 
 import { Update } from '../types';
 import { validatePublishedAt } from './date-utils';
+import { logger } from './logger';
 
 export type HighlightTarget = 'banner' | 'toast';
 
@@ -31,8 +32,15 @@ export function findHighlightedUpdate(
   context: string
 ): UpdateCheckResult {
   if (!updates || updates.length === 0) {
+    logger.debug(context, 'No updates to check');
     return { newUpdate: undefined, shouldShow: false };
   }
+
+  logger.debug(context, `Checking ${updates.length} updates for highlight_target="${highlightTarget}"`, {
+    lastViewed,
+    lastViewedFormatted: lastViewed ? new Date(lastViewed).toISOString() : null,
+    currentUpdateId,
+  });
 
   // Find the most recent update that's newer than lastViewed AND has the target highlight_target
   const newUpdate = updates.find(update => {
@@ -41,13 +49,25 @@ export function findHighlightedUpdate(
 
     const isNewer = lastViewed === null || lastViewed === 0 || updateTime > lastViewed;
     const matchesTarget = update.highlight_target === highlightTarget;
+
+    // Log updates that have any highlight_target set
+    if (update.highlight_target) {
+      logger.debug(context, `Update "${update.title?.substring(0, 40)}" has highlight_target="${update.highlight_target}"`, {
+        matchesTarget,
+        isNewer,
+        updateTime,
+        lastViewed,
+      });
+    }
+
     return isNewer && matchesTarget;
   });
 
   if (newUpdate && newUpdate.id !== currentUpdateId) {
-    console.log(`${context}: Found new update to display:`, newUpdate.title);
+    logger.debug(context, 'Found new update to display', { title: newUpdate.title });
     return { newUpdate, shouldShow: true };
   }
 
+  logger.debug(context, 'No matching update found');
   return { newUpdate: undefined, shouldShow: false };
 }
