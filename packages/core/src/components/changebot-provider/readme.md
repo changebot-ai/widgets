@@ -7,10 +7,10 @@
 
 | Property   | Attribute   | Description | Type     | Default     |
 | ---------- | ----------- | ----------- | -------- | ----------- |
+| `baseUrl`  | `base-url`  |             | `string` | `undefined` |
 | `mockData` | `mock-data` |             | `string` | `undefined` |
 | `scope`    | `scope`     |             | `string` | `'default'` |
 | `slug`     | `slug`      |             | `string` | `undefined` |
-| `url`      | `url`       |             | `string` | `undefined` |
 | `userData` | `user-data` |             | `string` | `undefined` |
 | `userId`   | `user-id`   |             | `string` | `undefined` |
 
