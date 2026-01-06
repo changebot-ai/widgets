@@ -134,14 +134,6 @@ export function waitForStore(scope: string = 'default', timeout: number = 5000):
     promise,
     cancel: () => {
       cancelled = true;
-      if (pendingEntry.timeoutId) {
-        clearTimeout(pendingEntry.timeoutId);
-      }
-      // Remove from pending if this entry is still the current one
-      const current = pending.get(scope);
-      if (current === pendingEntry) {
-        pending.delete(scope);
-      }
       log.debug('Cancelled wait for store', { scope });
     },
   };
