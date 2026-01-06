@@ -28,7 +28,6 @@ export class ChangebotPanel {
 
   private services?: Services;
   private subscriptionCleanups: (() => void)[] = [];
-  private waitForStoreCancel?: () => void;
   private panelElement?: HTMLDivElement;
   private firstFocusableElement?: HTMLElement;
   private lastFocusableElement?: HTMLElement;
@@ -60,9 +59,7 @@ export class ChangebotPanel {
 
   private async connectToProvider() {
     try {
-      const { promise, cancel } = waitForStore(this.scope || 'default');
-      this.waitForStoreCancel = cancel;
-      this.services = await promise;
+      this.services = await waitForStore(this.scope || 'default');
       log.debug('Connected to provider via registry', { scope: this.scope || 'default' });
       this.subscribeToStore();
     } catch (error) {
@@ -78,9 +75,6 @@ export class ChangebotPanel {
   }
 
   disconnectedCallback() {
-    // Cancel pending wait for store
-    this.waitForStoreCancel?.();
-
     this.subscriptionCleanups.forEach(cleanup => cleanup());
     this.subscriptionCleanups = [];
     this.themeManager?.cleanup();

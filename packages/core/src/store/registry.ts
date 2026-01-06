@@ -15,13 +15,6 @@ interface PendingStore {
   timeoutId?: ReturnType<typeof setTimeout>;
 }
 
-/**
- * Result of waitForStore - includes cancel function for cleanup.
- */
-export interface WaitForStoreResult {
-  promise: Promise<Services>;
-  cancel: () => void;
-}
 
 // Module-level registry - survives component lifecycle
 const registry = new Map<string, Services>();
@@ -63,48 +56,32 @@ export function unregisterStore(scope: string): void {
  *
  * @param scope - The scope identifier (default: 'default')
  * @param timeout - Maximum wait time in ms (default: 5000)
- * @returns Object with promise and cancel function
+ * @returns Promise that resolves with services when provider registers
  */
-export function waitForStore(scope: string = 'default', timeout: number = 5000): WaitForStoreResult {
+export function waitForStore(scope: string = 'default', timeout: number = 5000): Promise<Services> {
   // Return immediately if already registered
   const existing = registry.get(scope);
   if (existing) {
     log.debug('Store already registered, returning immediately', { scope });
-    return {
-      promise: Promise.resolve(existing),
-      cancel: () => {}, // No-op for immediate resolution
-    };
+    return Promise.resolve(existing);
   }
 
   // Check if already waiting - reuse the existing promise
   const existingPending = pending.get(scope);
   if (existingPending) {
     log.debug('Already waiting for store, reusing promise', { scope });
-    return {
-      promise: existingPending.promise,
-      cancel: () => {
-        // Individual cancellation doesn't affect shared promise
-        // The promise will still be fulfilled if provider registers
-      },
-    };
+    return existingPending.promise;
   }
 
   log.debug('Store not registered, waiting...', { scope, timeout });
-
-  // Track cancellation state for this specific waiter
-  let cancelled = false;
 
   // Create new pending entry with deferred promise pattern
   let resolvePromise: (services: Services) => void;
   let rejectPromise: (error: Error) => void;
 
   const promise = new Promise<Services>((resolve, reject) => {
-    resolvePromise = (services) => {
-      if (!cancelled) resolve(services);
-    };
-    rejectPromise = (error) => {
-      if (!cancelled) reject(error);
-    };
+    resolvePromise = resolve;
+    rejectPromise = reject;
   });
 
   const pendingEntry: PendingStore = {
@@ -116,7 +93,7 @@ export function waitForStore(scope: string = 'default', timeout: number = 5000):
   // Timeout handling
   if (timeout > 0) {
     pendingEntry.timeoutId = setTimeout(() => {
-      if (pending.has(scope) && !cancelled) {
+      if (pending.has(scope)) {
         pending.delete(scope);
         const error = new Error(
           `Timeout waiting for provider with scope "${scope}". ` +
@@ -130,13 +107,7 @@ export function waitForStore(scope: string = 'default', timeout: number = 5000):
 
   pending.set(scope, pendingEntry);
 
-  return {
-    promise,
-    cancel: () => {
-      cancelled = true;
-      log.debug('Cancelled wait for store', { scope });
-    },
-  };
+  return promise;
 }
 
 /**
