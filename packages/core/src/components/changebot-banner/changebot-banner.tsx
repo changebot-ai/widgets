@@ -93,11 +93,12 @@ export class ChangebotBanner {
   }
 
   private checkForNewUpdate(updates: Update[]) {
-    const lastViewed = this.services?.store.state.lastViewed ?? null;
+    // Use lastViewedBanner for banner visibility (independent of badge's lastViewed)
+    const lastViewedBanner = this.services?.store.state.lastViewedBanner ?? null;
     checkForHighlightedUpdate(
       updates,
       'banner',
-      lastViewed,
+      lastViewedBanner,
       this.currentUpdate?.id,
       {
         onShow: update => {
@@ -122,6 +123,10 @@ export class ChangebotBanner {
     }
 
     log.debug('Dismiss button clicked');
+
+    // Mark banner as viewed (persists to localStorage/API)
+    // This prevents the banner from reappearing after dismiss
+    this.services?.highlight.markBannerViewed();
 
     // Start dismissing animation
     this.isDismissing = true;

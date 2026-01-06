@@ -3,6 +3,8 @@ import { Update } from '../types';
 export interface UserTracking {
   id: string;
   last_seen_at: string | null;
+  last_viewed_banner_at: string | null;
+  last_viewed_toast_at: string | null;
 }
 
 class NullAPI {
@@ -16,10 +18,16 @@ class NullAPI {
     return null;
   }
 
-  async updateUserTracking(userId: string, timestamp: number, data?: object): Promise<boolean> {
-    console.warn('⚠️ Changebot widget: Cannot update user tracking - no slug or URL provided', { userId, timestamp, data });
+  async updateUserTracking(userId: string, timestamps: UserTrackingTimestamps, data?: object): Promise<boolean> {
+    console.warn('⚠️ Changebot widget: Cannot update user tracking - no slug or URL provided', { userId, timestamps, data });
     return false;
   }
+}
+
+export interface UserTrackingTimestamps {
+  lastViewed?: number;
+  lastViewedBanner?: number;
+  lastViewedToast?: number;
 }
 
 export class ChangebotAPI {
@@ -82,18 +90,35 @@ export class ChangebotAPI {
     }
   }
 
-  async updateUserTracking(userId: string, timestamp: number, data?: object): Promise<boolean> {
+  async updateUserTracking(userId: string, timestamps: UserTrackingTimestamps, data?: object): Promise<boolean> {
     try {
       const encodedUserId = encodeURIComponent(userId);
 
-      if (isNaN(timestamp)) {
-        console.error('API: Invalid timestamp provided to updateUserTracking:', timestamp);
-        return false;
+      const body: Record<string, unknown> = {};
+
+      if (timestamps.lastViewed !== undefined) {
+        if (isNaN(timestamps.lastViewed)) {
+          console.error('API: Invalid lastViewed timestamp provided to updateUserTracking:', timestamps.lastViewed);
+          return false;
+        }
+        body.last_seen_at = new Date(timestamps.lastViewed).toISOString();
       }
 
-      const body: any = {
-        last_seen_at: new Date(timestamp).toISOString(),
-      };
+      if (timestamps.lastViewedBanner !== undefined) {
+        if (isNaN(timestamps.lastViewedBanner)) {
+          console.error('API: Invalid lastViewedBanner timestamp provided to updateUserTracking:', timestamps.lastViewedBanner);
+          return false;
+        }
+        body.last_viewed_banner_at = new Date(timestamps.lastViewedBanner).toISOString();
+      }
+
+      if (timestamps.lastViewedToast !== undefined) {
+        if (isNaN(timestamps.lastViewedToast)) {
+          console.error('API: Invalid lastViewedToast timestamp provided to updateUserTracking:', timestamps.lastViewedToast);
+          return false;
+        }
+        body.last_viewed_toast_at = new Date(timestamps.lastViewedToast).toISOString();
+      }
 
       if (data) {
         body.data = data;

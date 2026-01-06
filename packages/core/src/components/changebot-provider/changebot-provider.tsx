@@ -37,6 +37,10 @@ export class ChangebotProvider {
       open: () => this.openAndMarkViewed(),
       close: () => this.scopedStore.actions.closeDisplay(),
     },
+    highlight: {
+      markBannerViewed: () => this.markBannerAsViewed(),
+      markToastViewed: () => this.markToastAsViewed(),
+    },
   };
 
   async componentWillLoad() {
@@ -134,6 +138,16 @@ export class ChangebotProvider {
     await this.setLastViewed(Date.now());
   }
 
+  private async markBannerAsViewed() {
+    log.debug('Marking banner as viewed', { scope: this.scope });
+    await this.setLastViewedBanner(Date.now());
+  }
+
+  private async markToastAsViewed() {
+    log.debug('Marking toast as viewed', { scope: this.scope });
+    await this.setLastViewedToast(Date.now());
+  }
+
   private openAndMarkViewed() {
     log.debug('Opening display and marking as viewed', { scope: this.scope });
     this.scopedStore.actions.openDisplay();
@@ -159,6 +173,36 @@ export class ChangebotProvider {
       this.updateLocalStore(currentTime);
     } else {
       log.debug('No timestamp found but userId exists, waiting for API sync', { userId: this.userId });
+    }
+
+    // Hydrate banner and toast timestamps from localStorage
+    this.hydrateLastViewedBanner();
+    this.hydrateLastViewedToast();
+  }
+
+  private hydrateLastViewedBanner() {
+    const key = getStorageKey(this.scope, 'lastViewedBanner', this.userId);
+    const stored = safeStorage.getItem(key);
+    if (stored) {
+      const timestamp = parseInt(stored, 10);
+      log.debug('Hydrating lastViewedBanner from localStorage', {
+        timestamp,
+        formatted: new Date(timestamp).toISOString(),
+      });
+      this.scopedStore.actions.markBannerViewed(timestamp);
+    }
+  }
+
+  private hydrateLastViewedToast() {
+    const key = getStorageKey(this.scope, 'lastViewedToast', this.userId);
+    const stored = safeStorage.getItem(key);
+    if (stored) {
+      const timestamp = parseInt(stored, 10);
+      log.debug('Hydrating lastViewedToast from localStorage', {
+        timestamp,
+        formatted: new Date(timestamp).toISOString(),
+      });
+      this.scopedStore.actions.markToastViewed(timestamp);
     }
   }
 
@@ -251,6 +295,36 @@ export class ChangebotProvider {
     log.debug('Updated localStorage', { key, value: timestamp });
   }
 
+  private updateLocalStoreBanner(timestamp: number) {
+    log.debug('Updating local store banner with timestamp', {
+      timestamp,
+      formatted: !isNaN(timestamp) ? new Date(timestamp).toISOString() : 'Invalid timestamp',
+      scope: this.scope,
+      userId: this.userId,
+    });
+
+    this.scopedStore.actions.markBannerViewed(timestamp);
+
+    const key = getStorageKey(this.scope, 'lastViewedBanner', this.userId);
+    safeStorage.setItem(key, timestamp.toString());
+    log.debug('Updated localStorage for banner', { key, value: timestamp });
+  }
+
+  private updateLocalStoreToast(timestamp: number) {
+    log.debug('Updating local store toast with timestamp', {
+      timestamp,
+      formatted: !isNaN(timestamp) ? new Date(timestamp).toISOString() : 'Invalid timestamp',
+      scope: this.scope,
+      userId: this.userId,
+    });
+
+    this.scopedStore.actions.markToastViewed(timestamp);
+
+    const key = getStorageKey(this.scope, 'lastViewedToast', this.userId);
+    safeStorage.setItem(key, timestamp.toString());
+    log.debug('Updated localStorage for toast', { key, value: timestamp });
+  }
+
   private async syncFromApi(): Promise<void> {
     // Check if aborted
     if (this.abortController?.signal.aborted) return;
@@ -266,6 +340,7 @@ export class ChangebotProvider {
       return;
     }
 
+    // Sync last_seen_at
     if (data.last_seen_at === null || data.last_seen_at === undefined) {
       log.debug('User not tracked yet, setting last_seen_at to current time');
       const currentTime = Date.now();
@@ -276,12 +351,28 @@ export class ChangebotProvider {
 
       if (isNaN(timestamp) || timestamp === 0) {
         log.warn('Invalid timestamp received from API', { last_seen_at: data.last_seen_at });
-        return;
+      } else {
+        log.debug('Fetched last_seen_at from API', { formatted: new Date(timestamp).toLocaleString() });
+        this.updateLocalStore(timestamp);
       }
+    }
 
-      log.debug('Fetched last_seen_at from API', { formatted: new Date(timestamp).toLocaleString() });
+    // Sync last_viewed_banner_at
+    if (data.last_viewed_banner_at) {
+      const bannerTimestamp = new Date(data.last_viewed_banner_at).getTime();
+      if (!isNaN(bannerTimestamp) && bannerTimestamp !== 0) {
+        log.debug('Fetched last_viewed_banner_at from API', { formatted: new Date(bannerTimestamp).toLocaleString() });
+        this.updateLocalStoreBanner(bannerTimestamp);
+      }
+    }
 
-      this.updateLocalStore(timestamp);
+    // Sync last_viewed_toast_at
+    if (data.last_viewed_toast_at) {
+      const toastTimestamp = new Date(data.last_viewed_toast_at).getTime();
+      if (!isNaN(toastTimestamp) && toastTimestamp !== 0) {
+        log.debug('Fetched last_viewed_toast_at from API', { formatted: new Date(toastTimestamp).toLocaleString() });
+        this.updateLocalStoreToast(toastTimestamp);
+      }
     }
 
     // Update sync timestamp after successful sync
@@ -295,7 +386,7 @@ export class ChangebotProvider {
     if (this.userId) {
       const userData = this.parseUserData();
       log.debug('Updating last_seen_at via API', { userId: this.userId });
-      const success = await this.updateUserTracking(timestamp, userData);
+      const success = await this.updateUserTracking({ lastViewed: timestamp }, userData);
 
       if (success) {
         log.debug('Successfully updated last_seen_at via API');
@@ -305,12 +396,42 @@ export class ChangebotProvider {
     }
   }
 
-  private async fetchUserTracking(): Promise<{ id: string; last_seen_at: string | null } | null> {
+  private async setLastViewedBanner(timestamp: number): Promise<void> {
+    this.updateLocalStoreBanner(timestamp);
+
+    if (this.userId) {
+      log.debug('Updating last_seen_at_banner via API', { userId: this.userId });
+      const success = await this.updateUserTracking({ lastViewedBanner: timestamp });
+
+      if (success) {
+        log.debug('Successfully updated last_seen_at_banner via API');
+      } else {
+        log.debug('Could not update last_seen_at_banner via API, but localStorage was updated');
+      }
+    }
+  }
+
+  private async setLastViewedToast(timestamp: number): Promise<void> {
+    this.updateLocalStoreToast(timestamp);
+
+    if (this.userId) {
+      log.debug('Updating last_seen_at_toast via API', { userId: this.userId });
+      const success = await this.updateUserTracking({ lastViewedToast: timestamp });
+
+      if (success) {
+        log.debug('Successfully updated last_seen_at_toast via API');
+      } else {
+        log.debug('Could not update last_seen_at_toast via API, but localStorage was updated');
+      }
+    }
+  }
+
+  private async fetchUserTracking() {
     return await this.api.fetchUserTracking(this.userId);
   }
 
-  private async updateUserTracking(timestamp: number, data?: object): Promise<boolean> {
-    return await this.api.updateUserTracking(this.userId, timestamp, data);
+  private async updateUserTracking(timestamps: { lastViewed?: number; lastViewedBanner?: number; lastViewedToast?: number }, data?: object): Promise<boolean> {
+    return await this.api.updateUserTracking(this.userId, timestamps, data);
   }
 
   private parseUserData(): object | null {

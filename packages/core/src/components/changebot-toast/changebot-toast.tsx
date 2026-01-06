@@ -113,11 +113,12 @@ export class ChangebotToast {
   }
 
   private checkForNewUpdate(updates: Update[]) {
-    const lastViewed = this.services?.store.state.lastViewed ?? null;
+    // Use lastViewedToast for toast visibility (independent of badge's lastViewed)
+    const lastViewedToast = this.services?.store.state.lastViewedToast ?? null;
     checkForHighlightedUpdate(
       updates,
       'toast',
-      lastViewed,
+      lastViewedToast,
       this.currentUpdate?.id,
       {
         onShow: update => {
@@ -152,6 +153,11 @@ export class ChangebotToast {
 
   private handleDismiss = () => {
     this.clearAutoDismissTimer();
+
+    // Mark toast as viewed (persists to localStorage/API)
+    // This prevents the toast from reappearing after dismiss
+    this.services?.highlight.markToastViewed();
+
     this.isVisible = false;
   };
 

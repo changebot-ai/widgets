@@ -118,7 +118,7 @@ describe('changebot-provider', () => {
 
       const component = page.rootInstance;
       const timestamp = Date.now();
-      await component.updateUserTracking(timestamp);
+      await component.updateUserTracking({ lastViewed: timestamp });
 
       expect(global.fetch).toHaveBeenCalledWith(
         'https://api.changebot.ai/v1/widgets/test-widget/users/user-123',
@@ -168,7 +168,7 @@ describe('changebot-provider', () => {
       const component = page.rootInstance;
       const timestamp = Date.now();
       const parsedData = component.parseUserData();
-      await component.updateUserTracking(timestamp, parsedData);
+      await component.updateUserTracking({ lastViewed: timestamp }, parsedData);
 
       const callArgs = (global.fetch as jest.Mock).mock.calls[0];
       const body = JSON.parse(callArgs[1].body);

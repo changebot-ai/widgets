@@ -104,6 +104,8 @@ export function createScopedStore() {
     updates: [],
     widget: null,
     lastViewed: null,
+    lastViewedBanner: null,
+    lastViewedToast: null,
     isOpen: false,
     newUpdatesCount: 0,
     isLoading: false,
@@ -209,6 +211,28 @@ export function createScopedStore() {
     markAllViewed() {
       const now = Date.now();
       store.state.lastViewed = now;
+    },
+
+    markBannerViewed(timestamp?: number) {
+      const now = timestamp ?? Date.now();
+      log.debug('markBannerViewed called', {
+        providedTimestamp: timestamp,
+        finalTimestamp: now,
+        finalFormatted: new Date(now).toISOString(),
+        previousValue: store.state.lastViewedBanner,
+      });
+      store.state.lastViewedBanner = now;
+    },
+
+    markToastViewed(timestamp?: number) {
+      const now = timestamp ?? Date.now();
+      log.debug('markToastViewed called', {
+        providedTimestamp: timestamp,
+        finalTimestamp: now,
+        finalFormatted: new Date(now).toISOString(),
+        previousValue: store.state.lastViewedToast,
+      });
+      store.state.lastViewedToast = now;
     },
 
     openDisplay() {

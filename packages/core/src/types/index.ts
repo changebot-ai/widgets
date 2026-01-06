@@ -27,6 +27,8 @@ export interface StoreState {
   updates: Update[];
   widget: Widget | null;
   lastViewed: number | null;
+  lastViewedBanner: number | null;
+  lastViewedToast: number | null;
   isOpen: boolean;
   newUpdatesCount: number;
   isLoading: boolean;
@@ -45,6 +47,8 @@ export interface StoreActions {
   loadMockUpdates: (data: unknown) => void;
   markViewed: (timestamp?: number) => void;
   markAllViewed: () => void;
+  markBannerViewed: (timestamp?: number) => void;
+  markToastViewed: (timestamp?: number) => void;
   openDisplay: () => void;
   closeDisplay: () => void;
   toggleDisplay: () => void;
@@ -74,11 +78,20 @@ export interface DisplayControl {
   close: () => void;
 }
 
+export interface HighlightControl {
+  /** Mark banner as viewed (persists to localStorage/API) */
+  markBannerViewed: () => void;
+  /** Mark toast as viewed (persists to localStorage/API) */
+  markToastViewed: () => void;
+}
+
 export interface Services {
   store: StencilStore<StoreState>;
   config: ProviderConfig;
   /** Display control operations */
   display: DisplayControl;
+  /** Highlight notification control operations */
+  highlight: HighlightControl;
 }
 
 /** Action types that can be dispatched via changebot:action events */
