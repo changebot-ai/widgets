@@ -608,7 +608,7 @@
               </ul>
               <p>We've been working on this for months and we're thrilled to finally share it with you. Try it out today and let us know what you think!</p>`,
             display_date: new Date().toISOString().split('T')[0],
-            published_at: new Date().toISOString(),
+            published_at: new Date(now - 6 * 60 * 60 * 1000).toISOString(),
             expires_on: null,
             highlight_target: 'banner',
             hosted_url: 'https://example.com/feature-release',

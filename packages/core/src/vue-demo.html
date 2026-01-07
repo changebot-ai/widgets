@@ -294,7 +294,7 @@
             title: "Today's Feature Release",
             content: '<p>We just launched a brand new feature!</p>',
             display_date: new Date().toISOString().split('T')[0],
-            published_at: new Date().toISOString(),
+            published_at: new Date(now - 6 * 60 * 60 * 1000).toISOString(),
             expires_on: null,
             highlight_target: 'banner',
             hosted_url: null,
