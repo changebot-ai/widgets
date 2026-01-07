@@ -420,6 +420,10 @@
       const [bannerPosition, setBannerPosition] = useState('top');
       const [toastPosition, setToastPosition] = useState('bottom-right');
 
+      // Preview mode
+      const [showPreviewToast, setShowPreviewToast] = useState(false);
+      const [showPreviewBanner, setShowPreviewBanner] = useState(false);
+
       // Theme state
       const [themeMode, setThemeMode] = useState('fixed');
       const [fixedTheme, setFixedTheme] = useState('catppuccin-mocha');
@@ -693,6 +697,28 @@
                   <button className="btn btn-danger" onClick={() => setLastViewed('clear')}>Reset All</button>
                 </div>
               </div>
+
+              {/* Preview Mode */}
+              <div className="control-section">
+                <h3>Preview Mode (CSS Development)</h3>
+                <p style={{ fontSize: 12, color: '#666', marginBottom: 12 }}>
+                  Show toast/banner with mock content - no provider needed. Useful for styling.
+                </p>
+                <div className="button-row">
+                  <button
+                    className={showPreviewToast ? 'btn btn-danger' : 'btn btn-success'}
+                    onClick={() => setShowPreviewToast(!showPreviewToast)}
+                  >
+                    {showPreviewToast ? 'Hide' : 'Show'} Preview Toast
+                  </button>
+                  <button
+                    className={showPreviewBanner ? 'btn btn-danger' : 'btn btn-warning'}
+                    onClick={() => setShowPreviewBanner(!showPreviewBanner)}
+                  >
+                    {showPreviewBanner ? 'Hide' : 'Show'} Preview Banner
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Debug Panel */}
@@ -747,6 +773,21 @@
               ref={toastRef}
               scope={SCOPE}
               position={toastPosition}
+              {...themeProps}
+            />
+          )}
+
+          {/* Preview mode components (no scope - standalone) */}
+          {showPreviewToast && (
+            <changebot-toast
+              preview="true"
+              position={toastPosition}
+              {...themeProps}
+            />
+          )}
+          {showPreviewBanner && (
+            <changebot-banner
+              preview="true"
               {...themeProps}
             />
           )}

@@ -25,6 +25,7 @@ export namespace Components {
         "dark"?: Theme;
         "dismiss": () => Promise<void>;
         "light"?: Theme;
+        "preview"?: boolean;
         "scope"?: string;
         "show": (update: Update) => Promise<void>;
         "theme"?: Theme;
@@ -63,6 +64,7 @@ export namespace Components {
           * @default 'bottom-right'
          */
         "position": 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+        "preview"?: boolean;
         "scope"?: string;
         "show": (update: Update) => Promise<void>;
         "theme"?: Theme;
@@ -122,6 +124,7 @@ declare namespace LocalJSX {
     interface ChangebotBanner {
         "dark"?: Theme;
         "light"?: Theme;
+        "preview"?: boolean;
         "scope"?: string;
         "theme"?: Theme;
     }
@@ -154,6 +157,7 @@ declare namespace LocalJSX {
           * @default 'bottom-right'
          */
         "position"?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+        "preview"?: boolean;
         "scope"?: string;
         "theme"?: Theme;
     }

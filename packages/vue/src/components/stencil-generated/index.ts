@@ -22,7 +22,8 @@ export const ChangebotBanner: StencilVueComponent<JSX.ChangebotBanner> = /*@__PU
   'scope',
   'theme',
   'light',
-  'dark'
+  'dark',
+  'preview'
 ]);
 
 
@@ -51,6 +52,7 @@ export const ChangebotToast: StencilVueComponent<JSX.ChangebotToast> = /*@__PURE
   'light',
   'dark',
   'position',
-  'autoDismiss'
+  'autoDismiss',
+  'preview'
 ]);
 

@@ -427,6 +427,18 @@
           <button class="btn btn-danger" onclick="resetAll()">Reset All</button>
         </div>
       </div>
+
+      <!-- Preview Mode -->
+      <div class="control-section">
+        <h3>Preview Mode (CSS Development)</h3>
+        <p style="font-size: 12px; color: #666; margin-bottom: 12px;">
+          Show toast/banner with mock content - no provider needed. Useful for styling.
+        </p>
+        <div class="button-row">
+          <button class="btn btn-success" id="previewToastBtn" onclick="togglePreviewToast()">Show Preview Toast</button>
+          <button class="btn btn-warning" id="previewBannerBtn" onclick="togglePreviewBanner()">Show Preview Banner</button>
+        </div>
+      </div>
     </div>
 
     <!-- Debug Panel -->
@@ -682,6 +694,63 @@
       localStorage.removeItem(LS_KEY);
       localStorage.removeItem(SLUG_KEY);
       location.reload();
+    }
+
+    // Preview Mode
+    let previewToast = null;
+    let previewBanner = null;
+
+    function togglePreviewToast() {
+      const btn = document.getElementById('previewToastBtn');
+      if (previewToast) {
+        previewToast.remove();
+        previewToast = null;
+        btn.textContent = 'Show Preview Toast';
+        btn.classList.remove('btn-danger');
+        btn.classList.add('btn-success');
+      } else {
+        previewToast = document.createElement('changebot-toast');
+        previewToast.setAttribute('preview', 'true');
+        previewToast.setAttribute('position', document.getElementById('toastPosition').value);
+        // Apply current theme
+        const mode = document.getElementById('themeMode').value;
+        if (mode === 'fixed') {
+          previewToast.setAttribute('theme', document.getElementById('fixedTheme').value);
+        } else {
+          previewToast.setAttribute('light', document.getElementById('lightTheme').value);
+          previewToast.setAttribute('dark', document.getElementById('darkTheme').value);
+        }
+        document.body.appendChild(previewToast);
+        btn.textContent = 'Hide Preview Toast';
+        btn.classList.remove('btn-success');
+        btn.classList.add('btn-danger');
+      }
+    }
+
+    function togglePreviewBanner() {
+      const btn = document.getElementById('previewBannerBtn');
+      if (previewBanner) {
+        previewBanner.remove();
+        previewBanner = null;
+        btn.textContent = 'Show Preview Banner';
+        btn.classList.remove('btn-danger');
+        btn.classList.add('btn-warning');
+      } else {
+        previewBanner = document.createElement('changebot-banner');
+        previewBanner.setAttribute('preview', 'true');
+        // Apply current theme
+        const mode = document.getElementById('themeMode').value;
+        if (mode === 'fixed') {
+          previewBanner.setAttribute('theme', document.getElementById('fixedTheme').value);
+        } else {
+          previewBanner.setAttribute('light', document.getElementById('lightTheme').value);
+          previewBanner.setAttribute('dark', document.getElementById('darkTheme').value);
+        }
+        document.body.insertBefore(previewBanner, document.body.firstChild);
+        btn.textContent = 'Hide Preview Banner';
+        btn.classList.remove('btn-warning');
+        btn.classList.add('btn-danger');
+      }
     }
 
     // Debug

@@ -366,6 +366,10 @@
         const bannerPosition = ref('top');
         const toastPosition = ref('bottom-right');
 
+        // Preview mode
+        const showPreviewToast = ref(false);
+        const showPreviewBanner = ref(false);
+
         // Theme
         const themeMode = ref('fixed');
         const fixedTheme = ref('catppuccin-mocha');
@@ -480,6 +484,8 @@
           showPanel,
           showBanner,
           showToast,
+          showPreviewToast,
+          showPreviewBanner,
           badgeShowCount,
           panelMode,
           bannerPosition,
@@ -666,6 +672,28 @@
                 <button class="btn btn-danger" @click="setLastViewed('clear')">Reset All</button>
               </div>
             </div>
+
+            <!-- Preview Mode -->
+            <div class="control-section">
+              <h3>Preview Mode (CSS Development)</h3>
+              <p style="font-size: 12px; color: #666; margin-bottom: 12px;">
+                Show toast/banner with mock content - no provider needed. Useful for styling.
+              </p>
+              <div class="button-row">
+                <button
+                  :class="showPreviewToast ? 'btn btn-danger' : 'btn btn-success'"
+                  @click="showPreviewToast = !showPreviewToast"
+                >
+                  {{ showPreviewToast ? 'Hide' : 'Show' }} Preview Toast
+                </button>
+                <button
+                  :class="showPreviewBanner ? 'btn btn-danger' : 'btn btn-warning'"
+                  @click="showPreviewBanner = !showPreviewBanner"
+                >
+                  {{ showPreviewBanner ? 'Hide' : 'Show' }} Preview Banner
+                </button>
+              </div>
+            </div>
           </div>
 
           <!-- Debug Panel -->
@@ -716,6 +744,19 @@
           ref="toastRef"
           :scope="SCOPE"
           :position="toastPosition"
+          v-bind="themeProps"
+        />
+
+        <!-- Preview mode components (no scope - standalone) -->
+        <changebot-toast
+          v-if="showPreviewToast"
+          preview="true"
+          :position="toastPosition"
+          v-bind="themeProps"
+        />
+        <changebot-banner
+          v-if="showPreviewBanner"
+          preview="true"
           v-bind="themeProps"
         />
       `
