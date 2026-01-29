@@ -361,7 +361,7 @@
         const showToast = ref(true);
 
         // Component options
-        const badgeShowCount = ref(true);
+        const badgeIndicator = ref('count');
         const panelMode = ref('drawer-right');
         const bannerPosition = ref('top');
         const toastPosition = ref('bottom-right');
@@ -486,7 +486,7 @@
           showToast,
           showPreviewToast,
           showPreviewBanner,
-          badgeShowCount,
+          badgeIndicator,
           panelMode,
           bannerPosition,
           toastPosition,
@@ -528,7 +528,7 @@
             <changebot-badge
               v-if="showBadge"
               :scope="SCOPE"
-              :show-count="badgeShowCount.toString()"
+              :indicator="badgeIndicator"
               v-bind="themeProps"
             />
           </div>
@@ -627,8 +627,10 @@
               <div class="control-row">
                 <input type="checkbox" v-model="showBadge" />
                 <label>Badge</label>
-                <input type="checkbox" v-model="badgeShowCount" style="margin-left: auto;" />
-                <label style="min-width: auto;">Count</label>
+                <select v-model="badgeIndicator" style="margin-left: auto; flex: none; width: 100px;">
+                  <option value="count">Count</option>
+                  <option value="dot">Dot</option>
+                </select>
               </div>
               <div class="control-row">
                 <input type="checkbox" v-model="showPanel" />

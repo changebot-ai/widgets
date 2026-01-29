@@ -92,10 +92,10 @@ describe('changebot-badge', () => {
   });
 
 
-  it('hides count when showCount is false', async () => {
+  it('shows dot when indicator is "dot"', async () => {
     const { root } = await newSpecPage({
       components: [ChangebotBadge],
-      html: '<changebot-badge show-count="false" count="5"></changebot-badge>',
+      html: '<changebot-badge indicator="dot" count="5"></changebot-badge>',
     });
 
     const badge = root.shadowRoot.querySelector('.badge');

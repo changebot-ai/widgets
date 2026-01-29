@@ -60,9 +60,10 @@ declare global {
       'changebot-badge': React.DetailedHTMLProps<
         React.HTMLAttributes<HTMLElement> & {
           'scope'?: string;
-          'theme'?: 'light' | 'dark';
-          'show-count'?: boolean;
-          'count'?: number;
+          'theme'?: string;
+          'light'?: string;
+          'dark'?: string;
+          'indicator'?: 'count' | 'dot';
         },
         HTMLElement
       >;

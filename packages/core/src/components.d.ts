@@ -13,12 +13,12 @@ export namespace Components {
     interface ChangebotBadge {
         "count"?: number;
         "dark"?: Theme;
+        /**
+          * @default 'count'
+         */
+        "indicator": 'count' | 'dot';
         "light"?: Theme;
         "scope"?: string;
-        /**
-          * @default true
-         */
-        "showCount": boolean;
         "theme"?: Theme;
     }
     interface ChangebotBanner {
@@ -112,12 +112,12 @@ declare namespace LocalJSX {
     interface ChangebotBadge {
         "count"?: number;
         "dark"?: Theme;
+        /**
+          * @default 'count'
+         */
+        "indicator"?: 'count' | 'dot';
         "light"?: Theme;
         "scope"?: string;
-        /**
-          * @default true
-         */
-        "showCount"?: boolean;
         "theme"?: Theme;
     }
     interface ChangebotBanner {

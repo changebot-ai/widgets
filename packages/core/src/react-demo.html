@@ -415,7 +415,7 @@
       const [showToast, setShowToast] = useState(true);
 
       // Component options
-      const [badgeShowCount, setBadgeShowCount] = useState(true);
+      const [badgeIndicator, setBadgeIndicator] = useState('count');
       const [panelMode, setPanelMode] = useState('drawer-right');
       const [bannerPosition, setBannerPosition] = useState('top');
       const [toastPosition, setToastPosition] = useState('bottom-right');
@@ -545,7 +545,7 @@
               {showBadge && (
                 <changebot-badge
                   scope={SCOPE}
-                  show-count={badgeShowCount.toString()}
+                  indicator={badgeIndicator}
                   {...themeProps}
                 />
               )}
@@ -652,8 +652,10 @@
                 <div className="control-row">
                   <input type="checkbox" checked={showBadge} onChange={(e) => setShowBadge(e.target.checked)} />
                   <label>Badge</label>
-                  <input type="checkbox" checked={badgeShowCount} onChange={(e) => setBadgeShowCount(e.target.checked)} style={{ marginLeft: 'auto' }} />
-                  <label style={{ minWidth: 'auto' }}>Count</label>
+                  <select value={badgeIndicator} onChange={(e) => setBadgeIndicator(e.target.value)} style={{ marginLeft: 'auto', flex: 'none', width: 100 }}>
+                    <option value="count">Count</option>
+                    <option value="dot">Dot</option>
+                  </select>
                 </div>
                 <div className="control-row">
                   <input type="checkbox" checked={showPanel} onChange={(e) => setShowPanel(e.target.checked)} />

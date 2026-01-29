@@ -90,8 +90,7 @@ Badge that displays the count of new updates.
 - `theme` (string, optional) - Theme name (see themes below)
 - `light` (string, optional) - Theme for light mode
 - `dark` (string, optional) - Theme for dark mode
-- `show-count` (boolean, default: true) - Show number or just dot
-- `count` (number, optional) - Manual count override
+- `indicator` (string, default: "count") - Display style: "count" or "dot"
 
 ```html
 <!-- Fixed theme -->
@@ -99,6 +98,9 @@ Badge that displays the count of new updates.
 
 <!-- Auto light/dark switching -->
 <changebot-badge light="catppuccin-latte" dark="catppuccin-mocha" />
+
+<!-- Show dot instead of count -->
+<changebot-badge indicator="dot" />
 ```
 
 ### changebot-panel
@@ -423,8 +425,7 @@ Badge that displays the count of new updates.
 | `theme`      | string  | -           | Fixed theme name (see themes below)                 |
 | `light`      | string  | -           | Theme for light mode                                |
 | `dark`       | string  | -           | Theme for dark mode                                 |
-| `show-count` | boolean | `true`      | Show number or just dot                             |
-| `count`      | number  | -           | Manual count override (for testing/standalone mode) |
+| `indicator`  | string  | `"count"`   | Display style: `"count"` or `"dot"`                 |
 
 **Events:**
 

@@ -107,7 +107,7 @@ All components support:
 
 - `scope`: Provider scope to connect to
 - `theme`: "light" or "dark"
-- `show-count`: Boolean to show/hide count number
+- `indicator`: Display style - "count" (default) or "dot"
 - `count`: Direct count control (standalone mode)
 
 ### Drawer Props

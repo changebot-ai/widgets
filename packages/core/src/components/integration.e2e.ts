@@ -247,7 +247,7 @@ describe('Integration Tests - Full System', () => {
       const page = await newE2EPage();
 
       await page.setContent(`
-        <changebot-badge count="5" show-count="true"></changebot-badge>
+        <changebot-badge count="5" indicator="count"></changebot-badge>
       `);
 
       await page.waitForChanges();

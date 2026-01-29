@@ -17,8 +17,8 @@ export class ChangebotBadge {
   @Prop() theme?: Theme;
   @Prop() light?: Theme;
   @Prop() dark?: Theme;
-  @Prop() showCount: boolean = true;
-  @Prop() count?: number; // For testing and external control
+  @Prop() indicator: 'count' | 'dot' = 'count';
+  @Prop() count?: number; // Testing: manual count override
 
   @State() newUpdatesCount: number = 0;
   @State() activeTheme?: Theme;
@@ -174,7 +174,7 @@ export class ChangebotBadge {
     if (this.newUpdatesCount === 1) {
       return '1 new update';
     }
-    if (!this.showCount) {
+    if (this.indicator === 'dot') {
       return 'New updates available';
     }
     return `${this.newUpdatesCount} new updates`;
@@ -189,7 +189,7 @@ export class ChangebotBadge {
 
     const countClasses = {
       'badge__count': true,
-      'badge__count--hidden': !this.showCount && this.newUpdatesCount > 0,
+      'badge__count--hidden': this.indicator === 'dot' && this.newUpdatesCount > 0,
     };
 
     return (
@@ -207,7 +207,7 @@ declare global {
     theme?: Theme;
     light?: Theme;
     dark?: Theme;
-    showCount: boolean;
+    indicator: 'count' | 'dot';
     newUpdatesCount: number;
   }
 }

@@ -44,12 +44,12 @@ describe('changebot-badge e2e', () => {
     expect(await component.getAttribute('data-scope')).toBe('dashboard');
   });
 
-  it('renders with showCount prop', async () => {
+  it('renders with indicator prop', async () => {
     const page = await newE2EPage();
-    await page.setContent('<changebot-badge show-count="false"></changebot-badge>');
+    await page.setContent('<changebot-badge indicator="dot"></changebot-badge>');
 
     const component = await page.find('changebot-badge');
-    expect(await component.getProperty('showCount')).toBe(false);
+    expect(await component.getProperty('indicator')).toBe('dot');
   });
 
   it.skip('displays correct count after badge re-renders', async () => {

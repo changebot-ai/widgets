@@ -93,10 +93,10 @@ A badge component that displays the count of new, unread updates. Clicking the b
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `scope` | `string` | `"default"` | Scope to connect to (must match provider scope) |
-| `show-count` | `boolean` | `true` | Whether to display the numeric count |
 | `theme` | `Theme` | - | Fixed theme (see Theming section) |
 | `light` | `Theme` | - | Theme for light mode (auto-switches based on system preference) |
 | `dark` | `Theme` | - | Theme for dark mode (auto-switches based on system preference) |
+| `indicator` | `"count"` \| `"dot"` | `"count"` | Display style: show count number or dot only |
 
 #### Example
 
@@ -108,14 +108,14 @@ A badge component that displays the count of new, unread updates. Clicking the b
   <!-- With theme -->
   <ChangebotBadge theme="catppuccin-mocha" />
 
+  <!-- Show dot instead of count -->
+  <ChangebotBadge indicator="dot" />
+
   <!-- Auto-switching theme -->
   <ChangebotBadge
     light="catppuccin-latte"
     dark="catppuccin-mocha"
   />
-
-  <!-- Hidden count (shows dot only) -->
-  <ChangebotBadge :show-count="false" />
 </template>
 ```
 

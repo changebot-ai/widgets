@@ -349,7 +349,7 @@
     <div class="badge-wrapper">
       <span class="badge-label">Updates:</span>
       <div id="badge-container">
-        <changebot-badge id="badge" scope="vanilla-demo" show-count="true"></changebot-badge>
+        <changebot-badge id="badge" scope="vanilla-demo" indicator="count"></changebot-badge>
       </div>
     </div>
   </header>
@@ -440,8 +440,10 @@
         <div class="control-row">
           <input type="checkbox" id="showBadge" checked onchange="toggleComponent('badge')" />
           <label>Badge</label>
-          <input type="checkbox" id="badgeShowCount" checked onchange="updateBadge()" style="margin-left: auto;" />
-          <label style="min-width: auto;">Show Count</label>
+          <select id="badgeIndicator" onchange="updateBadge()" style="margin-left: auto; flex: none; width: 100px;">
+            <option value="count" selected>Count</option>
+            <option value="dot">Dot</option>
+          </select>
         </div>
         <div class="control-row">
           <input type="checkbox" id="showPanel" checked onchange="toggleComponent('panel')" />
@@ -778,9 +780,9 @@
 
     function updateBadge() {
       const badge = document.getElementById('badge');
-      const showCount = document.getElementById('badgeShowCount').checked;
+      const indicator = document.getElementById('badgeIndicator').value;
       if (badge) {
-        badge.setAttribute('show-count', showCount.toString());
+        badge.setAttribute('indicator', indicator);
       }
     }
 

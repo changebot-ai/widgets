@@ -13,7 +13,7 @@ export const ChangebotBadge: StencilVueComponent<JSX.ChangebotBadge> = /*@__PURE
   'theme',
   'light',
   'dark',
-  'showCount',
+  'indicator',
   'count'
 ]);
 
