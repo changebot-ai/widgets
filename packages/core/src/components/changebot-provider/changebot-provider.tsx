@@ -21,6 +21,7 @@ export class ChangebotProvider {
   @Prop() mockData?: string;
   @Prop() userId?: string;
   @Prop() userData?: string;
+  @Prop() preview?: boolean; // Load built-in mock data for layout testing
 
   private scopedStore = createScopedStore();
   private api = createAPI();
@@ -77,7 +78,10 @@ export class ChangebotProvider {
 
     // Load data in background - don't await (non-blocking)
     // When data arrives, store updates and consumers react via subscriptions
-    if (this.mockData) {
+    if (this.preview) {
+      log.debug('Preview mode enabled, loading built-in mock data');
+      this.loadPreviewData();
+    } else if (this.mockData) {
       log.debug('Loading mock data');
       this.loadMockData();
     } else if (this.slug || this.baseUrl) {
@@ -86,6 +90,58 @@ export class ChangebotProvider {
     } else {
       log.debug('No slug, baseUrl, or mock data provided - skipping update load');
     }
+  }
+
+  private loadPreviewData() {
+    // 2 updates with future dates (appear as "new"), 1 with past date (appears as "viewed")
+    const future = new Date('2099-01-01').toISOString();
+    const past = new Date('2020-01-01').toISOString();
+
+    const previewData = {
+      widget: {
+        title: "What's New",
+        subheading: 'Preview Mode',
+        slug: 'preview',
+        branded: true,
+      },
+      publications: [
+        {
+          id: 1,
+          title: 'Preview: Banner Update',
+          content: '<p>This is preview mode. The banner displays highlighted updates. In production, your actual updates will appear here.</p>',
+          display_date: new Date().toISOString().split('T')[0],
+          published_at: future,
+          expires_on: null,
+          highlight_target: 'banner',
+          hosted_url: null,
+          tags: [{ id: 1, name: 'Preview', color: '#8b5cf6' }],
+        },
+        {
+          id: 2,
+          title: 'Preview: Toast Notification',
+          content: '<p>This is preview mode. The toast displays highlighted updates. In production, your actual updates will appear here.</p>',
+          display_date: new Date().toISOString().split('T')[0],
+          published_at: future,
+          expires_on: null,
+          highlight_target: 'toast',
+          hosted_url: null,
+          tags: [{ id: 2, name: 'Preview', color: '#8b5cf6' }],
+        },
+        {
+          id: 3,
+          title: 'Preview: Regular Update',
+          content: '<p>This is preview mode. Regular updates appear in the panel. In production, your actual updates will appear here.</p>',
+          display_date: new Date().toISOString().split('T')[0],
+          published_at: past,
+          expires_on: null,
+          highlight_target: null,
+          hosted_url: null,
+          tags: [{ id: 3, name: 'Preview', color: '#8b5cf6' }],
+        },
+      ],
+    };
+
+    this.scopedStore.actions.loadMockUpdates(previewData);
   }
 
   disconnectedCallback() {

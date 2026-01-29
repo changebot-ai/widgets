@@ -19,7 +19,6 @@ export class ChangebotBanner {
   @Prop() theme?: Theme;
   @Prop() light?: Theme;
   @Prop() dark?: Theme;
-  @Prop() preview?: boolean; // Show with mock content for CSS development
 
   @State() isVisible: boolean = false;
   @State() isExpanded: boolean = false;
@@ -51,29 +50,8 @@ export class ChangebotBanner {
       this.el.setAttribute('data-scope', this.scope);
     }
 
-    // Preview mode: show immediately with mock content, skip provider
-    if (this.preview) {
-      this.currentUpdate = this.createPreviewUpdate();
-      this.isVisible = true;
-      return;
-    }
-
     // Connect to provider asynchronously (don't block rendering)
     this.connectToProvider();
-  }
-
-  private createPreviewUpdate(): Update {
-    return {
-      id: -1,
-      title: 'Preview: Important Update',
-      content: '<p>This is preview mode. Use this to style and position the banner. In production, your actual updates will appear here. You can click to expand and see more content in the expanded state.</p>',
-      display_date: new Date().toISOString().split('T')[0],
-      published_at: new Date().toISOString(),
-      expires_on: null,
-      highlight_target: 'banner',
-      hosted_url: null,
-      tags: [],
-    };
   }
 
   private async connectToProvider() {
@@ -146,11 +124,8 @@ export class ChangebotBanner {
 
     log.debug('Dismiss button clicked');
 
-    // In preview mode, just hide (will reappear on next reload)
-    // In normal mode, mark as viewed to persist dismissal
-    if (!this.preview) {
-      this.services?.highlight.markBannerViewed();
-    }
+    // Mark as viewed to persist dismissal
+    this.services?.highlight.markBannerViewed();
 
     // Start dismissing animation
     this.isDismissing = true;

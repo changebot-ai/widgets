@@ -21,7 +21,6 @@ export class ChangebotToast {
   @Prop() dark?: Theme;
   @Prop() position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' = 'bottom-right';
   @Prop() autoDismiss?: number; // Auto-dismiss after N seconds (optional)
-  @Prop() preview?: boolean; // Show with mock content for CSS development
 
   @State() isVisible: boolean = false;
   @State() currentUpdate?: Update;
@@ -60,29 +59,8 @@ export class ChangebotToast {
       this.el.setAttribute('data-scope', this.scope);
     }
 
-    // Preview mode: show immediately with mock content, skip provider
-    if (this.preview) {
-      this.currentUpdate = this.createPreviewUpdate();
-      this.isVisible = true;
-      return;
-    }
-
     // Connect to provider asynchronously (don't block rendering)
     this.connectToProvider();
-  }
-
-  private createPreviewUpdate(): Update {
-    return {
-      id: -1,
-      title: 'Preview: New Feature Announcement',
-      content: '<p>This is preview mode. Use this to style and position the toast. In production, your actual updates will appear here.</p>',
-      display_date: new Date().toISOString().split('T')[0],
-      published_at: new Date().toISOString(),
-      expires_on: null,
-      highlight_target: 'toast',
-      hosted_url: null,
-      tags: [],
-    };
   }
 
   private async connectToProvider() {
@@ -176,11 +154,8 @@ export class ChangebotToast {
   private handleDismiss = () => {
     this.clearAutoDismissTimer();
 
-    // In preview mode, just hide (will reappear on next reload)
-    // In normal mode, mark as viewed to persist dismissal
-    if (!this.preview) {
-      this.services?.highlight.markToastViewed();
-    }
+    // Mark as viewed to persist dismissal
+    this.services?.highlight.markToastViewed();
 
     this.isVisible = false;
   };

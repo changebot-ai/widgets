@@ -1,0 +1,383 @@
+<!doctype html>
+<html dir="ltr" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Preview Demo - Changebot Widgets</title>
+
+  <script type="module" src="/build/widgets.esm.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+    }
+
+    .demo-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .demo-header h1 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .demo-header p {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    .badge-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+
+    .info-box {
+      background: #e8f4fd;
+      border: 1px solid #b3d9f7;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+
+    .info-box h2 {
+      font-size: 16px;
+      color: #1a73e8;
+      margin-bottom: 8px;
+    }
+
+    .info-box p {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    .info-box code {
+      background: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #d63384;
+    }
+
+    .control-section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      margin-bottom: 24px;
+    }
+
+    .control-section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .control-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .control-row label {
+      min-width: 100px;
+      font-size: 13px;
+      color: #555;
+    }
+
+    .control-row select {
+      flex: 1;
+      max-width: 250px;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      background: white;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+
+    .btn-secondary {
+      background: #e9ecef;
+      color: #495057;
+    }
+
+    .btn-secondary:hover {
+      background: #dee2e6;
+    }
+
+    .code-block {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 13px;
+      overflow-x: auto;
+      margin-top: 16px;
+    }
+
+    .code-block .tag {
+      color: #89b4fa;
+    }
+
+    .code-block .attr {
+      color: #f9e2af;
+    }
+
+    .code-block .value {
+      color: #a6e3a1;
+    }
+
+    .code-block .comment {
+      color: #6c7086;
+    }
+
+    .component-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .component-card {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .component-card h4 {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 12px;
+    }
+
+    .component-card changebot-badge {
+      display: inline-block;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Provider with preview mode - loads built-in mock data -->
+  <changebot-provider id="provider" scope="preview" preview></changebot-provider>
+
+  <!-- Banner -->
+  <changebot-banner id="banner" scope="preview"></changebot-banner>
+
+  <header class="demo-header">
+    <div>
+      <h1>Preview Demo</h1>
+      <p>Test widget layouts without a backend connection</p>
+    </div>
+    <div class="badge-wrapper">
+      <span class="badge-label">Updates:</span>
+      <changebot-badge id="badge" scope="preview"></changebot-badge>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="info-box">
+      <h2>What is Preview Mode?</h2>
+      <p>
+        Add the <code>preview</code> attribute to the provider to load built-in mock data.
+        All components work normally - no API connection needed. Perfect for designing layouts and testing styles.
+      </p>
+    </div>
+
+    <!-- Theme Controls -->
+    <div class="control-section">
+      <h3>Theme</h3>
+      <div class="control-row">
+        <label>Select Theme:</label>
+        <select id="themeSelect" onchange="updateTheme()">
+          <optgroup label="Light Themes">
+            <option value="catppuccin-latte">Catppuccin Latte</option>
+            <option value="gruvbox-light">Gruvbox Light</option>
+            <option value="solarized-light">Solarized Light</option>
+            <option value="everforest-light">Everforest Light</option>
+            <option value="frost">Frost</option>
+          </optgroup>
+          <optgroup label="Dark Themes">
+            <option value="catppuccin-frappe">Catppuccin Frappe</option>
+            <option value="catppuccin-macchiato">Catppuccin Macchiato</option>
+            <option value="catppuccin-mocha">Catppuccin Mocha</option>
+            <option value="gruvbox-dark">Gruvbox Dark</option>
+            <option value="dracula">Dracula</option>
+            <option value="nord" selected>Nord</option>
+            <option value="solarized-dark">Solarized Dark</option>
+            <option value="everforest-dark">Everforest Dark</option>
+            <option value="tokyo-night">Tokyo Night</option>
+            <option value="cyberpunk">Cyberpunk</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="control-row">
+        <label>Panel Mode:</label>
+        <select id="panelMode" onchange="updatePanelMode()">
+          <option value="drawer-right" selected>Drawer Right</option>
+          <option value="drawer-left">Drawer Left</option>
+          <option value="modal">Modal</option>
+        </select>
+      </div>
+      <div class="control-row">
+        <label>Toast Position:</label>
+        <select id="toastPosition" onchange="updateToastPosition()">
+          <option value="bottom-right" selected>Bottom Right</option>
+          <option value="bottom-left">Bottom Left</option>
+          <option value="top-right">Top Right</option>
+          <option value="top-left">Top Left</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="control-section">
+      <h3>Actions</h3>
+      <div class="button-row">
+        <button class="btn btn-primary" onclick="openPanel()">Open Panel</button>
+      </div>
+    </div>
+
+    <!-- Code Example -->
+    <div class="control-section">
+      <h3>Usage Example</h3>
+      <p style="font-size: 13px; color: #666; margin-bottom: 8px;">
+        Copy this code to preview widgets in your app:
+      </p>
+      <div class="code-block">
+        <span class="tag">&lt;script</span> <span class="attr">type</span>=<span class="value">"module"</span> <span class="attr">src</span>=<span class="value">"https://widgets.changebot.ai/latest/widgets.esm.js"</span><span class="tag">&gt;&lt;/script&gt;</span><br><br>
+        <span class="comment">&lt;!-- Provider with preview loads mock data --&gt;</span><br>
+        <span class="tag">&lt;changebot-provider</span> <span class="attr">preview</span> <span class="tag">/&gt;</span><br><br>
+        <span class="comment">&lt;!-- Components work normally --&gt;</span><br>
+        <span class="tag">&lt;changebot-badge</span> <span class="attr">theme</span>=<span class="value">"nord"</span> <span class="tag">/&gt;</span><br>
+        <span class="tag">&lt;changebot-panel</span> <span class="attr">mode</span>=<span class="value">"drawer-right"</span> <span class="attr">theme</span>=<span class="value">"nord"</span> <span class="tag">/&gt;</span><br>
+        <span class="tag">&lt;changebot-banner</span> <span class="attr">theme</span>=<span class="value">"nord"</span> <span class="tag">/&gt;</span><br>
+        <span class="tag">&lt;changebot-toast</span> <span class="attr">position</span>=<span class="value">"bottom-right"</span> <span class="attr">theme</span>=<span class="value">"nord"</span> <span class="tag">/&gt;</span>
+      </div>
+    </div>
+
+    <!-- Component Preview Cards -->
+    <div class="control-section">
+      <h3>Badge Variants</h3>
+      <div class="component-grid">
+        <div class="component-card">
+          <h4>With Count</h4>
+          <changebot-badge id="badge-preview" scope="preview"></changebot-badge>
+        </div>
+        <div class="component-card">
+          <h4>Dot Only</h4>
+          <changebot-badge id="badge-dot" scope="preview" show-count="false"></changebot-badge>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel -->
+  <changebot-panel id="panel" scope="preview" mode="drawer-right"></changebot-panel>
+
+  <!-- Toast -->
+  <changebot-toast id="toast" scope="preview" position="bottom-right"></changebot-toast>
+
+  <script>
+    function updateTheme() {
+      const theme = document.getElementById('themeSelect').value;
+      const components = ['badge', 'badge-preview', 'badge-dot', 'panel', 'banner', 'toast'];
+
+      components.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.setAttribute('theme', theme);
+        }
+      });
+    }
+
+    function updatePanelMode() {
+      const mode = document.getElementById('panelMode').value;
+      const panel = document.getElementById('panel');
+      if (panel) {
+        panel.setAttribute('mode', mode);
+      }
+    }
+
+    function updateToastPosition() {
+      const position = document.getElementById('toastPosition').value;
+      const toast = document.getElementById('toast');
+      if (toast) {
+        toast.setAttribute('position', position);
+      }
+    }
+
+    function openPanel() {
+      document.dispatchEvent(new CustomEvent('changebot:action', {
+        detail: { type: 'openDisplay', scope: 'preview' }
+      }));
+    }
+
+    // Initialize theme on load
+    document.addEventListener('DOMContentLoaded', () => {
+      updateTheme();
+    });
+  </script>
+</body>
+
+</html>

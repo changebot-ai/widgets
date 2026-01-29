@@ -87,6 +87,10 @@
       background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
     }
 
+    .demo-card.preview {
+      background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    }
+
     .demo-card h3 {
       margin: 0 0 8px 0;
       font-size: 18px;
@@ -175,6 +179,11 @@
       <a href="/userid-demo.html" class="demo-card userid">
         <h3>UserId Testing</h3>
         <p>Test userId tracking with local mock server. Requires <code>pnpm run mock-server</code>.</p>
+      </a>
+
+      <a href="/preview-demo.html" class="demo-card preview">
+        <h3>Preview Mode</h3>
+        <p>Test layouts without a backend. All components use <code>preview</code> prop with mock data.</p>
       </a>
     </div>
 

@@ -70,6 +70,7 @@ When running `pnpm start`, the dev server serves at `http://localhost:<port>` (p
 - **Vue 3** (`/vue-demo.html`) - Vue 3 Composition API demo. Uses ref/reactive for state.
 - **Production (CDN)** (`/production-demo.html`) - Loads from CDN with real API. Tests deployed widgets.
 - **UserId Testing** (`/userid-demo.html`) - Tests userId tracking with local mock server. Requires `pnpm run mock-server` (port 3456).
+- **Preview Mode** (`/preview-demo.html`) - All components with `preview` prop. No backend needed - for layout testing.
 
 ### Component Structure
 
@@ -152,7 +153,7 @@ The following props are for internal testing purposes only and should **not** be
 
 - `baseUrl` (changebot-provider) - Base URL for custom API endpoint (e.g., `http://localhost:3456`). The widget appends paths like `/updates` and `/users/:userId` to this base.
 - `mockData` (changebot-provider) - JSON string for loading mock data directly (for demos and testing when API is unavailable)
-- `preview` (changebot-banner, changebot-toast) - Show with mock content for CSS development
+- `preview` (changebot-provider) - Load built-in mock data for layout testing
 
 These props should be omitted from all customer-facing documentation.
 
