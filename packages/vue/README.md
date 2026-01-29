@@ -28,14 +28,15 @@ import {
 </script>
 
 <template>
-  <ChangebotProvider slug="your-team-slug">
-    <header>
-      <h1>My App</h1>
-      <ChangebotBadge />
-    </header>
+  <!-- Provider can be placed anywhere - components don't need to be nested -->
+  <ChangebotProvider slug="your-team-slug" />
 
-    <ChangebotPanel mode="drawer-right" />
-  </ChangebotProvider>
+  <header>
+    <h1>My App</h1>
+    <ChangebotBadge />
+  </header>
+
+  <ChangebotPanel mode="drawer-right" />
 </template>
 ```
 
@@ -43,7 +44,7 @@ import {
 
 ### ChangebotProvider
 
-The provider component manages state and data fetching for all child Changebot components. Wrap your components with this provider to enable automatic updates and state synchronization.
+The provider component manages state and data fetching for all Changebot components. It listens at the document level, so components do **not** need to be nested inside it—they can be placed anywhere on the page.
 
 #### Props
 
@@ -56,9 +57,10 @@ The provider component manages state and data fetching for all child Changebot c
 
 ```vue
 <template>
-  <ChangebotProvider slug="acme-corp">
-    <!-- Your components -->
-  </ChangebotProvider>
+  <!-- Components can be siblings - no nesting required -->
+  <ChangebotProvider slug="acme-corp" />
+  <ChangebotBadge />
+  <ChangebotPanel />
 </template>
 ```
 
@@ -413,21 +415,6 @@ Displays as a centered modal dialog with backdrop overlay. Best for focused, imp
 
 Components can work independently without a provider for simple use cases:
 
-#### Standalone Badge
-
-```vue
-<script setup>
-import { ref } from 'vue';
-import { ChangebotBadge } from '@changebot/widgets-vue';
-
-const count = ref(3);
-</script>
-
-<template>
-  <ChangebotBadge :count="count" :show-count="true" />
-</template>
-```
-
 #### Standalone Panel
 
 ```vue
@@ -479,33 +466,34 @@ import {
 </script>
 
 <template>
-  <ChangebotProvider slug="acme-corp">
-    <!-- Banner appears automatically for banner-highlighted updates -->
-    <ChangebotBanner theme="catppuccin-mocha" />
+  <!-- Provider can be placed anywhere -->
+  <ChangebotProvider slug="acme-corp" />
 
-    <header>
-      <h1>ACME Corp</h1>
-      <!-- Badge shows count of new updates -->
-      <ChangebotBadge theme="catppuccin-mocha" />
-    </header>
+  <!-- Banner appears automatically for banner-highlighted updates -->
+  <ChangebotBanner theme="catppuccin-mocha" />
 
-    <main>
-      <!-- Your app content -->
-    </main>
+  <header>
+    <h1>ACME Corp</h1>
+    <!-- Badge shows count of new updates -->
+    <ChangebotBadge theme="catppuccin-mocha" />
+  </header>
 
-    <!-- Panel opens when badge is clicked -->
-    <ChangebotPanel
-      mode="drawer-right"
-      theme="catppuccin-mocha"
-    />
+  <main>
+    <!-- Your app content -->
+  </main>
 
-    <!-- Toast appears for toast-highlighted updates -->
-    <ChangebotToast
-      position="bottom-right"
-      :auto-dismiss="5"
-      theme="catppuccin-mocha"
-    />
-  </ChangebotProvider>
+  <!-- Panel opens when badge is clicked -->
+  <ChangebotPanel
+    mode="drawer-right"
+    theme="catppuccin-mocha"
+  />
+
+  <!-- Toast appears for toast-highlighted updates -->
+  <ChangebotToast
+    position="bottom-right"
+    :auto-dismiss="5"
+    theme="catppuccin-mocha"
+  />
 </template>
 ```
 

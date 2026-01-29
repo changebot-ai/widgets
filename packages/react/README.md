@@ -27,14 +27,17 @@ import {
 
 function App() {
   return (
-    <ChangebotProvider slug="your-team-slug">
+    <>
+      {/* Provider can be placed anywhere - components don't need to be nested */}
+      <ChangebotProvider slug="your-team-slug" />
+
       <header>
         <h1>My App</h1>
         <ChangebotBadge />
       </header>
 
       <ChangebotPanel mode="drawer-right" />
-    </ChangebotProvider>
+    </>
   );
 }
 ```
@@ -43,7 +46,7 @@ function App() {
 
 ### ChangebotProvider
 
-The provider component manages state and data fetching for all child Changebot components. Wrap your components with this provider to enable automatic updates and state synchronization.
+The provider component manages state and data fetching for all Changebot components. It listens at the document level, so components do **not** need to be nested inside it—they can be placed anywhere on the page.
 
 #### Props
 
@@ -51,14 +54,14 @@ The provider component manages state and data fetching for all child Changebot c
 |------|------|---------|-------------|
 | `slug` | `string` | required | Your Changebot team slug (from your Changebot dashboard) |
 | `scope` | `string` | `"default"` | Scope identifier for isolating multiple instances |
-| `children` | `ReactNode` | required | Child components |
 
 #### Example
 
 ```tsx
-<ChangebotProvider slug="acme-corp">
-  {/* Your components */}
-</ChangebotProvider>
+// Components can be siblings - no nesting required
+<ChangebotProvider slug="acme-corp" />
+<ChangebotBadge />
+<ChangebotPanel />
 ```
 
 #### Multiple Instances
@@ -347,20 +350,6 @@ Displays as a centered modal dialog with backdrop overlay. Best for focused, imp
 
 Components can work independently without a provider for simple use cases:
 
-#### Standalone Badge
-
-```tsx
-import { ChangebotBadge } from '@changebot/widgets-react';
-
-function Header() {
-  const [count, setCount] = useState(3);
-
-  return (
-    <ChangebotBadge count={count} showCount={true} />
-  );
-}
-```
-
 #### Standalone Panel
 
 ```tsx
@@ -413,7 +402,10 @@ import {
 
 function App() {
   return (
-    <ChangebotProvider slug="acme-corp">
+    <>
+      {/* Provider can be placed anywhere */}
+      <ChangebotProvider slug="acme-corp" />
+
       {/* Banner appears automatically for banner-highlighted updates */}
       <ChangebotBanner theme="catppuccin-mocha" />
 
@@ -439,7 +431,7 @@ function App() {
         autoDismiss={5}
         theme="catppuccin-mocha"
       />
-    </ChangebotProvider>
+    </>
   );
 }
 ```

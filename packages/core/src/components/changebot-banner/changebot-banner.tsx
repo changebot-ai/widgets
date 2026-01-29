@@ -15,8 +15,8 @@ import { checkForHighlightedUpdate } from '../../utils/highlight-consumer';
 export class ChangebotBanner {
   @Element() el: HTMLChangebotBannerElement;
 
-  @Prop() scope?: string;
   @Prop() theme?: Theme;
+  @Prop() scope?: string; // Undocumented: for multiple provider instances
   @Prop() light?: Theme;
   @Prop() dark?: Theme;
 

@@ -13,8 +13,8 @@ import { logBadge as log } from '../../utils/logger';
 export class ChangebotBadge {
   @Element() el: HTMLChangebotBadgeElement;
 
-  @Prop() scope?: string;
   @Prop() theme?: Theme;
+  @Prop() scope?: string; // Undocumented: for multiple provider instances
   @Prop() light?: Theme;
   @Prop() dark?: Theme;
   @Prop() indicator: 'count' | 'dot' = 'count';

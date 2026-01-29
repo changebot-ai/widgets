@@ -15,13 +15,13 @@ import { safeStorage } from '../../utils/safe-storage';
 export class ChangebotProvider {
   @Element() el: HTMLElement;
 
-  @Prop() baseUrl?: string;
   @Prop() slug?: string;
-  @Prop() scope: string = 'default';
-  @Prop() mockData?: string;
   @Prop() userId?: string;
   @Prop() userData?: string;
-  @Prop() preview?: boolean; // Load built-in mock data for layout testing
+  @Prop() scope: string = 'default'; // Undocumented: for multiple provider instances
+  @Prop() baseUrl?: string; // Testing: custom API endpoint
+  @Prop() mockData?: string; // Testing: JSON string of mock data for demos
+  @Prop() preview?: boolean; // Testing: load built-in mock data for layout testing
 
   private scopedStore = createScopedStore();
   private api = createAPI();
@@ -177,10 +177,10 @@ export class ChangebotProvider {
           this.services.display.open();
         }
         break;
-      case 'markViewed':
+      case 'markViewed': // Internal: mark updates as viewed without opening panel
         void this.markAsViewed();
         break;
-      case 'markAllViewed':
+      case 'markAllViewed': // Internal: mark all updates as viewed
         this.scopedStore.actions.markAllViewed();
         void this.markAsViewed();
         break;

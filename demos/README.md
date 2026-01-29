@@ -106,20 +106,23 @@ All components support:
 ### Badge Props
 
 - `scope`: Provider scope to connect to
-- `theme`: "light" or "dark"
 - `indicator`: Display style - "count" (default) or "dot"
-- `count`: Direct count control (standalone mode)
+- `theme`: Theme name (see available themes)
+- `light`: Theme for light mode
+- `dark`: Theme for dark mode
 
-### Drawer Props
+### Panel Props
 
 - `scope`: Provider scope to connect to
-- `theme`: "light" or "dark"
-- `display-mode`: "drawer-left", "drawer-right", or "modal"
+- `theme`: Theme name
+- `light`: Theme for light mode
+- `dark`: Theme for dark mode
+- `mode`: "drawer-left", "drawer-right" (default), or "modal"
 
-### Drawer Methods
+### Panel Methods
 
-- `open()`: Open the drawer
-- `close()`: Close the drawer
+- `open()`: Open the panel
+- `close()`: Close the panel
 - `setUpdates(updates)`: Set updates array
 
 ## 💡 Tips

@@ -36,12 +36,12 @@ export const ChangebotPanel: StencilVueComponent<JSX.ChangebotPanel> = /*@__PURE
 
 
 export const ChangebotProvider: StencilVueComponent<JSX.ChangebotProvider> = /*@__PURE__*/ defineContainer<JSX.ChangebotProvider>('changebot-provider', undefined, [
-  'baseUrl',
   'slug',
   'scope',
-  'mockData',
   'userId',
   'userData',
+  'baseUrl',
+  'mockData',
   'preview'
 ]);
 

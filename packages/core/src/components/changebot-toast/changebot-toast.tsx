@@ -15,8 +15,8 @@ import { checkForHighlightedUpdate } from '../../utils/highlight-consumer';
 export class ChangebotToast {
   @Element() el: HTMLChangebotToastElement;
 
-  @Prop() scope?: string;
   @Prop() theme?: Theme;
+  @Prop() scope?: string; // Undocumented: for multiple provider instances
   @Prop() light?: Theme;
   @Prop() dark?: Theme;
   @Prop() position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' = 'bottom-right';

@@ -94,7 +94,11 @@ export interface Services {
   highlight: HighlightControl;
 }
 
-/** Action types that can be dispatched via changebot:action events */
+/**
+ * Action types that can be dispatched via changebot:action events
+ * - openDisplay, closeDisplay, toggleDisplay: Public API
+ * - markViewed, markAllViewed: Internal use only
+ */
 export type ActionType = 'openDisplay' | 'closeDisplay' | 'toggleDisplay' | 'markViewed' | 'markAllViewed';
 
 export interface ActionDetail {

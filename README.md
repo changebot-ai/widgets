@@ -43,7 +43,7 @@ Load directly from CDN - no build step required:
 For production, pin to a specific version:
 
 ```html
-<script type="module" src="https://widgets.changebot.ai/v0.1.22/widgets.esm.js"></script>
+<script type="module" src="https://widgets.changebot.ai/v0.2.0/widgets.esm.js"></script>
 ```
 
 ### Option 2: npm (For bundled apps)
