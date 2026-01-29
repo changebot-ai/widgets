@@ -152,6 +152,7 @@ The following props are for internal testing purposes only and should **not** be
 
 - `baseUrl` (changebot-provider) - Base URL for custom API endpoint (e.g., `http://localhost:3456`). The widget appends paths like `/updates` and `/users/:userId` to this base.
 - `mockData` (changebot-provider) - JSON string for loading mock data directly (for demos and testing when API is unavailable)
+- `preview` (changebot-banner, changebot-toast) - Show with mock content for CSS development
 
 These props should be omitted from all customer-facing documentation.
 
@@ -182,7 +183,7 @@ interface Services {
 
 ## Theme System
 
-Themes defined in `packages/core/src/utils/themes.ts` with 14 palettes (Catppuccin, Gruvbox, Dracula, Nord, etc.).
+Themes defined in `packages/core/src/utils/themes.ts` with 15 palettes (Catppuccin, Gruvbox, Dracula, Nord, etc.).
 
 Theme selection priority:
 1. Explicit `theme` prop → use that theme

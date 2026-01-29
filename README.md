@@ -24,7 +24,7 @@ Load directly from CDN - no build step required:
   <head>
     <title>My App</title>
     <!-- Module scripts are deferred by default and won't block rendering -->
-    <script type="module" src="https://widgets.changebot.ai/latest.js"></script>
+    <script type="module" src="https://widgets.changebot.ai/latest/widgets.esm.js"></script>
   </head>
   <body>
     <changebot-provider slug="your-slug" />
@@ -43,7 +43,7 @@ Load directly from CDN - no build step required:
 For production, pin to a specific version:
 
 ```html
-<script type="module" src="https://widgets.changebot.ai/v0.1.13.js"></script>
+<script type="module" src="https://widgets.changebot.ai/v0.1.22/widgets.esm.js"></script>
 ```
 
 ### Option 2: npm (For bundled apps)
@@ -70,9 +70,14 @@ Required component that manages state and API calls.
 
 - `slug` (string, required) - Your Changebot product slug
 - `scope` (string, default: "default") - Scope for multiple providers
+- `user-id` (string, optional) - User identifier for cross-device tracking
+- `user-data` (string, optional) - JSON string with user metadata (e.g., email, name)
 
 ```html
 <changebot-provider slug="your-team" />
+
+<!-- With user tracking -->
+<changebot-provider slug="your-team" user-id="user_123" user-data='{"email":"user@example.com"}' />
 ```
 
 ### changebot-badge
@@ -315,12 +320,15 @@ await drawer.close();
 // Set updates manually
 await drawer.setUpdates([
   {
-    id: '1',
+    id: 1,
     title: 'New Feature',
-    description: 'Description here',
-    date: new Date().toISOString(),
-    timestamp: Date.now(),
-    tags: [{ text: 'Feature', color: '#3b82f6' }],
+    content: '<p>Description here</p>',
+    display_date: '2025-01-29',
+    published_at: new Date().toISOString(),
+    expires_on: null,
+    highlight_target: null,
+    hosted_url: null,
+    tags: [{ id: 1, name: 'Feature', color: '#3b82f6' }],
   },
 ]);
 ```
@@ -393,10 +401,12 @@ import { ChangebotProvider, ChangebotBadge, ChangebotPanel, ChangebotBanner, Cha
 
 Required component that manages state and API calls.
 
-| Prop    | Type   | Default     | Description                      |
-| ------- | ------ | ----------- | -------------------------------- |
-| `slug`  | string | -           | Your Changebot product slug      |
-| `scope` | string | `"default"` | Scope for multiple providers     |
+| Prop        | Type   | Default     | Description                                          |
+| ----------- | ------ | ----------- | ---------------------------------------------------- |
+| `slug`      | string | -           | Your Changebot product slug                          |
+| `scope`     | string | `"default"` | Scope for multiple providers                         |
+| `user-id`   | string | -           | User identifier for cross-device tracking            |
+| `user-data` | string | -           | JSON string with user metadata (e.g., email, name)   |
 
 **Events:**
 
