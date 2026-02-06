@@ -22,6 +22,16 @@ The provider manages data and API calls for all widget components:
 
 Components do not need to be nested inside the provider. Place the provider anywhere on the page and components will automatically connect to it.
 
+### Preview mode during setup
+
+Add the `preview` attribute to the provider while you're placing components in your layout:
+
+```html
+<changebot-provider slug="YOUR_WIDGET_SLUG" preview />
+```
+
+This renders all components with sample data so you can see where they appear and what they look like. Without it, you won't see anything until you've published updates to this destination. The widget also tracks which updates each user has already seen — once viewed, badges, banners, and toasts won't re-highlight the same updates on subsequent page loads. Preview mode bypasses both of these, making it easy to iterate on placement. Remove the attribute when you're ready to go live.
+
 ## 3. Add display components
 
 Choose which components to use based on your needs:
