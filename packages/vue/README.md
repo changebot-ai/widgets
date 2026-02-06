@@ -667,6 +667,5 @@ Apache-2.0
 ## Links
 
 - [Changebot Website](https://www.changebot.ai)
-- [Documentation](https://docs.changebot.ai)
 - [GitHub Repository](https://github.com/changebot-ai/widgets)
 - [NPM Package](https://www.npmjs.com/package/@changebot/widgets-vue)

@@ -19,11 +19,7 @@ npm install react react-dom
 ## Quick Start
 
 ```tsx
-import {
-  ChangebotProvider,
-  ChangebotBadge,
-  ChangebotPanel
-} from '@changebot/widgets-react';
+import { ChangebotProvider, ChangebotBadge, ChangebotPanel } from '@changebot/widgets-react';
 
 function App() {
   return (
@@ -50,10 +46,10 @@ The provider component manages state and data fetching for all Changebot compone
 
 #### Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `slug` | `string` | required | Your Changebot team slug (from your Changebot dashboard) |
-| `scope` | `string` | `"default"` | Scope identifier for isolating multiple instances |
+| Prop    | Type     | Default     | Description                                              |
+| ------- | -------- | ----------- | -------------------------------------------------------- |
+| `slug`  | `string` | required    | Your Changebot team slug (from your Changebot dashboard) |
+| `scope` | `string` | `"default"` | Scope identifier for isolating multiple instances        |
 
 #### Example
 
@@ -90,13 +86,13 @@ A badge component that displays the count of new, unread updates. Clicking the b
 
 #### Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `scope` | `string` | `"default"` | Scope to connect to (must match provider scope) |
-| `theme` | `Theme` | - | Fixed theme (see Theming section) |
-| `light` | `Theme` | - | Theme for light mode (auto-switches based on system preference) |
-| `dark` | `Theme` | - | Theme for dark mode (auto-switches based on system preference) |
-| `indicator` | `"count"` \| `"dot"` | `"count"` | Display style: show count number or dot only |
+| Prop        | Type                 | Default     | Description                                                     |
+| ----------- | -------------------- | ----------- | --------------------------------------------------------------- |
+| `scope`     | `string`             | `"default"` | Scope to connect to (must match provider scope)                 |
+| `theme`     | `Theme`              | -           | Fixed theme (see Theming section)                               |
+| `light`     | `Theme`              | -           | Theme for light mode (auto-switches based on system preference) |
+| `dark`      | `Theme`              | -           | Theme for dark mode (auto-switches based on system preference)  |
+| `indicator` | `"count"` \| `"dot"` | `"count"`   | Display style: show count number or dot only                    |
 
 #### Example
 
@@ -125,13 +121,13 @@ A panel component that displays your product updates. Can be displayed as a draw
 
 #### Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `scope` | `string` | `"default"` | Scope to connect to (must match provider scope) |
-| `mode` | `"drawer-left"` \| `"drawer-right"` \| `"modal"` | `"drawer-right"` | Display mode |
-| `theme` | `Theme` | - | Fixed theme (see Theming section) |
-| `light` | `Theme` | - | Theme for light mode (auto-switches based on system preference) |
-| `dark` | `Theme` | - | Theme for dark mode (auto-switches based on system preference) |
+| Prop    | Type                                             | Default          | Description                                                     |
+| ------- | ------------------------------------------------ | ---------------- | --------------------------------------------------------------- |
+| `scope` | `string`                                         | `"default"`      | Scope to connect to (must match provider scope)                 |
+| `mode`  | `"drawer-left"` \| `"drawer-right"` \| `"modal"` | `"drawer-right"` | Display mode                                                    |
+| `theme` | `Theme`                                          | -                | Fixed theme (see Theming section)                               |
+| `light` | `Theme`                                          | -                | Theme for light mode (auto-switches based on system preference) |
+| `dark`  | `Theme`                                          | -                | Theme for dark mode (auto-switches based on system preference)  |
 
 #### Methods
 
@@ -166,11 +162,7 @@ function App() {
   return (
     <>
       <button onClick={handleOpenPanel}>Show Updates</button>
-      <ChangebotPanel
-        ref={panelRef}
-        mode="drawer-right"
-        theme="nord"
-      />
+      <ChangebotPanel ref={panelRef} mode="drawer-right" theme="nord" />
     </>
   );
 }
@@ -184,12 +176,12 @@ A banner component that displays a highlighted update at the top of your page. A
 
 #### Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `scope` | `string` | `"default"` | Scope to connect to (must match provider scope) |
-| `theme` | `Theme` | - | Fixed theme (see Theming section) |
-| `light` | `Theme` | - | Theme for light mode (auto-switches based on system preference) |
-| `dark` | `Theme` | - | Theme for dark mode (auto-switches based on system preference) |
+| Prop    | Type     | Default     | Description                                                     |
+| ------- | -------- | ----------- | --------------------------------------------------------------- |
+| `scope` | `string` | `"default"` | Scope to connect to (must match provider scope)                 |
+| `theme` | `Theme`  | -           | Fixed theme (see Theming section)                               |
+| `light` | `Theme`  | -           | Theme for light mode (auto-switches based on system preference) |
+| `dark`  | `Theme`  | -           | Theme for dark mode (auto-switches based on system preference)  |
 
 #### Methods
 
@@ -209,9 +201,7 @@ await bannerRef.current?.toggle();
 #### Example
 
 ```tsx
-<ChangebotBanner
-  theme="dracula"
-/>
+<ChangebotBanner theme="dracula" />
 ```
 
 ---
@@ -222,14 +212,14 @@ A toast notification component that displays brief update notifications. Automat
 
 #### Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `scope` | `string` | `"default"` | Scope to connect to (must match provider scope) |
-| `position` | `"top-left"` \| `"top-right"` \| `"bottom-left"` \| `"bottom-right"` | `"bottom-right"` | Screen position for the toast |
-| `autoDismiss` | `number` | - | Auto-dismiss after N seconds (optional) |
-| `theme` | `Theme` | - | Fixed theme (see Theming section) |
-| `light` | `Theme` | - | Theme for light mode (auto-switches based on system preference) |
-| `dark` | `Theme` | - | Theme for dark mode (auto-switches based on system preference) |
+| Prop          | Type                                                                 | Default          | Description                                                     |
+| ------------- | -------------------------------------------------------------------- | ---------------- | --------------------------------------------------------------- |
+| `scope`       | `string`                                                             | `"default"`      | Scope to connect to (must match provider scope)                 |
+| `position`    | `"top-left"` \| `"top-right"` \| `"bottom-left"` \| `"bottom-right"` | `"bottom-right"` | Screen position for the toast                                   |
+| `autoDismiss` | `number`                                                             | -                | Auto-dismiss after N seconds (optional)                         |
+| `theme`       | `Theme`                                                              | -                | Fixed theme (see Theming section)                               |
+| `light`       | `Theme`                                                              | -                | Theme for light mode (auto-switches based on system preference) |
+| `dark`        | `Theme`                                                              | -                | Theme for dark mode (auto-switches based on system preference)  |
 
 #### Methods
 
@@ -246,11 +236,7 @@ await toastRef.current?.dismiss();
 #### Example
 
 ```tsx
-<ChangebotToast
-  position="bottom-right"
-  autoDismiss={5}
-  theme="tokyo-night"
-/>
+<ChangebotToast position="bottom-right" autoDismiss={5} theme="tokyo-night" />
 ```
 
 ---
@@ -283,32 +269,17 @@ Use the `theme` prop for a theme that never changes:
 Use `light` and `dark` props to automatically switch based on user's system preference:
 
 ```tsx
-<ChangebotPanel
-  light="catppuccin-latte"
-  dark="catppuccin-mocha"
-/>
+<ChangebotPanel light="catppuccin-latte" dark="catppuccin-mocha" />
 ```
 
 #### Apply to All Components
 
 ```tsx
 <ChangebotProvider slug="acme">
-  <ChangebotBadge
-    light="gruvbox-light"
-    dark="gruvbox-dark"
-  />
-  <ChangebotPanel
-    light="gruvbox-light"
-    dark="gruvbox-dark"
-  />
-  <ChangebotBanner
-    light="gruvbox-light"
-    dark="gruvbox-dark"
-  />
-  <ChangebotToast
-    light="gruvbox-light"
-    dark="gruvbox-dark"
-  />
+  <ChangebotBadge light="gruvbox-light" dark="gruvbox-dark" />
+  <ChangebotPanel light="gruvbox-light" dark="gruvbox-dark" />
+  <ChangebotBanner light="gruvbox-light" dark="gruvbox-dark" />
+  <ChangebotToast light="gruvbox-light" dark="gruvbox-dark" />
 </ChangebotProvider>
 ```
 
@@ -370,8 +341,8 @@ function Updates() {
         expires_on: null,
         highlight_target: null,
         hosted_url: null,
-        tags: [{ id: 1, name: 'Feature', color: '#3b82f6' }]
-      }
+        tags: [{ id: 1, name: 'Feature', color: '#3b82f6' }],
+      },
     ]);
     await panelRef.current?.open();
   };
@@ -392,13 +363,7 @@ function Updates() {
 ### Basic Setup with All Components
 
 ```tsx
-import {
-  ChangebotProvider,
-  ChangebotBadge,
-  ChangebotPanel,
-  ChangebotBanner,
-  ChangebotToast
-} from '@changebot/widgets-react';
+import { ChangebotProvider, ChangebotBadge, ChangebotPanel, ChangebotBanner, ChangebotToast } from '@changebot/widgets-react';
 
 function App() {
   return (
@@ -415,22 +380,13 @@ function App() {
         <ChangebotBadge theme="catppuccin-mocha" />
       </header>
 
-      <main>
-        {/* Your app content */}
-      </main>
+      <main>{/* Your app content */}</main>
 
       {/* Panel opens when badge is clicked */}
-      <ChangebotPanel
-        mode="drawer-right"
-        theme="catppuccin-mocha"
-      />
+      <ChangebotPanel mode="drawer-right" theme="catppuccin-mocha" />
 
       {/* Toast appears for toast-highlighted updates */}
-      <ChangebotToast
-        position="bottom-right"
-        autoDismiss={5}
-        theme="catppuccin-mocha"
-      />
+      <ChangebotToast position="bottom-right" autoDismiss={5} theme="catppuccin-mocha" />
     </>
   );
 }
@@ -439,11 +395,7 @@ function App() {
 ### Responsive Theme Example
 
 ```tsx
-import {
-  ChangebotProvider,
-  ChangebotBadge,
-  ChangebotPanel
-} from '@changebot/widgets-react';
+import { ChangebotProvider, ChangebotBadge, ChangebotPanel } from '@changebot/widgets-react';
 
 function App() {
   // Automatically switches between light/dark based on system preference
@@ -451,17 +403,10 @@ function App() {
     <ChangebotProvider slug="acme-corp">
       <header>
         <h1>My App</h1>
-        <ChangebotBadge
-          light="catppuccin-latte"
-          dark="catppuccin-mocha"
-        />
+        <ChangebotBadge light="catppuccin-latte" dark="catppuccin-mocha" />
       </header>
 
-      <ChangebotPanel
-        mode="drawer-right"
-        light="catppuccin-latte"
-        dark="catppuccin-mocha"
-      />
+      <ChangebotPanel mode="drawer-right" light="catppuccin-latte" dark="catppuccin-mocha" />
     </ChangebotProvider>
   );
 }
@@ -470,11 +415,7 @@ function App() {
 ### Multiple Scopes Example
 
 ```tsx
-import {
-  ChangebotProvider,
-  ChangebotBadge,
-  ChangebotPanel
-} from '@changebot/widgets-react';
+import { ChangebotProvider, ChangebotBadge, ChangebotPanel } from '@changebot/widgets-react';
 
 function MultiTenantApp() {
   return (
@@ -509,10 +450,7 @@ function MultiTenantApp() {
 
 ```tsx
 import { useRef } from 'react';
-import {
-  ChangebotProvider,
-  ChangebotPanel
-} from '@changebot/widgets-react';
+import { ChangebotProvider, ChangebotPanel } from '@changebot/widgets-react';
 
 function App() {
   const panelRef = useRef<HTMLChangebotPanelElement>(null);
@@ -559,6 +497,5 @@ Apache-2.0
 ## Links
 
 - [Changebot Website](https://www.changebot.ai)
-- [Documentation](https://docs.changebot.ai)
 - [GitHub Repository](https://github.com/changebot-ai/widgets)
 - [NPM Package](https://www.npmjs.com/package/@changebot/widgets-react)
