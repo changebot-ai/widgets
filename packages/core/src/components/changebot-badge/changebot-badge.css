@@ -9,7 +9,7 @@
 
   /* Sizing variables */
   --badge-size: 20px;
-  --badge-font-size: 11px;
+  --badge-font-size: calc(var(--badge-size) * 0.55);
   --badge-animation-duration: 0.3s;
 
   display: inline-block;
@@ -22,7 +22,7 @@
   justify-content: center;
   min-width: var(--badge-size);
   height: var(--badge-size);
-  padding: 0 6px;
+  padding: 0 0.55em;
   background-color: var(--cb-badge-bg);
   color: var(--cb-badge-text);
   border-radius: calc(var(--badge-size) / 2);
@@ -35,7 +35,7 @@
               opacity var(--badge-animation-duration) ease,
               background-color var(--badge-animation-duration) ease;
   animation: badge-appear var(--badge-animation-duration) cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 2px 8px var(--cb-badge-shadow);
+  box-shadow: 0 0.18em 0.73em var(--cb-badge-shadow);
   position: relative;
   overflow: hidden;
 }
@@ -59,7 +59,7 @@
     box-shadow: 0 0 0 0 var(--cb-badge-pulse);
   }
   70% {
-    box-shadow: 0 0 0 10px transparent;
+    box-shadow: 0 0 0 0.91em transparent;
   }
   100% {
     box-shadow: 0 0 0 0 transparent;
@@ -82,7 +82,7 @@
 
 .badge:focus {
   outline: 2px solid var(--cb-badge-bg);
-  outline-offset: 2px;
+  outline-offset: 0.18em;
 }
 
 .badge:focus:not(:focus-visible) {
@@ -100,8 +100,8 @@
 }
 
 .badge__count--hidden {
-  width: 6px;
-  height: 6px;
+  width: 0.55em;
+  height: 0.55em;
   background-color: var(--cb-badge-text);
   border-radius: 50%;
   font-size: 0;
