@@ -7,9 +7,14 @@
   --cb-badge-hover-mix: black;
   --cb-badge-ripple: rgba(255, 255, 255, 0.3);
 
-  /* Sizing variables */
+  /* Sizing variables - override any of these individually, or just set --badge-size */
   --badge-size: 20px;
   --badge-font-size: calc(var(--badge-size) * 0.55);
+  --badge-padding: calc(var(--badge-size) * 0.3);
+  --badge-dot-size: calc(var(--badge-size) * 0.3);
+  --badge-shadow-y: calc(var(--badge-size) * 0.1);
+  --badge-shadow-blur: calc(var(--badge-size) * 0.4);
+  --badge-pulse-spread: calc(var(--badge-size) * 0.5);
   --badge-animation-duration: 0.3s;
 
   display: inline-block;
@@ -22,7 +27,7 @@
   justify-content: center;
   min-width: var(--badge-size);
   height: var(--badge-size);
-  padding: 0 calc(var(--badge-size) * 0.3);
+  padding: 0 var(--badge-padding);
   background-color: var(--cb-badge-bg);
   color: var(--cb-badge-text);
   border-radius: calc(var(--badge-size) / 2);
@@ -35,7 +40,7 @@
               opacity var(--badge-animation-duration) ease,
               background-color var(--badge-animation-duration) ease;
   animation: badge-appear var(--badge-animation-duration) cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 calc(var(--badge-size) * 0.1) calc(var(--badge-size) * 0.4) var(--cb-badge-shadow);
+  box-shadow: 0 var(--badge-shadow-y) var(--badge-shadow-blur) var(--cb-badge-shadow);
   position: relative;
   overflow: hidden;
 }
@@ -59,7 +64,7 @@
     box-shadow: 0 0 0 0 var(--cb-badge-pulse);
   }
   70% {
-    box-shadow: 0 0 0 calc(var(--badge-size) * 0.5) transparent;
+    box-shadow: 0 0 0 var(--badge-pulse-spread) transparent;
   }
   100% {
     box-shadow: 0 0 0 0 transparent;
@@ -100,8 +105,8 @@
 }
 
 .badge__count--hidden {
-  width: calc(var(--badge-size) * 0.3);
-  height: calc(var(--badge-size) * 0.3);
+  width: var(--badge-dot-size);
+  height: var(--badge-dot-size);
   background-color: var(--cb-badge-text);
   border-radius: 50%;
   font-size: 0;
