@@ -12,6 +12,10 @@ Add this script tag to your HTML `<head>`:
 
 For production, pin to a specific version like `v0.2.0/widgets.esm.js`.
 
+> **Using React or Vue?** Use the NPM packages instead of the script tag:
+> - `npm install` [@changebot/widgets-react](https://www.npmjs.com/package/@changebot/widgets-react)
+> - `npm install` [@changebot/widgets-vue](https://www.npmjs.com/package/@changebot/widgets-vue)
+
 ## 2. Add the provider
 
 The provider manages data and API calls for all widget components:
@@ -32,121 +36,121 @@ Add the `preview` attribute to the provider while you're placing components in y
 
 This renders all components with sample data so you can see where they appear and what they look like. Without it, you won't see anything until you've published updates to this destination. The widget also tracks which updates each user has already seen — once viewed, badges, banners, and toasts won't re-highlight the same updates on subsequent page loads. Preview mode bypasses both of these, making it easy to iterate on placement. Remove the attribute when you're ready to go live.
 
-## 3. Add display components
+## 3. User tracking (optional)
 
-Choose which components to use based on your needs:
+Track which users have viewed updates by passing a `user-id` to the provider:
 
 ```html
-<!-- Badge showing update count -->
-<changebot-badge theme="nord" />
-
-<!-- Panel with full update list -->
-<changebot-panel mode="drawer-right" light="catppuccin-latte" dark="catppuccin-mocha" />
-
-<!-- Banner for important announcements -->
-<changebot-banner theme="nord" />
-
-<!-- Toast/popup notifications -->
-<changebot-toast position="bottom-right" auto-dismiss="5" />
+<changebot-provider slug="YOUR_WIDGET_SLUG" user-id="user_123" />
 ```
 
-### Component options
-
-**Badge:**
-
-- `indicator` - Display style: `count` (shows number) or `dot` (shows dot only) (default: `count`)
-
-**Panel:**
-
-- `mode` - Display mode: `drawer-right`, `drawer-left`, or `modal` (default: `drawer-right`)
-
-**Banner:**
-
-- No additional options beyond theming
-
-**Toast:**
-
-- `position` - Screen position: `bottom-right`, `bottom-left`, `top-right`, or `top-left` (default: `bottom-right`)
-- `auto-dismiss` - Auto-dismiss after N seconds (optional)
-
-All components support `theme`, `light`, and `dark` props for theming (see Available themes below).
-
-## 4. Control programmatically (optional)
-
-### Direct method calls
-
-Call methods directly on the panel element:
+This syncs the user's last-viewed timestamp with the Changebot API, enabling cross-device read state. You can also pass additional user metadata with `user-data`:
 
 <!-- prettier-ignore -->
 ```html
-<button onclick="document.querySelector('changebot-panel').open()">What's New</button>
-<button onclick="document.querySelector('changebot-panel').close()">Close</button>
+<changebot-provider
+  slug="YOUR_WIDGET_SLUG"
+  user-id="user_123"
+  user-data='{"email":"user@example.com","name":"Jane Doe"}'
+/>
 ```
 
-### Using events
+## 4. Choose a theme
 
-Dispatch `changebot:action` events for more control:
-
-```javascript
-// Open panel
-document.dispatchEvent(
-  new CustomEvent('changebot:action', {
-    detail: { type: 'openDisplay' },
-  }),
-);
-
-// Close panel
-document.dispatchEvent(
-  new CustomEvent('changebot:action', {
-    detail: { type: 'closeDisplay' },
-  }),
-);
-
-// Toggle panel
-document.dispatchEvent(
-  new CustomEvent('changebot:action', {
-    detail: { type: 'toggleDisplay' },
-  }),
-);
-```
-
-## Available themes
-
-**Light themes:**
-
-- catppuccin-latte
-- gruvbox-light
-- solarized-light
-- everforest-light
-- frost
-
-**Dark themes:**
-
-- catppuccin-frappe
-- catppuccin-macchiato
-- catppuccin-mocha
-- gruvbox-dark
-- dracula
-- nord
-- solarized-dark
-- everforest-dark
-- tokyo-night
-- cyberpunk
-
-Use `light` and `dark` props for automatic theme switching based on system preferences:
+Use `theme` for a fixed theme, or `light` and `dark` to switch automatically based on system preference:
 
 ```html
 <changebot-badge light="catppuccin-latte" dark="catppuccin-mocha" />
 ```
 
-## Framework packages
+**Light:** catppuccin-latte, gruvbox-light, solarized-light, everforest-light, frost
 
-For React and Vue applications, use our NPM packages for better integration:
+**Dark:** catppuccin-frappe, catppuccin-macchiato, catppuccin-mocha, gruvbox-dark, dracula, nord, solarized-dark, everforest-dark, tokyo-night, cyberpunk
 
-- **React:** `npm install @changebot/widgets-react`
-- **Vue:** `npm install @changebot/widgets-vue`
+## 5. Add display components
 
-See the package READMEs on npm for framework-specific usage.
+Choose which components to use based on your needs. Props with defaults don't need to be set.
+
+### Badge
+
+Displays a count of new updates. Clicking opens the panel.
+
+```html
+<changebot-badge theme="nord" />
+```
+
+| Prop | Values | Default |
+| --- | --- | --- |
+| `indicator` | `"count"`, `"dot"` | `"count"` |
+
+**CSS custom properties:**
+
+Set `--badge-size` to scale the entire badge proportionally. All other dimensions adjust automatically via `em` units.
+
+```css
+changebot-badge {
+  --badge-size: 14px;
+}
+```
+
+You can also override these properties individually:
+
+| Variable | Description | Default |
+| --- | --- | --- |
+| `--badge-size` | Badge height and min-width | `20px` |
+| `--badge-font-size` | Text size (scales padding, dot, shadows) | `calc(var(--badge-size) * 0.55)` |
+| `--cb-badge-bg` | Background color | `#ff4444` |
+| `--cb-badge-text` | Text color | `white` |
+| `--cb-badge-shadow` | Box shadow color | `rgba(0, 0, 0, 0.15)` |
+
+### Panel
+
+Drawer or modal that displays the full list of updates.
+
+```html
+<changebot-panel light="catppuccin-latte" dark="catppuccin-mocha" />
+```
+
+| Prop | Values | Default |
+| --- | --- | --- |
+| `mode` | `"drawer-right"`, `"drawer-left"`, `"modal"` | `"drawer-right"` |
+
+**Programmatic control:**
+
+```javascript
+// Direct method calls
+document.querySelector('changebot-panel').open();
+document.querySelector('changebot-panel').close();
+
+// Or dispatch events
+document.dispatchEvent(new CustomEvent('changebot:action', {
+  detail: { type: 'openDisplay' }
+}));
+document.dispatchEvent(new CustomEvent('changebot:action', {
+  detail: { type: 'toggleDisplay' }
+}));
+```
+
+### Banner
+
+Top-of-page banner that automatically displays updates published with `highlight_target="banner"`. No additional props beyond theming.
+
+```html
+<changebot-banner theme="nord" />
+```
+
+### Toast
+
+Popup notification that automatically displays updates published with `highlight_target="toast"`.
+
+```html
+<changebot-toast theme="nord" auto-dismiss="5" />
+```
+
+| Prop | Values | Default |
+| --- | --- | --- |
+| `position` | `"bottom-right"`, `"bottom-left"`, `"top-right"`, `"top-left"` | `"bottom-right"` |
+| `auto-dismiss` | seconds (number) | none |
 
 ## Complete example
 
@@ -172,29 +176,6 @@ Here's a minimal working example:
     <changebot-panel mode="drawer-right" light="frost" dark="nord" />
   </body>
 </html>
-```
-
-## Advanced usage
-
-### User tracking
-
-Track which users have viewed updates by passing a `user-id`:
-
-```html
-<changebot-provider slug="YOUR_WIDGET_SLUG" user-id="user_123" />
-```
-
-This syncs the user's last-viewed timestamp with the Changebot API, enabling cross-device read state.
-
-You can also pass additional user metadata with `user-data`:
-
-<!-- prettier-ignore -->
-```html
-<changebot-provider
-  slug="YOUR_WIDGET_SLUG"
-  user-id="user_123"
-  user-data='{"email":"user@example.com","name":"Jane Doe"}'
-/>
 ```
 
 ## More information
