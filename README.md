@@ -43,7 +43,7 @@ Load directly from CDN - no build step required:
 For production, pin to a specific version:
 
 ```html
-<script type="module" src="https://widgets.changebot.ai/v0.2.0/widgets.esm.js"></script>
+<script type="module" src="https://widgets.changebot.ai/v0.2.2/widgets.esm.js"></script>
 ```
 
 ### Option 2: npm (For bundled apps)
@@ -403,12 +403,12 @@ import { ChangebotProvider, ChangebotBadge, ChangebotPanel, ChangebotBanner, Cha
 
 Required component that manages state and API calls.
 
-| Prop        | Type   | Default     | Description                                          |
-| ----------- | ------ | ----------- | ---------------------------------------------------- |
-| `slug`      | string | -           | Your Changebot product slug                          |
-| `scope`     | string | `"default"` | Scope for multiple providers                         |
-| `user-id`   | string | -           | User identifier for cross-device tracking            |
-| `user-data` | string | -           | JSON string with user metadata (e.g., email, name)   |
+| Prop        | Type   | Default     | Description                                        |
+| ----------- | ------ | ----------- | -------------------------------------------------- |
+| `slug`      | string | -           | Your Changebot product slug                        |
+| `scope`     | string | `"default"` | Scope for multiple providers                       |
+| `user-id`   | string | -           | User identifier for cross-device tracking          |
+| `user-data` | string | -           | JSON string with user metadata (e.g., email, name) |
 
 **Events:**
 
@@ -419,13 +419,13 @@ Required component that manages state and API calls.
 
 Badge that displays the count of new updates.
 
-| Prop         | Type    | Default     | Description                                         |
-| ------------ | ------- | ----------- | --------------------------------------------------- |
-| `scope`      | string  | `"default"` | Connect to matching provider                        |
-| `theme`      | string  | -           | Fixed theme name (see themes below)                 |
-| `light`      | string  | -           | Theme for light mode                                |
-| `dark`       | string  | -           | Theme for dark mode                                 |
-| `indicator`  | string  | `"count"`   | Display style: `"count"` or `"dot"`                 |
+| Prop        | Type   | Default     | Description                         |
+| ----------- | ------ | ----------- | ----------------------------------- |
+| `scope`     | string | `"default"` | Connect to matching provider        |
+| `theme`     | string | -           | Fixed theme name (see themes below) |
+| `light`     | string | -           | Theme for light mode                |
+| `dark`      | string | -           | Theme for dark mode                 |
+| `indicator` | string | `"count"`   | Display style: `"count"` or `"dot"` |
 
 **Events:**
 
@@ -638,13 +638,13 @@ document.addEventListener('changebot:lastViewed', event => {
 
 #### Available Action Types
 
-| Action Type | Description |
-|-------------|-------------|
-| `openDisplay` | Opens the panel and marks updates as viewed |
-| `closeDisplay` | Closes the panel |
+| Action Type     | Description                                           |
+| --------------- | ----------------------------------------------------- |
+| `openDisplay`   | Opens the panel and marks updates as viewed           |
+| `closeDisplay`  | Closes the panel                                      |
 | `toggleDisplay` | Toggles the panel (opens with mark viewed, or closes) |
-| `markViewed` | Marks updates as viewed without opening panel |
-| `markAllViewed` | Marks all updates as viewed |
+| `markViewed`    | Marks updates as viewed without opening panel         |
+| `markAllViewed` | Marks all updates as viewed                           |
 
 ## Accessibility Features
 
@@ -755,6 +755,7 @@ git push origin main
 ```
 
 GitHub Actions will automatically:
+
 1. Detect the version change
 2. Create tags (`core-vY.Y.Y`, `widgets-react-vY.Y.Y`, `widgets-vue-vY.Y.Y`)
 3. Create GitHub releases
