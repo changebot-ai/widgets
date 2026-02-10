@@ -37,6 +37,7 @@ export const config: Config = {
         { src: 'production-demo.html' },
         { src: 'userid-demo.html' },
         { src: 'preview-demo.html' },
+        { src: 'badge-demo.html' },
       ],
     },
   ],

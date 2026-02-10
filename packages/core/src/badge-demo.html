@@ -1,0 +1,294 @@
+<!doctype html>
+<html dir="ltr" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Badge Demo - Changebot Widgets</title>
+
+  <script type="module" src="/build/widgets.esm.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+    }
+
+    .demo-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 24px 32px;
+    }
+
+    .demo-header h1 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .demo-header p {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      margin-bottom: 24px;
+    }
+
+    .section h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-row {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .badge-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-cell label {
+      font-size: 12px;
+      color: #888;
+    }
+
+    .size-10 { --badge-size: 10px; }
+    .size-14 { --badge-size: 14px; }
+    .size-20 { --badge-size: 20px; }
+    .size-28 { --badge-size: 28px; }
+    .size-40 { --badge-size: 40px; }
+
+    .theme-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .theme-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .theme-label {
+      min-width: 140px;
+      font-size: 13px;
+      color: #555;
+    }
+
+    .dark-bg {
+      background: #1e1e2e;
+      border-radius: 8px;
+      padding: 16px 24px;
+    }
+
+    .dark-bg .theme-label {
+      color: #aaa;
+    }
+
+    .info-box {
+      background: #e8f4fd;
+      border: 1px solid #b3d9f7;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+
+    .info-box p {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    .info-box code {
+      background: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #d63384;
+    }
+  </style>
+</head>
+
+<body>
+  <changebot-provider id="provider" scope="badge-demo" preview></changebot-provider>
+
+  <header class="demo-header">
+    <h1>Badge Demo</h1>
+    <p>Badge component at various sizes, indicators, and themes</p>
+  </header>
+
+  <div class="container">
+    <div class="info-box">
+      <p>
+        Set <code>--badge-size</code> to scale the entire badge proportionally.
+        All dimensions (padding, shadows, dot, pulse) scale via <code>calc(var(--badge-size) * factor)</code>.
+      </p>
+    </div>
+
+    <!-- Sizes with count -->
+    <div class="section">
+      <h2>Count indicator at different sizes</h2>
+      <div class="badge-row">
+        <div class="badge-cell">
+          <changebot-badge class="size-14" scope="badge-demo" count="3"></changebot-badge>
+          <label>14px</label>
+        </div>
+        <div class="badge-cell">
+          <changebot-badge class="size-20" scope="badge-demo" count="3"></changebot-badge>
+          <label>20px (default)</label>
+        </div>
+        <div class="badge-cell">
+          <changebot-badge class="size-28" scope="badge-demo" count="3"></changebot-badge>
+          <label>28px</label>
+        </div>
+        <div class="badge-cell">
+          <changebot-badge class="size-40" scope="badge-demo" count="3"></changebot-badge>
+          <label>40px</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sizes with dot -->
+    <div class="section">
+      <h2>Dot indicator at different sizes</h2>
+      <div class="badge-row">
+        <div class="badge-cell">
+          <changebot-badge class="size-10" scope="badge-demo" count="3" indicator="dot"></changebot-badge>
+          <label>10px</label>
+        </div>
+        <div class="badge-cell">
+          <changebot-badge class="size-14" scope="badge-demo" count="3" indicator="dot"></changebot-badge>
+          <label>14px</label>
+        </div>
+        <div class="badge-cell">
+          <changebot-badge class="size-20" scope="badge-demo" count="3" indicator="dot"></changebot-badge>
+          <label>20px (default)</label>
+        </div>
+        <div class="badge-cell">
+          <changebot-badge class="size-28" scope="badge-demo" count="3" indicator="dot"></changebot-badge>
+          <label>28px</label>
+        </div>
+        <div class="badge-cell">
+          <changebot-badge class="size-40" scope="badge-demo" count="3" indicator="dot"></changebot-badge>
+          <label>40px</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Multi-digit counts -->
+    <div class="section">
+      <h2>Multi-digit counts (pill shape)</h2>
+      <div class="badge-row">
+        <div class="badge-cell">
+          <changebot-badge class="size-20" scope="badge-demo" count="1"></changebot-badge>
+          <label>1</label>
+        </div>
+        <div class="badge-cell">
+          <changebot-badge class="size-20" scope="badge-demo" count="5"></changebot-badge>
+          <label>5</label>
+        </div>
+        <div class="badge-cell">
+          <changebot-badge class="size-20" scope="badge-demo" count="9"></changebot-badge>
+          <label>9</label>
+        </div>
+        <div class="badge-cell">
+          <changebot-badge class="size-20" scope="badge-demo" count="10"></changebot-badge>
+          <label>9+ (capped)</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Themes on light background -->
+    <div class="section">
+      <h2>Light themes</h2>
+      <div class="theme-row">
+        <span class="theme-label">Catppuccin Latte</span>
+        <changebot-badge scope="badge-demo" count="3" theme="catppuccin-latte"></changebot-badge>
+        <changebot-badge scope="badge-demo" count="3" theme="catppuccin-latte" indicator="dot"></changebot-badge>
+      </div>
+      <div class="theme-row">
+        <span class="theme-label">Gruvbox Light</span>
+        <changebot-badge scope="badge-demo" count="3" theme="gruvbox-light"></changebot-badge>
+        <changebot-badge scope="badge-demo" count="3" theme="gruvbox-light" indicator="dot"></changebot-badge>
+      </div>
+      <div class="theme-row">
+        <span class="theme-label">Solarized Light</span>
+        <changebot-badge scope="badge-demo" count="3" theme="solarized-light"></changebot-badge>
+        <changebot-badge scope="badge-demo" count="3" theme="solarized-light" indicator="dot"></changebot-badge>
+      </div>
+      <div class="theme-row">
+        <span class="theme-label">Everforest Light</span>
+        <changebot-badge scope="badge-demo" count="3" theme="everforest-light"></changebot-badge>
+        <changebot-badge scope="badge-demo" count="3" theme="everforest-light" indicator="dot"></changebot-badge>
+      </div>
+      <div class="theme-row">
+        <span class="theme-label">Frost</span>
+        <changebot-badge scope="badge-demo" count="3" theme="frost"></changebot-badge>
+        <changebot-badge scope="badge-demo" count="3" theme="frost" indicator="dot"></changebot-badge>
+      </div>
+    </div>
+
+    <!-- Themes on dark background -->
+    <div class="section">
+      <h2>Dark themes</h2>
+      <div class="dark-bg">
+        <div class="theme-row">
+          <span class="theme-label">Catppuccin Mocha</span>
+          <changebot-badge scope="badge-demo" count="3" theme="catppuccin-mocha"></changebot-badge>
+          <changebot-badge scope="badge-demo" count="3" theme="catppuccin-mocha" indicator="dot"></changebot-badge>
+        </div>
+        <div class="theme-row">
+          <span class="theme-label">Dracula</span>
+          <changebot-badge scope="badge-demo" count="3" theme="dracula"></changebot-badge>
+          <changebot-badge scope="badge-demo" count="3" theme="dracula" indicator="dot"></changebot-badge>
+        </div>
+        <div class="theme-row">
+          <span class="theme-label">Nord</span>
+          <changebot-badge scope="badge-demo" count="3" theme="nord"></changebot-badge>
+          <changebot-badge scope="badge-demo" count="3" theme="nord" indicator="dot"></changebot-badge>
+        </div>
+        <div class="theme-row">
+          <span class="theme-label">Tokyo Night</span>
+          <changebot-badge scope="badge-demo" count="3" theme="tokyo-night"></changebot-badge>
+          <changebot-badge scope="badge-demo" count="3" theme="tokyo-night" indicator="dot"></changebot-badge>
+        </div>
+        <div class="theme-row">
+          <span class="theme-label">Cyberpunk</span>
+          <changebot-badge scope="badge-demo" count="3" theme="cyberpunk"></changebot-badge>
+          <changebot-badge scope="badge-demo" count="3" theme="cyberpunk" indicator="dot"></changebot-badge>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
