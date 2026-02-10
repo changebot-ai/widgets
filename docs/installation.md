@@ -85,7 +85,7 @@ Displays a count of new updates. Clicking opens the panel.
 
 **CSS custom properties:**
 
-Set `--badge-size` to scale the entire badge proportionally. All other dimensions adjust automatically via `em` units.
+Set `--badge-size` to scale the entire badge proportionally. All other dimensions adjust automatically.
 
 ```css
 changebot-badge {
@@ -98,7 +98,12 @@ You can also override these properties individually:
 | Variable | Description | Default |
 | --- | --- | --- |
 | `--badge-size` | Badge height and min-width | `20px` |
-| `--badge-font-size` | Text size (scales padding, dot, shadows) | `calc(var(--badge-size) * 0.55)` |
+| `--badge-font-size` | Text size | `calc(var(--badge-size) * 0.55)` |
+| `--badge-padding` | Horizontal padding | `calc(var(--badge-size) * 0.3)` |
+| `--badge-dot-size` | Dot indicator diameter | `calc(var(--badge-size) * 0.3)` |
+| `--badge-shadow-y` | Shadow vertical offset | `calc(var(--badge-size) * 0.1)` |
+| `--badge-shadow-blur` | Shadow blur radius | `calc(var(--badge-size) * 0.4)` |
+| `--badge-pulse-spread` | Pulse animation spread | `calc(var(--badge-size) * 0.5)` |
 | `--cb-badge-bg` | Background color | `#ff4444` |
 | `--cb-badge-text` | Text color | `white` |
 | `--cb-badge-shadow` | Box shadow color | `rgba(0, 0, 0, 0.15)` |
