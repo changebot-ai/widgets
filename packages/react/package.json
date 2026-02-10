@@ -1,6 +1,6 @@
 {
   "name": "@changebot/widgets-react",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "React wrapper components for Changebot widgets",
   "main": "dist/index.js",
   "module": "dist/index.js",
