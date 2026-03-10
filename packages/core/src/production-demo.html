@@ -315,6 +315,40 @@
         </div>
       </div>
 
+      <!-- Last Viewed Toast Time Controls -->
+      <div class="control-section">
+        <h3>Last Viewed Toast Time</h3>
+        <div class="button-row">
+          <button class="btn btn-secondary" onclick="setLastViewedToast('now')">Now</button>
+          <button class="btn btn-secondary" onclick="setLastViewedToast('1day')">1 Day Ago</button>
+          <button class="btn btn-secondary" onclick="setLastViewedToast('7days')">7 Days</button>
+          <button class="btn btn-secondary" onclick="setLastViewedToast('30days')">30 Days</button>
+          <button class="btn btn-danger" onclick="setLastViewedToast('clear')">Clear</button>
+        </div>
+        <div class="control-row" style="margin-top: 12px;">
+          <label>Custom:</label>
+          <input type="datetime-local" id="customDateToast" />
+          <button class="btn btn-primary" onclick="setCustomDateToast()">Set</button>
+        </div>
+      </div>
+
+      <!-- Last Viewed Banner Time Controls -->
+      <div class="control-section">
+        <h3>Last Viewed Banner Time</h3>
+        <div class="button-row">
+          <button class="btn btn-secondary" onclick="setLastViewedBanner('now')">Now</button>
+          <button class="btn btn-secondary" onclick="setLastViewedBanner('1day')">1 Day Ago</button>
+          <button class="btn btn-secondary" onclick="setLastViewedBanner('7days')">7 Days</button>
+          <button class="btn btn-secondary" onclick="setLastViewedBanner('30days')">30 Days</button>
+          <button class="btn btn-danger" onclick="setLastViewedBanner('clear')">Clear</button>
+        </div>
+        <div class="control-row" style="margin-top: 12px;">
+          <label>Custom:</label>
+          <input type="datetime-local" id="customDateBanner" />
+          <button class="btn btn-primary" onclick="setCustomDateBanner()">Set</button>
+        </div>
+      </div>
+
       <!-- Theme Controls -->
       <div class="control-section">
         <h3>Theme</h3>
@@ -459,6 +493,22 @@
         <span class="debug-value" id="debug-lastviewed">-</span>
       </div>
       <div class="debug-row">
+        <span class="debug-label">Last Viewed Toast (raw):</span>
+        <span class="debug-value" id="debug-lastviewed-toast-raw">-</span>
+      </div>
+      <div class="debug-row">
+        <span class="debug-label">Last Viewed Toast (formatted):</span>
+        <span class="debug-value" id="debug-lastviewed-toast">-</span>
+      </div>
+      <div class="debug-row">
+        <span class="debug-label">Last Viewed Banner (raw):</span>
+        <span class="debug-value" id="debug-lastviewed-banner-raw">-</span>
+      </div>
+      <div class="debug-row">
+        <span class="debug-label">Last Viewed Banner (formatted):</span>
+        <span class="debug-value" id="debug-lastviewed-banner">-</span>
+      </div>
+      <div class="debug-row">
         <span class="debug-label">Current Theme:</span>
         <span class="debug-value" id="debug-theme">-</span>
       </div>
@@ -486,6 +536,8 @@
   <script>
     const SCOPE = 'production-demo';
     const LS_KEY = `changebot:lastViewed:${SCOPE}`;
+    const LS_KEY_BANNER = `changebot:lastViewedBanner:${SCOPE}`;
+    const LS_KEY_TOAST = `changebot:lastViewedToast:${SCOPE}`;
     const SLUG_KEY = 'changebot:demo:slug';
 
     // Get saved slug or use default
@@ -564,6 +616,62 @@
       if (input.value) {
         const timestamp = new Date(input.value).getTime();
         localStorage.setItem(LS_KEY, timestamp.toString());
+        location.reload();
+      }
+    }
+
+    // Last Viewed Toast Controls
+    function setLastViewedToast(period) {
+      setLastViewedFor(LS_KEY_TOAST, period);
+    }
+
+    function setCustomDateToast() {
+      setCustomDateFor(LS_KEY_TOAST, 'customDateToast');
+    }
+
+    // Last Viewed Banner Controls
+    function setLastViewedBanner(period) {
+      setLastViewedFor(LS_KEY_BANNER, period);
+    }
+
+    function setCustomDateBanner() {
+      setCustomDateFor(LS_KEY_BANNER, 'customDateBanner');
+    }
+
+    // Shared helpers for last viewed controls
+    function setLastViewedFor(key, period) {
+      const now = Date.now();
+      const day = 24 * 60 * 60 * 1000;
+      let timestamp;
+
+      switch (period) {
+        case 'now':
+          timestamp = now;
+          break;
+        case '1day':
+          timestamp = now - day;
+          break;
+        case '7days':
+          timestamp = now - 7 * day;
+          break;
+        case '30days':
+          timestamp = now - 30 * day;
+          break;
+        case 'clear':
+          localStorage.removeItem(key);
+          location.reload();
+          return;
+      }
+
+      localStorage.setItem(key, timestamp.toString());
+      location.reload();
+    }
+
+    function setCustomDateFor(key, inputId) {
+      const input = document.getElementById(inputId);
+      if (input.value) {
+        const timestamp = new Date(input.value).getTime();
+        localStorage.setItem(key, timestamp.toString());
         location.reload();
       }
     }
@@ -694,6 +802,8 @@
 
     function resetAll() {
       localStorage.removeItem(LS_KEY);
+      localStorage.removeItem(LS_KEY_TOAST);
+      localStorage.removeItem(LS_KEY_BANNER);
       localStorage.removeItem(SLUG_KEY);
       location.reload();
     }
@@ -758,6 +868,8 @@
     // Debug
     function refreshDebug() {
       const raw = localStorage.getItem(LS_KEY);
+      const rawToast = localStorage.getItem(LS_KEY_TOAST);
+      const rawBanner = localStorage.getItem(LS_KEY_BANNER);
       const debugSlug = document.getElementById('debug-slug');
       const debugRaw = document.getElementById('debug-lastviewed-raw');
       const debugFormatted = document.getElementById('debug-lastviewed');
@@ -775,6 +887,12 @@
         debugFormatted.className = 'debug-value warning';
       }
 
+      // Toast last viewed
+      formatDebugTimestamp(rawToast, 'debug-lastviewed-toast-raw', 'debug-lastviewed-toast');
+
+      // Banner last viewed
+      formatDebugTimestamp(rawBanner, 'debug-lastviewed-banner-raw', 'debug-lastviewed-banner');
+
       // Theme info
       const mode = document.getElementById('themeMode').value;
       if (mode === 'fixed') {
@@ -783,6 +901,23 @@
         const light = document.getElementById('lightTheme').value;
         const dark = document.getElementById('darkTheme').value;
         debugTheme.textContent = `light: ${light}, dark: ${dark}`;
+      }
+    }
+
+    function formatDebugTimestamp(raw, rawElId, formattedElId) {
+      const rawEl = document.getElementById(rawElId);
+      const formattedEl = document.getElementById(formattedElId);
+
+      rawEl.textContent = raw || '(not set)';
+      rawEl.className = 'debug-value' + (raw ? '' : ' warning');
+
+      if (raw) {
+        const date = new Date(parseInt(raw));
+        formattedEl.textContent = date.toLocaleString();
+        formattedEl.className = 'debug-value';
+      } else {
+        formattedEl.textContent = '(not set - first visit behavior)';
+        formattedEl.className = 'debug-value warning';
       }
     }
 
