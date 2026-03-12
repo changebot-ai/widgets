@@ -8,7 +8,7 @@ export interface Update {
   id: number;
   title: string;
   content: string; // HTML content from ActionText
-  display_date: string; // YYYY-MM-DD format
+  display_date: string; // YYYY-MM-DD or ISO 8601 timestamp
   published_at: string; // ISO 8601 timestamp
   expires_on: string | null; // Optional expiration date
   highlight_target: 'banner' | 'toast' | null; // Display emphasis mode
