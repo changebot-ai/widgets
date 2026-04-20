@@ -13,14 +13,14 @@ echo "Deploying version ${VERSION} to R2..."
 aws s3 sync packages/core/dist/widgets "s3://${BUCKET}/v${VERSION}" \
   --endpoint-url "$ENDPOINT" \
   --region auto \
-  --cache-control "public, max-age=31536000, immutable" \
+  --cache-control "public, max-age=31536000, immutable, stale-if-error=604800" \
   --exclude "*.map"
 
 # Latest (mutable alias)
 aws s3 sync packages/core/dist/widgets "s3://${BUCKET}/latest" \
   --endpoint-url "$ENDPOINT" \
   --region auto \
-  --cache-control "public, max-age=300" \
+  --cache-control "public, max-age=300, stale-if-error=86400" \
   --delete \
   --exclude "*.map"
 
