@@ -8,17 +8,35 @@
 import { Services } from '../types';
 import { logRegistry as log } from '../utils/logger';
 
-interface PendingStore {
-  promise: Promise<Services>;
+interface PendingListener {
   resolve: (services: Services) => void;
   reject: (error: Error) => void;
   timeoutId?: ReturnType<typeof setTimeout>;
+  signal?: AbortSignal;
+  abortHandler?: () => void;
 }
-
 
 // Module-level registry - survives component lifecycle
 const registry = new Map<string, Services>();
-const pending = new Map<string, PendingStore>();
+const pending = new Map<string, Set<PendingListener>>();
+
+function detachListener(scope: string, listener: PendingListener): void {
+  if (listener.timeoutId) {
+    clearTimeout(listener.timeoutId);
+    listener.timeoutId = undefined;
+  }
+  if (listener.signal && listener.abortHandler) {
+    listener.signal.removeEventListener('abort', listener.abortHandler);
+    listener.abortHandler = undefined;
+  }
+  const listeners = pending.get(scope);
+  if (listeners) {
+    listeners.delete(listener);
+    if (listeners.size === 0) {
+      pending.delete(scope);
+    }
+  }
+}
 
 /**
  * Register a store for a given scope. Called by provider after initialization.
@@ -29,15 +47,23 @@ export function registerStore(scope: string, services: Services): void {
   registry.set(scope, services);
 
   // Resolve any pending waiters
-  const pendingEntry = pending.get(scope);
-  if (pendingEntry) {
-    log.debug('Resolving pending waiters', { scope });
-    // Clear timeout before resolving
-    if (pendingEntry.timeoutId) {
-      clearTimeout(pendingEntry.timeoutId);
-    }
-    pendingEntry.resolve(services);
+  const listeners = pending.get(scope);
+  if (listeners && listeners.size > 0) {
+    log.debug('Resolving pending waiters', { scope, count: listeners.size });
+    // Snapshot to avoid mutation during iteration
+    const snapshot = Array.from(listeners);
     pending.delete(scope);
+    for (const listener of snapshot) {
+      if (listener.timeoutId) {
+        clearTimeout(listener.timeoutId);
+        listener.timeoutId = undefined;
+      }
+      if (listener.signal && listener.abortHandler) {
+        listener.signal.removeEventListener('abort', listener.abortHandler);
+        listener.abortHandler = undefined;
+      }
+      listener.resolve(services);
+    }
   }
 }
 
@@ -54,11 +80,30 @@ export function unregisterStore(scope: string): void {
  * Get store for a scope. Returns immediately if available,
  * or waits for provider to register.
  *
+ * Supports cancellation via AbortSignal so consumers can cancel
+ * in-flight waits when they disconnect, preventing dangling timers
+ * and late log output.
+ *
  * @param scope - The scope identifier (default: 'default')
- * @param timeout - Maximum wait time in ms (default: 5000)
- * @returns Promise that resolves with services when provider registers
+ * @param options - Optional timeout (default: 5000) and AbortSignal
+ * @returns Promise that resolves with services when provider registers,
+ *          or rejects on timeout / abort.
  */
-export function waitForStore(scope: string = 'default', timeout: number = 5000): Promise<Services> {
+export function waitForStore(
+  scope: string = 'default',
+  options: { timeout?: number; signal?: AbortSignal } = {}
+): Promise<Services> {
+  const timeout = options.timeout ?? 5000;
+  const signal = options.signal;
+
+  // If caller already aborted, reject immediately.
+  if (signal?.aborted) {
+    const reason =
+      (signal.reason as Error | undefined) ??
+      new DOMException('waitForStore aborted', 'AbortError');
+    return Promise.reject(reason);
+  }
+
   // Return immediately if already registered
   const existing = registry.get(scope);
   if (existing) {
@@ -66,48 +111,53 @@ export function waitForStore(scope: string = 'default', timeout: number = 5000):
     return Promise.resolve(existing);
   }
 
-  // Check if already waiting - reuse the existing promise
-  const existingPending = pending.get(scope);
-  if (existingPending) {
-    log.debug('Already waiting for store, reusing promise', { scope });
-    return existingPending.promise;
-  }
-
   log.debug('Store not registered, waiting...', { scope, timeout });
 
-  // Create new pending entry with deferred promise pattern
-  let resolvePromise: (services: Services) => void;
-  let rejectPromise: (error: Error) => void;
+  return new Promise<Services>((resolve, reject) => {
+    const listener: PendingListener = { resolve, reject };
 
-  const promise = new Promise<Services>((resolve, reject) => {
-    resolvePromise = resolve;
-    rejectPromise = reject;
-  });
-
-  const pendingEntry: PendingStore = {
-    promise,
-    resolve: resolvePromise!,
-    reject: rejectPromise!,
-  };
-
-  // Timeout handling
-  if (timeout > 0) {
-    pendingEntry.timeoutId = setTimeout(() => {
-      if (pending.has(scope)) {
-        pending.delete(scope);
+    // Per-caller timeout
+    if (timeout > 0) {
+      listener.timeoutId = setTimeout(() => {
+        // Only fire if still pending for this listener
+        const listeners = pending.get(scope);
+        if (!listeners || !listeners.has(listener)) {
+          return;
+        }
+        detachListener(scope, listener);
         const error = new Error(
           `Timeout waiting for provider with scope "${scope}". ` +
             `Ensure <changebot-provider scope="${scope}"> is present in the DOM.`
         );
         log.warn('Timeout waiting for store', { scope, timeout });
-        rejectPromise!(error);
-      }
-    }, timeout);
-  }
+        reject(error);
+      }, timeout);
+    }
 
-  pending.set(scope, pendingEntry);
+    // Per-caller abort
+    if (signal) {
+      listener.signal = signal;
+      listener.abortHandler = () => {
+        const listeners = pending.get(scope);
+        if (!listeners || !listeners.has(listener)) {
+          return;
+        }
+        detachListener(scope, listener);
+        const reason =
+          (signal.reason as Error | undefined) ??
+          new DOMException('waitForStore aborted', 'AbortError');
+        reject(reason);
+      };
+      signal.addEventListener('abort', listener.abortHandler);
+    }
 
-  return promise;
+    let listeners = pending.get(scope);
+    if (!listeners) {
+      listeners = new Set();
+      pending.set(scope, listeners);
+    }
+    listeners.add(listener);
+  });
 }
 
 /**
@@ -130,10 +180,17 @@ export function getStore(scope: string = 'default'): Services | undefined {
  */
 export function clearRegistry(): void {
   log.debug('Clearing registry');
-  // Clear any pending timeouts
-  for (const entry of pending.values()) {
-    if (entry.timeoutId) {
-      clearTimeout(entry.timeoutId);
+  // Clear any pending timeouts and abort listeners
+  for (const listeners of pending.values()) {
+    for (const listener of listeners) {
+      if (listener.timeoutId) {
+        clearTimeout(listener.timeoutId);
+        listener.timeoutId = undefined;
+      }
+      if (listener.signal && listener.abortHandler) {
+        listener.signal.removeEventListener('abort', listener.abortHandler);
+        listener.abortHandler = undefined;
+      }
     }
   }
   registry.clear();
