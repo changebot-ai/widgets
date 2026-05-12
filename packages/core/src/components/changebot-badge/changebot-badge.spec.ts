@@ -2,6 +2,16 @@ import { newSpecPage } from '@stencil/core/testing';
 import { ChangebotBadge } from './changebot-badge';
 
 describe('changebot-badge', () => {
+  let warnSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    warnSpy.mockRestore();
+  });
+
   it('renders with hidden badge when count is 0', async () => {
     const { root } = await newSpecPage({
       components: [ChangebotBadge],
