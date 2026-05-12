@@ -156,12 +156,24 @@ describe('Integration Tests - Full System', () => {
       `);
 
       await page.waitForChanges();
+      // Wait for async provider connections to complete before calling panel methods.
+      // Matches the pattern used by other tests in this file (tech debt — see file header).
+      // We can't use condition-based polling for the services-ready signal because
+      // the panel's `services` field is private and not exposed on the host element,
+      // and the provider doesn't set a DOM-observable readiness marker on its host.
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       // Open drawer programmatically
       await page.$eval('changebot-panel', (el: any) => el.open());
 
-      await page.waitForChanges();
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Wait for the panel to transition to open
+      await page.waitForFunction(
+        () => {
+          const panel = document.querySelector('changebot-panel')?.shadowRoot?.querySelector('.panel');
+          return panel?.classList.contains('panel--open');
+        },
+        { timeout: 5000, polling: 50 },
+      );
 
       // Verify drawer is open
       const drawer = await page.find('changebot-panel >>> .panel');
@@ -171,8 +183,14 @@ describe('Integration Tests - Full System', () => {
       // Close drawer programmatically
       await page.$eval('changebot-panel', (el: any) => el.close());
 
-      await page.waitForChanges();
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Wait for the panel to transition to closed
+      await page.waitForFunction(
+        () => {
+          const panel = document.querySelector('changebot-panel')?.shadowRoot?.querySelector('.panel');
+          return panel?.classList.contains('panel--closed') && !panel?.classList.contains('panel--open');
+        },
+        { timeout: 5000, polling: 50 },
+      );
 
       // Verify drawer is closed
       const closedDrawer = await page.find('changebot-panel >>> .panel');
