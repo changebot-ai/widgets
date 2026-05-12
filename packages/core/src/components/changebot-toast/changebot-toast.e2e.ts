@@ -90,14 +90,6 @@ describe('changebot-toast e2e', () => {
     expect(await component.getAttribute('data-scope')).toBe('dashboard');
   });
 
-  it('renders with auto-dismiss prop', async () => {
-    const page = await newE2EPage();
-    await page.setContent('<changebot-toast auto-dismiss="5"></changebot-toast>');
-
-    const component = await page.find('changebot-toast');
-    expect(await component.getProperty('autoDismiss')).toBe(5);
-  });
-
   it('has correct aria attributes', async () => {
     const page = await newE2EPage();
     await page.setContent('<changebot-toast></changebot-toast>');

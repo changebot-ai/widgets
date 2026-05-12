@@ -171,7 +171,6 @@ Toast notification for highlighting updates. Automatically displays updates mark
   - `top-right`
   - `bottom-left`
   - `bottom-right`
-- `auto-dismiss` (number, optional) - Auto-dismiss after N seconds
 
 **Methods:**
 
@@ -181,16 +180,15 @@ Toast notification for highlighting updates. Automatically displays updates mark
 **Behavior:**
 
 - Automatically shows for updates with `highlight_target="toast"`
-- Optional auto-dismiss after specified seconds
-- Can be manually dismissed with close button
+- Dismissed via the close button (or by pressing Enter/Space while focused)
 - Marks update as viewed when dismissed
 
 ```html
 <!-- Basic toast -->
 <changebot-toast />
 
-<!-- Positioned toast with auto-dismiss -->
-<changebot-toast position="top-right" auto-dismiss="5" theme="dracula" />
+<!-- Positioned toast with theme -->
+<changebot-toast position="top-right" theme="dracula" />
 ```
 
 ## Opening the Drawer from Custom Elements
@@ -360,7 +358,7 @@ function App() {
 
       <ChangebotPanel mode="drawer-right" light="catppuccin-latte" dark="catppuccin-mocha" />
       <ChangebotBanner theme="nord" />
-      <ChangebotToast position="bottom-right" autoDismiss={5} />
+      <ChangebotToast position="bottom-right" />
     </div>
   );
 }
@@ -388,7 +386,7 @@ Then use the components in your Vue app:
 
     <changebot-panel mode="drawer-right" light="catppuccin-latte" dark="catppuccin-mocha" />
     <changebot-banner theme="nord" />
-    <changebot-toast position="bottom-right" :auto-dismiss="5" />
+    <changebot-toast position="bottom-right" />
   </div>
 </template>
 
@@ -515,7 +513,6 @@ Toast notification for highlighting updates.
 | `light`        | string | -                | Theme for light mode                                                         |
 | `dark`         | string | -                | Theme for dark mode                                                          |
 | `position`     | string | `"bottom-right"` | Position: `top-left`, `top-right`, `bottom-left`, or `bottom-right`          |
-| `auto-dismiss` | number | -                | Auto-dismiss after N seconds (automatically hides toast after this duration) |
 
 **Methods:**
 
@@ -531,9 +528,7 @@ Toast notification for highlighting updates.
 - Automatically displays updates with `highlight_target="toast"`
 - Shows full content in toast notification
 - Dismiss button marks update as viewed in localStorage
-- Optional auto-dismiss clears toast after specified seconds
 - Supports keyboard navigation (Enter/Space to dismiss)
-- Manual dismiss clears auto-dismiss timer if active
 
 ## CSS Customization
 

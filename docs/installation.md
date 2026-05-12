@@ -149,13 +149,12 @@ Top-of-page banner that automatically displays updates published with `highlight
 Popup notification that automatically displays updates published with `highlight_target="toast"`.
 
 ```html
-<changebot-toast theme="nord" auto-dismiss="5" />
+<changebot-toast theme="nord" />
 ```
 
 | Prop | Values | Default |
 | --- | --- | --- |
 | `position` | `"bottom-right"`, `"bottom-left"`, `"top-right"`, `"top-left"` | `"bottom-right"` |
-| `auto-dismiss` | seconds (number) | none |
 
 ## Complete example
 

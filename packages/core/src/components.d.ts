@@ -56,7 +56,6 @@ export namespace Components {
         "userId"?: string;
     }
     interface ChangebotToast {
-        "autoDismiss"?: number;
         "dark"?: Theme;
         "dismiss": () => Promise<void>;
         "light"?: Theme;
@@ -149,7 +148,6 @@ declare namespace LocalJSX {
         "userId"?: string;
     }
     interface ChangebotToast {
-        "autoDismiss"?: number;
         "dark"?: Theme;
         "light"?: Theme;
         /**

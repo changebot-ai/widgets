@@ -20,7 +20,6 @@ export class ChangebotToast {
   @Prop() light?: Theme;
   @Prop() dark?: Theme;
   @Prop() position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' = 'bottom-right';
-  @Prop() autoDismiss?: number; // Auto-dismiss after N seconds (optional)
 
   @State() isVisible: boolean = false;
   @State() currentUpdate?: Update;
@@ -36,7 +35,6 @@ export class ChangebotToast {
   private services?: Services;
   private subscriptionCleanups: (() => void)[] = [];
   private themeManager?: ThemeManager;
-  private autoDismissTimer?: ReturnType<typeof setTimeout>;
   private resizeObserver?: ResizeObserver;
 
   @Watch('theme')
@@ -85,7 +83,6 @@ export class ChangebotToast {
     this.subscriptionCleanups.forEach(cleanup => cleanup());
     this.subscriptionCleanups = [];
     this.themeManager?.cleanup();
-    this.clearAutoDismissTimer();
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
@@ -124,7 +121,6 @@ export class ChangebotToast {
         onShow: update => {
           this.currentUpdate = update;
           this.isVisible = true;
-          this.setupAutoDismiss();
         },
         onHide: () => {
           this.isVisible = false;
@@ -135,25 +131,7 @@ export class ChangebotToast {
     );
   }
 
-  private setupAutoDismiss() {
-    if (this.autoDismiss) {
-      this.clearAutoDismissTimer();
-      this.autoDismissTimer = setTimeout(() => {
-        this.handleDismiss();
-      }, this.autoDismiss * 1000);
-    }
-  }
-
-  private clearAutoDismissTimer() {
-    if (this.autoDismissTimer) {
-      clearTimeout(this.autoDismissTimer);
-      this.autoDismissTimer = undefined;
-    }
-  }
-
   private handleDismiss = () => {
-    this.clearAutoDismissTimer();
-
     // Mark as viewed to persist dismissal
     this.services?.highlight.markToastViewed();
 
@@ -171,7 +149,6 @@ export class ChangebotToast {
   async show(update: Update) {
     this.currentUpdate = update;
     this.isVisible = true;
-    this.setupAutoDismiss();
   }
 
   @Method()
@@ -292,7 +269,6 @@ declare global {
     light?: Theme;
     dark?: Theme;
     position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-    autoDismiss?: number;
     preview?: boolean;
   }
 }

@@ -260,7 +260,6 @@ A toast notification component that displays brief update notifications. Automat
 |------|------|---------|-------------|
 | `scope` | `string` | `"default"` | Scope to connect to (must match provider scope) |
 | `position` | `"top-left"` \| `"top-right"` \| `"bottom-left"` \| `"bottom-right"` | `"bottom-right"` | Screen position for the toast |
-| `auto-dismiss` | `number` | - | Auto-dismiss after N seconds (optional) |
 | `theme` | `Theme` | - | Fixed theme (see Theming section) |
 | `light` | `Theme` | - | Theme for light mode (auto-switches based on system preference) |
 | `dark` | `Theme` | - | Theme for dark mode (auto-switches based on system preference) |
@@ -288,7 +287,6 @@ const dismissToast = async () => {
   <ChangebotToast
     ref="toastRef"
     position="bottom-right"
-    :auto-dismiss="5"
     theme="tokyo-night"
   />
 </template>
@@ -300,7 +298,6 @@ const dismissToast = async () => {
 <template>
   <ChangebotToast
     position="bottom-right"
-    :auto-dismiss="5"
     theme="tokyo-night"
   />
 </template>
@@ -491,7 +488,6 @@ import {
   <!-- Toast appears for toast-highlighted updates -->
   <ChangebotToast
     position="bottom-right"
-    :auto-dismiss="5"
     theme="catppuccin-mocha"
   />
 </template>
