@@ -410,28 +410,35 @@ describe('Integration Tests - Full System', () => {
     });
 
     it('should handle panel operations without provider gracefully', async () => {
-      const page = await newE2EPage();
+      // Silence expected "no services available" warnings bridged from the
+      // browser by Stencil's e2e harness (panel.tsx open/close paths).
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const page = await newE2EPage();
 
-      // Panel without provider should still render and not crash
-      await page.setContent(`
-        <changebot-panel></changebot-panel>
-      `);
+        // Panel without provider should still render and not crash
+        await page.setContent(`
+          <changebot-panel></changebot-panel>
+        `);
 
-      await page.waitForChanges();
+        await page.waitForChanges();
 
-      const panel = await page.find('changebot-panel');
-      expect(panel).toHaveClass('hydrated');
+        const panel = await page.find('changebot-panel');
+        expect(panel).toHaveClass('hydrated');
 
-      // Calling open/close without provider should not crash
-      await page.$eval('changebot-panel', (el: any) => el.open());
-      await page.waitForChanges();
+        // Calling open/close without provider should not crash
+        await page.$eval('changebot-panel', (el: any) => el.open());
+        await page.waitForChanges();
 
-      await page.$eval('changebot-panel', (el: any) => el.close());
-      await page.waitForChanges();
+        await page.$eval('changebot-panel', (el: any) => el.close());
+        await page.waitForChanges();
 
-      // Panel should still be in a valid state
-      const panelElement = await page.find('changebot-panel >>> .panel');
-      expect(panelElement).not.toBeNull();
+        // Panel should still be in a valid state
+        const panelElement = await page.find('changebot-panel >>> .panel');
+        expect(panelElement).not.toBeNull();
+      } finally {
+        warnSpy.mockRestore();
+      }
     });
   });
 
