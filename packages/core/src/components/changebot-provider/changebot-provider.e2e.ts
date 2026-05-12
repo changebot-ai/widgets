@@ -11,6 +11,27 @@ describe('changebot-provider', () => {
 
   it('renders with baseUrl prop', async () => {
     const page = await newE2EPage();
+
+    // Stub window.fetch before the page loads so the provider's auto-fetch
+    // on mount doesn't hit DNS for api.example.com and produce console noise
+    // that this test doesn't assert on. (Stencil's e2e harness already owns
+    // request interception, so we patch at the fetch layer instead.)
+    await page.evaluateOnNewDocument(() => {
+      const originalFetch = window.fetch;
+      window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+        if (url.startsWith('https://api.example.com/')) {
+          return Promise.resolve(
+            new Response(JSON.stringify({ publications: [] }), {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' },
+            }),
+          );
+        }
+        return originalFetch(input, init);
+      };
+    });
+
     await page.setContent('<changebot-provider base-url="https://api.example.com" />');
 
     const element = await page.find('changebot-provider');
