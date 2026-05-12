@@ -36,6 +36,7 @@ export class ChangebotToast {
   private subscriptionCleanups: (() => void)[] = [];
   private themeManager?: ThemeManager;
   private resizeObserver?: ResizeObserver;
+  private abortController?: AbortController;
 
   @Watch('theme')
   @Watch('light')
@@ -62,11 +63,21 @@ export class ChangebotToast {
   }
 
   private async connectToProvider() {
+    // If a previous wait is in flight (e.g. componentWillLoad re-ran),
+    // abort it before starting a new one.
+    this.abortController?.abort();
+    this.abortController = new AbortController();
+    const signal = this.abortController.signal;
     try {
-      this.services = await waitForStore(this.scope || 'default');
+      this.services = await waitForStore(this.scope || 'default', { signal });
       log.debug('Connected to provider via registry', { scope: this.scope || 'default' });
       this.subscribeToStore();
     } catch (error) {
+      // Aborts are an expected lifecycle event (component disconnected
+      // before provider registered), not a failure to log.
+      if ((error as { name?: string } | null)?.name === 'AbortError') {
+        return;
+      }
       log.warn('Failed to connect to provider', {
         error: error instanceof Error ? error.message : error,
         scope: this.scope || 'default',
@@ -80,6 +91,8 @@ export class ChangebotToast {
   }
 
   disconnectedCallback() {
+    this.abortController?.abort();
+    this.abortController = undefined;
     this.subscriptionCleanups.forEach(cleanup => cleanup());
     this.subscriptionCleanups = [];
     this.themeManager?.cleanup();
