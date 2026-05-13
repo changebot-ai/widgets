@@ -195,6 +195,44 @@ describe('store/registry', () => {
       expect(warn).not.toHaveBeenCalled();
       expect(onConnect).not.toHaveBeenCalled();
     });
+
+    it('invokes onTimeout when the timeout fires', () => {
+      jest.useFakeTimers();
+      jest.spyOn(console, 'warn').mockImplementation();
+
+      const onConnect = jest.fn();
+      const onTimeout = jest.fn();
+      onStoreReady('s', onConnect, { timeout: 1000, onTimeout });
+
+      jest.advanceTimersByTime(1000);
+      expect(onTimeout).toHaveBeenCalledTimes(1);
+      expect(onConnect).not.toHaveBeenCalled();
+    });
+
+    it('does not invoke onTimeout when the store registers before the timeout', () => {
+      jest.useFakeTimers();
+      const onConnect = jest.fn();
+      const onTimeout = jest.fn();
+      onStoreReady('s', onConnect, { timeout: 1000, onTimeout });
+
+      registerStore('s', makeServices());
+      jest.advanceTimersByTime(2000);
+
+      expect(onConnect).toHaveBeenCalledTimes(1);
+      expect(onTimeout).not.toHaveBeenCalled();
+    });
+
+    it('does not invoke onTimeout when the subscriber unsubscribes first', () => {
+      jest.useFakeTimers();
+      jest.spyOn(console, 'warn').mockImplementation();
+
+      const onTimeout = jest.fn();
+      const unsubscribe = onStoreReady('s', jest.fn(), { timeout: 1000, onTimeout });
+      unsubscribe();
+
+      jest.advanceTimersByTime(2000);
+      expect(onTimeout).not.toHaveBeenCalled();
+    });
   });
 
   describe('unregisterStore', () => {
