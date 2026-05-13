@@ -49,7 +49,13 @@ export function registerStore(scope: string, services: Services): void {
       if (listener.timeoutId) {
         clearTimeout(listener.timeoutId);
       }
-      listener.onConnect(services);
+      // Isolate each subscriber so a thrower can't orphan its siblings or
+      // break provider initialization, which calls registerStore synchronously.
+      try {
+        listener.onConnect(services);
+      } catch (error) {
+        log.error('Subscriber threw during onConnect', { scope, error });
+      }
     }
   }
 }
@@ -86,7 +92,12 @@ export function onStoreReady(
     log.debug('Store already registered, notifying in microtask', { scope });
     let cancelled = false;
     queueMicrotask(() => {
-      if (!cancelled) onConnect(existing);
+      if (cancelled) return;
+      try {
+        onConnect(existing);
+      } catch (error) {
+        log.error('Subscriber threw during onConnect', { scope, error });
+      }
     });
     return () => {
       cancelled = true;
