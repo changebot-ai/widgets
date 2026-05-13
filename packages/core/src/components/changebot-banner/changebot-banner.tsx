@@ -1,6 +1,6 @@
 import { Component, Element, Prop, State, Watch, Method, h, Host } from '@stencil/core';
 import { Services, Update } from '../../types';
-import { waitForStore } from '../../store/registry';
+import { onStoreReady } from '../../store/registry';
 import { Theme } from '../../utils/themes';
 import { createThemeManager, ThemeManager } from '../../utils/theme-manager';
 import { logBanner as log } from '../../utils/logger';
@@ -29,7 +29,7 @@ export class ChangebotBanner {
   private services?: Services;
   private subscriptionCleanups: (() => void)[] = [];
   private themeManager?: ThemeManager;
-  private abortController?: AbortController;
+  private unsubscribeFromRegistry?: () => void;
 
   @Watch('theme')
   @Watch('light')
@@ -55,32 +55,18 @@ export class ChangebotBanner {
     this.connectToProvider();
   }
 
-  private async connectToProvider() {
-    // If a previous wait is in flight (e.g. componentWillLoad re-ran),
-    // abort it before starting a new one.
-    this.abortController?.abort();
-    this.abortController = new AbortController();
-    const signal = this.abortController.signal;
-    try {
-      this.services = await waitForStore(this.scope || 'default', { signal });
+  private connectToProvider() {
+    this.unsubscribeFromRegistry?.();
+    this.unsubscribeFromRegistry = onStoreReady(this.scope || 'default', services => {
+      this.services = services;
       log.debug('Connected to provider via registry', { scope: this.scope || 'default' });
       this.subscribeToStore();
-    } catch (error) {
-      // Aborts are an expected lifecycle event (component disconnected
-      // before provider registered), not a failure to log.
-      if ((error as { name?: string } | null)?.name === 'AbortError') {
-        return;
-      }
-      log.warn('Failed to connect to provider', {
-        error: error instanceof Error ? error.message : error,
-        scope: this.scope || 'default',
-      });
-    }
+    });
   }
 
   disconnectedCallback() {
-    this.abortController?.abort();
-    this.abortController = undefined;
+    this.unsubscribeFromRegistry?.();
+    this.unsubscribeFromRegistry = undefined;
     this.subscriptionCleanups.forEach(cleanup => cleanup());
     this.subscriptionCleanups = [];
     this.themeManager?.cleanup();
