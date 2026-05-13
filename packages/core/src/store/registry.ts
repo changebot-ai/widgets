@@ -96,12 +96,8 @@ export function waitForStore(
   const timeout = options.timeout ?? 5000;
   const signal = options.signal;
 
-  // If caller already aborted, reject immediately.
   if (signal?.aborted) {
-    const reason =
-      (signal.reason as Error | undefined) ??
-      new DOMException('waitForStore aborted', 'AbortError');
-    return Promise.reject(reason);
+    return Promise.reject(signal.reason);
   }
 
   // Return immediately if already registered
@@ -116,10 +112,8 @@ export function waitForStore(
   return new Promise<Services>((resolve, reject) => {
     const listener: PendingListener = { resolve, reject };
 
-    // Per-caller timeout
     if (timeout > 0) {
       listener.timeoutId = setTimeout(() => {
-        // Only fire if still pending for this listener
         const listeners = pending.get(scope);
         if (!listeners || !listeners.has(listener)) {
           return;
@@ -134,7 +128,6 @@ export function waitForStore(
       }, timeout);
     }
 
-    // Per-caller abort
     if (signal) {
       listener.signal = signal;
       listener.abortHandler = () => {
@@ -143,10 +136,7 @@ export function waitForStore(
           return;
         }
         detachListener(scope, listener);
-        const reason =
-          (signal.reason as Error | undefined) ??
-          new DOMException('waitForStore aborted', 'AbortError');
-        reject(reason);
+        reject(signal.reason);
       };
       signal.addEventListener('abort', listener.abortHandler);
     }
