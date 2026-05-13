@@ -8,6 +8,7 @@ import { logRegistry as log } from '../utils/logger';
 
 interface PendingListener {
   onConnect: (services: Services) => void;
+  onTimeout?: () => void;
   timeoutId?: ReturnType<typeof setTimeout>;
 }
 
@@ -64,15 +65,15 @@ export function unregisterStore(scope: string): void {
  * is already registered, onConnect is deferred to a microtask (never
  * synchronous, so callers can safely assign the unsubscribe handle first).
  *
- * On timeout the registry logs a warning and drops the subscription;
- * onConnect is never called and the caller is not notified.
+ * On timeout the registry logs a warning, drops the subscription, and
+ * calls onTimeout if provided.
  *
  * @returns unsubscribe function; safe to call multiple times.
  */
 export function onStoreReady(
   scope: string = 'default',
   onConnect: (services: Services) => void,
-  options: { timeout?: number } = {}
+  options: { timeout?: number; onTimeout?: () => void } = {}
 ): () => void {
   const timeout = options.timeout ?? 5000;
 
@@ -95,7 +96,7 @@ export function onStoreReady(
 
   log.debug('Store not registered, subscribing...', { scope, timeout });
 
-  const listener: PendingListener = { onConnect };
+  const listener: PendingListener = { onConnect, onTimeout: options.onTimeout };
 
   if (timeout > 0) {
     listener.timeoutId = setTimeout(() => {
@@ -106,6 +107,13 @@ export function onStoreReady(
           `Ensure <changebot-provider scope="${scope}"> is present in the DOM.`,
         { scope, timeout }
       );
+      if (listener.onTimeout) {
+        try {
+          listener.onTimeout();
+        } catch (error) {
+          log.error('Subscriber threw during onTimeout', { scope, error });
+        }
+      }
     }, timeout);
   }
 

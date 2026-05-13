@@ -23,7 +23,7 @@ describe('changebot-badge', () => {
     });
 
     expect(root).toEqualHtml(`
-      <changebot-badge>
+      <changebot-badge data-changebot-state="waiting-for-provider">
         <mock:shadow-root>
           <button
             class="badge badge--hidden"
@@ -298,5 +298,25 @@ describe('changebot-badge', () => {
 
     expect(component.services).toBeUndefined();
     expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('exposes connection state via data-changebot-state', async () => {
+    const page = await newSpecPage({
+      components: [ChangebotBadge],
+      html: '<changebot-badge></changebot-badge>',
+    });
+
+    const host = page.root;
+    expect(host.getAttribute('data-changebot-state')).toBe('waiting-for-provider');
+
+    const services = {
+      store: {
+        state: { updates: [], lastViewed: null },
+        onChange: jest.fn().mockReturnValue(jest.fn()),
+      },
+    } as unknown as Services;
+    registerStore('default', services);
+
+    expect(host.getAttribute('data-changebot-state')).toBe('connected');
   });
 });
