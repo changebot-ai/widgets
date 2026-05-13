@@ -1,9 +1,6 @@
 /**
- * Store Registry - Module-level registry for scoped stores
- *
- * Consumers subscribe via onStoreReady; the provider calls registerStore
- * when it has initialized. Module-level state survives component lifecycles
- * so consumers and providers can be registered in any order.
+ * Module-level state survives component lifecycles so consumers and
+ * providers can register in any order.
  */
 
 import { Services } from '../types';
@@ -31,10 +28,6 @@ function detachListener(scope: string, listener: PendingListener): void {
   }
 }
 
-/**
- * Register a store for a given scope. Called by provider after initialization.
- * Notifies any pending subscribers.
- */
 export function registerStore(scope: string, services: Services): void {
   log.debug('Registering store', { scope });
   registry.set(scope, services);
@@ -60,25 +53,21 @@ export function registerStore(scope: string, services: Services): void {
   }
 }
 
-/**
- * Unregister a store when provider disconnects.
- */
 export function unregisterStore(scope: string): void {
   log.debug('Unregistering store', { scope });
   registry.delete(scope);
-  // Note: Don't clear pending - a new provider may register.
+  // Don't clear pending — a new provider may register on this scope.
 }
 
 /**
- * Subscribe to a store for a given scope. If the store is already registered,
- * onConnect fires in a microtask. Otherwise it fires when the provider
- * registers, or never if the subscriber unsubscribes first.
+ * Fires onConnect when the store for `scope` is registered. If the store
+ * is already registered, onConnect is deferred to a microtask (never
+ * synchronous, so callers can safely assign the unsubscribe handle first).
  *
- * If no provider registers within the timeout, the registry logs a warning
- * and drops the subscription silently — subscribers don't get notified of
- * timeouts since there is nothing useful for them to do.
+ * On timeout the registry logs a warning and drops the subscription;
+ * onConnect is never called and the caller is not notified.
  *
- * @returns an unsubscribe function. Safe to call multiple times.
+ * @returns unsubscribe function; safe to call multiple times.
  */
 export function onStoreReady(
   scope: string = 'default',
@@ -130,24 +119,16 @@ export function onStoreReady(
   return () => detachListener(scope, listener);
 }
 
-/**
- * Check if a store is registered (synchronous check).
- */
 export function hasStore(scope: string = 'default'): boolean {
   return registry.has(scope);
 }
 
-/**
- * Get store synchronously, returns undefined if not registered.
- * Use onStoreReady() for the async pattern.
- */
+/** Returns undefined if not yet registered; use onStoreReady to wait. */
 export function getStore(scope: string = 'default'): Services | undefined {
   return registry.get(scope);
 }
 
-/**
- * Clear all stores and pending subscribers (useful for testing).
- */
+/** Test-only: drops all stores and pending subscribers without notifying them. */
 export function clearRegistry(): void {
   log.debug('Clearing registry');
   for (const listeners of pending.values()) {
