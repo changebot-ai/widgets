@@ -1,10 +1,17 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { ChangebotBanner } from './changebot-banner';
+import { Services } from '../../types';
+import { clearRegistry, registerStore } from '../../store/registry';
 
 describe('changebot-banner', () => {
   beforeEach(() => {
     // Clear localStorage before each test
     localStorage.clear();
+    clearRegistry();
+  });
+
+  afterEach(() => {
+    clearRegistry();
   });
 
   it('renders nothing when no update is visible', async () => {
@@ -422,6 +429,27 @@ describe('changebot-banner', () => {
     component.disconnectedCallback();
 
     expect(unsubscribe).toHaveBeenCalled();
+  });
+
+  it('cancels its pending registry subscription on disconnect', async () => {
+    const page = await newSpecPage({
+      components: [ChangebotBanner],
+      html: '<changebot-banner></changebot-banner>',
+    });
+
+    const component = page.rootInstance;
+    expect(component.services).toBeUndefined();
+
+    component.disconnectedCallback();
+
+    const onChange = jest.fn().mockReturnValue(jest.fn());
+    const services = {
+      store: { state: { updates: [] }, onChange },
+    } as unknown as Services;
+    registerStore('default', services);
+
+    expect(component.services).toBeUndefined();
+    expect(onChange).not.toHaveBeenCalled();
   });
 
 });
