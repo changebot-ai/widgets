@@ -16,6 +16,7 @@ export class ChangebotToast {
   @Element() el: HTMLChangebotToastElement;
 
   @Prop() theme?: Theme;
+  // Connect-time only: changes after mount are ignored. To rebind, remount the element.
   @Prop() scope?: string; // Undocumented: for multiple provider instances
   @Prop() light?: Theme;
   @Prop() dark?: Theme;
