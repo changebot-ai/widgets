@@ -1,15 +1,19 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { ChangebotBadge } from './changebot-badge';
+import { Services } from '../../types';
+import { clearRegistry, registerStore } from '../../store/registry';
 
 describe('changebot-badge', () => {
   let warnSpy: jest.SpyInstance;
 
   beforeEach(() => {
     warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    clearRegistry();
   });
 
   afterEach(() => {
     warnSpy.mockRestore();
+    clearRegistry();
   });
 
   it('renders with hidden badge when count is 0', async () => {
@@ -273,5 +277,26 @@ describe('changebot-badge', () => {
     component.disconnectedCallback();
 
     expect(unsubscribe).toHaveBeenCalled();
+  });
+
+  it('cancels its pending registry subscription on disconnect', async () => {
+    const page = await newSpecPage({
+      components: [ChangebotBadge],
+      html: '<changebot-badge></changebot-badge>',
+    });
+
+    const component = page.rootInstance;
+    expect(component.services).toBeUndefined();
+
+    component.disconnectedCallback();
+
+    const onChange = jest.fn().mockReturnValue(jest.fn());
+    const services = {
+      store: { state: { updates: [], lastViewed: null }, onChange },
+    } as unknown as Services;
+    registerStore('default', services);
+
+    expect(component.services).toBeUndefined();
+    expect(onChange).not.toHaveBeenCalled();
   });
 });

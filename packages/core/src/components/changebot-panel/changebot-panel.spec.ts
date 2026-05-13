@@ -1,7 +1,17 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { ChangebotPanel } from './changebot-panel';
+import { Services } from '../../types';
+import { clearRegistry, registerStore } from '../../store/registry';
 
 describe('changebot-panel', () => {
+  beforeEach(() => {
+    clearRegistry();
+  });
+
+  afterEach(() => {
+    clearRegistry();
+  });
+
   // Basic rendering tests
   it('renders closed by default', async () => {
     const { root } = await newSpecPage({
@@ -361,6 +371,30 @@ describe('changebot-panel', () => {
     expect(unsubscribeUpdates).toHaveBeenCalled();
     expect(unsubscribeWidget).toHaveBeenCalled();
     expect(unsubscribeIsLoading).toHaveBeenCalled();
+  });
+
+  it('cancels its pending registry subscription on disconnect', async () => {
+    const page = await newSpecPage({
+      components: [ChangebotPanel],
+      html: '<changebot-panel></changebot-panel>',
+    });
+
+    const component = page.rootInstance;
+    expect(component.services).toBeUndefined();
+
+    component.disconnectedCallback();
+
+    const onChange = jest.fn().mockReturnValue(jest.fn());
+    const services = {
+      store: {
+        state: { isOpen: false, updates: [], widget: null, isLoading: false },
+        onChange,
+      },
+    } as unknown as Services;
+    registerStore('default', services);
+
+    expect(component.services).toBeUndefined();
+    expect(onChange).not.toHaveBeenCalled();
   });
 
   // ARIA and accessibility tests
