@@ -1,6 +1,6 @@
 import { Component, Element, Prop, State, Method, Watch, Listen, h, Host } from '@stencil/core';
 import { Services, Update, Widget } from '../../types';
-import { onStoreReady } from '../../store/registry';
+import { connectConsumer } from '../../store/registry';
 import { Theme } from '../../utils/themes';
 import { createThemeManager, ThemeManager } from '../../utils/theme-manager';
 import { logPanel as log } from '../../utils/logger';
@@ -61,20 +61,14 @@ export class ChangebotPanel {
 
   private connectToProvider() {
     this.unsubscribeFromRegistry?.();
-    this.el.setAttribute('data-changebot-state', 'waiting-for-provider');
-    this.unsubscribeFromRegistry = onStoreReady(
+    this.unsubscribeFromRegistry = connectConsumer(
+      this.el,
       this.scope || 'default',
       services => {
         this.services = services;
-        this.el.setAttribute('data-changebot-state', 'connected');
         log.debug('Connected to provider via registry', { scope: this.scope || 'default' });
         this.subscribeToStore();
       },
-      {
-        onTimeout: () => {
-          this.el.setAttribute('data-changebot-state', 'provider-missing');
-        },
-      }
     );
   }
 
