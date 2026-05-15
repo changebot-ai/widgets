@@ -20,6 +20,12 @@ export class ChangebotPanel {
   @Prop() light?: Theme;
   @Prop() dark?: Theme;
   @Prop() mode: 'modal' | 'drawer-left' | 'drawer-right' = 'drawer-right';
+  /**
+   * CSS selector for elements that should open the panel when clicked.
+   * Uses event delegation on the document, so elements added after mount also work.
+   * Example: `trigger=".open-updates"`.
+   */
+  @Prop() trigger?: string;
 
   @State() isOpen: boolean = false;
   @State() updates: Update[] = [];
@@ -34,6 +40,7 @@ export class ChangebotPanel {
   private lastFocusableElement?: HTMLElement;
   private themeManager?: ThemeManager;
   private unsubscribeFromRegistry?: () => void;
+  private validatedTrigger?: string;
 
   @Watch('theme')
   @Watch('light')
@@ -43,6 +50,11 @@ export class ChangebotPanel {
     this.themeManager = createThemeManager(this, theme => {
       this.activeTheme = theme;
     });
+  }
+
+  @Watch('trigger')
+  onTriggerChange() {
+    this.validateTrigger();
   }
 
   componentWillLoad() {
@@ -55,8 +67,24 @@ export class ChangebotPanel {
       this.el.setAttribute('data-scope', this.scope);
     }
 
+    this.validateTrigger();
+
     // Connect to provider asynchronously (don't block rendering)
     this.connectToProvider();
+  }
+
+  private validateTrigger() {
+    if (!this.trigger) {
+      this.validatedTrigger = undefined;
+      return;
+    }
+    try {
+      document.querySelector(this.trigger);
+      this.validatedTrigger = this.trigger;
+    } catch {
+      log.warn('Invalid trigger selector', { trigger: this.trigger });
+      this.validatedTrigger = undefined;
+    }
   }
 
   private connectToProvider() {
@@ -203,6 +231,15 @@ export class ChangebotPanel {
         event.preventDefault();
         this.firstFocusableElement?.focus();
       }
+    }
+  }
+
+  @Listen('click', { target: 'document' })
+  handleTriggerClick(event: MouseEvent) {
+    if (!this.validatedTrigger) return;
+    const target = event.target as Element | null;
+    if (target?.closest?.(this.validatedTrigger)) {
+      void this.open();
     }
   }
 

@@ -42,6 +42,10 @@ export namespace Components {
         "scope"?: string;
         "setUpdates": (updates: Update[]) => Promise<void>;
         "theme"?: Theme;
+        /**
+          * CSS selector for elements that should open the panel when clicked. Uses event delegation on the document, so elements added after mount also work. Example: `trigger=".open-updates"`.
+         */
+        "trigger"?: string;
     }
     interface ChangebotProvider {
         "baseUrl"?: string;
@@ -134,6 +138,10 @@ declare namespace LocalJSX {
         "mode"?: 'modal' | 'drawer-left' | 'drawer-right';
         "scope"?: string;
         "theme"?: Theme;
+        /**
+          * CSS selector for elements that should open the panel when clicked. Uses event delegation on the document, so elements added after mount also work. Example: `trigger=".open-updates"`.
+         */
+        "trigger"?: string;
     }
     interface ChangebotProvider {
         "baseUrl"?: string;
