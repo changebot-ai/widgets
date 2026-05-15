@@ -53,6 +53,10 @@ export const ChangebotToast: StencilVueComponent<JSX.ChangebotToast> = /*@__PURE
   'light',
   'dark',
   'position',
-  'confetti'
+  'confetti',
+  'confettiParticleCount',
+  'confettiSpread',
+  'confettiStartVelocity',
+  'confettiScalar'
 ]);
 
