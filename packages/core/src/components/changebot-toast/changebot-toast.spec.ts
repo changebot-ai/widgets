@@ -386,4 +386,23 @@ describe('changebot-toast', () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
+  it('exposes connection state via data-changebot-state', async () => {
+    const page = await newSpecPage({
+      components: [ChangebotToast],
+      html: '<changebot-toast></changebot-toast>',
+    });
+
+    const host = page.root;
+    expect(host.getAttribute('data-changebot-state')).toBe('waiting-for-provider');
+
+    const onChange = jest.fn().mockReturnValue(jest.fn());
+    const services = {
+      store: { state: { updates: [] }, onChange },
+    } as unknown as Services;
+    registerStore('default', services);
+
+    expect(host.getAttribute('data-changebot-state')).toBe('connected');
+  });
+
+
 });

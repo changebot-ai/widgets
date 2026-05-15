@@ -424,4 +424,24 @@ describe('changebot-panel', () => {
     const liveRegion = root.shadowRoot.querySelector('[aria-live]');
     expect(liveRegion).toBeDefined();
   });
+
+  it('exposes connection state via data-changebot-state', async () => {
+    const page = await newSpecPage({
+      components: [ChangebotPanel],
+      html: '<changebot-panel></changebot-panel>',
+    });
+
+    const host = page.root;
+    expect(host.getAttribute('data-changebot-state')).toBe('waiting-for-provider');
+
+    const onChange = jest.fn().mockReturnValue(jest.fn());
+    const services = {
+      store: { state: { updates: [], isOpen: false, isLoading: false, error: null, widget: null, lastViewed: null, newUpdatesCount: 0 }, onChange },
+      display: { open: jest.fn(), close: jest.fn() },
+    } as unknown as Services;
+    registerStore('default', services);
+
+    expect(host.getAttribute('data-changebot-state')).toBe('connected');
+  });
+
 });
