@@ -66,7 +66,7 @@ export namespace Components {
         /**
           * @default 'bottom-right'
          */
-        "position": 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+        "position": 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
         "scope"?: string;
         "show": (update: Update) => Promise<void>;
         "theme"?: Theme;
@@ -161,7 +161,7 @@ declare namespace LocalJSX {
         /**
           * @default 'bottom-right'
          */
-        "position"?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+        "position"?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
         "scope"?: string;
         "theme"?: Theme;
     }

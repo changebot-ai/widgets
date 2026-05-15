@@ -20,7 +20,7 @@ export class ChangebotToast {
   @Prop() scope?: string; // Undocumented: for multiple provider instances
   @Prop() light?: Theme;
   @Prop() dark?: Theme;
-  @Prop() position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' = 'bottom-right';
+  @Prop() position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center' = 'bottom-right';
 
   @State() isVisible: boolean = false;
   @State() currentUpdate?: Update;
@@ -168,6 +168,8 @@ export class ChangebotToast {
         return 'toast--bottom-left';
       case 'bottom-right':
         return 'toast--bottom-right';
+      case 'center':
+        return 'toast--center';
       default:
         return 'toast--bottom-right';
     }
@@ -270,7 +272,7 @@ declare global {
     theme?: Theme;
     light?: Theme;
     dark?: Theme;
-    position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+    position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
     preview?: boolean;
   }
 }
