@@ -123,6 +123,9 @@ export class ChangebotToast {
       .then(mod => {
         // canvas-confetti uses `export =`; bundlers may wrap as { default }.
         this.confettiFn = (mod as any).default ?? mod;
+        // If the toast became visible before the import resolved, the
+        // componentDidRender burst was a no-op — fire now.
+        if (this.isVisible) this.maybeFireConfetti();
       })
       .catch(err => log.warn('Failed to load canvas-confetti', err));
   }
