@@ -484,6 +484,7 @@
         <h3>Actions</h3>
         <div class="button-row">
           <button class="btn btn-primary" onclick="openPanel()">Open Panel</button>
+          <button class="btn btn-primary open-updates">Open via Trigger</button>
           <button class="btn btn-success" onclick="showToast()">Show Toast</button>
           <button class="btn btn-warning" onclick="showBanner()">Show Banner</button>
         </div>
@@ -579,7 +580,7 @@
 
   <!-- Panel Component -->
   <div id="panel-container">
-    <changebot-panel id="panel" scope="vanilla-demo" mode="drawer-right"></changebot-panel>
+    <changebot-panel id="panel" scope="vanilla-demo" mode="drawer-right" trigger=".open-updates"></changebot-panel>
   </div>
 
   <!-- Toast Component -->
