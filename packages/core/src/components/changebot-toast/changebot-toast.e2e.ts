@@ -1,5 +1,7 @@
 import { newE2EPage } from '@stencil/core/testing';
 
+const emptyMockData = JSON.stringify({ publications: [], widget: { name: 'Test' } });
+
 describe('changebot-toast e2e', () => {
   beforeEach(() => {
     // Clear localStorage before each test
@@ -10,7 +12,7 @@ describe('changebot-toast e2e', () => {
 
   it('renders without crashing', async () => {
     const page = await newE2EPage();
-    await page.setContent('<changebot-toast></changebot-toast>');
+    await page.setContent(`<changebot-toast></changebot-toast><changebot-provider mock-data='${emptyMockData}'></changebot-provider>`);
 
     const component = await page.find('changebot-toast');
     expect(component).toHaveClass('hydrated');
@@ -18,7 +20,7 @@ describe('changebot-toast e2e', () => {
 
   it('applies theme prop correctly', async () => {
     const page = await newE2EPage();
-    await page.setContent('<changebot-toast theme="catppuccin-mocha"></changebot-toast>');
+    await page.setContent(`<changebot-toast theme="catppuccin-mocha"></changebot-toast><changebot-provider mock-data='${emptyMockData}'></changebot-provider>`);
 
     const component = await page.find('changebot-toast');
 
@@ -40,7 +42,7 @@ describe('changebot-toast e2e', () => {
 
   it('applies correct position class', async () => {
     const page = await newE2EPage();
-    await page.setContent('<changebot-toast position="top-left"></changebot-toast>');
+    await page.setContent(`<changebot-toast position="top-left"></changebot-toast><changebot-provider mock-data='${emptyMockData}'></changebot-provider>`);
 
     const component = await page.find('changebot-toast');
 
@@ -62,7 +64,7 @@ describe('changebot-toast e2e', () => {
 
   it('applies default position when not specified', async () => {
     const page = await newE2EPage();
-    await page.setContent('<changebot-toast></changebot-toast>');
+    await page.setContent(`<changebot-toast></changebot-toast><changebot-provider mock-data='${emptyMockData}'></changebot-provider>`);
 
     const component = await page.find('changebot-toast');
 
@@ -84,7 +86,7 @@ describe('changebot-toast e2e', () => {
 
   it('handles scope attribute correctly', async () => {
     const page = await newE2EPage();
-    await page.setContent('<changebot-toast scope="dashboard"></changebot-toast>');
+    await page.setContent(`<changebot-toast scope="dashboard"></changebot-toast><changebot-provider scope="dashboard" mock-data='${emptyMockData}'></changebot-provider>`);
 
     const component = await page.find('changebot-toast');
     expect(await component.getAttribute('data-scope')).toBe('dashboard');
@@ -92,7 +94,7 @@ describe('changebot-toast e2e', () => {
 
   it('has correct aria attributes', async () => {
     const page = await newE2EPage();
-    await page.setContent('<changebot-toast></changebot-toast>');
+    await page.setContent(`<changebot-toast></changebot-toast><changebot-provider mock-data='${emptyMockData}'></changebot-provider>`);
 
     const component = await page.find('changebot-toast');
 
@@ -115,7 +117,7 @@ describe('changebot-toast e2e', () => {
 
   it('close button has correct aria-label', async () => {
     const page = await newE2EPage();
-    await page.setContent('<changebot-toast></changebot-toast>');
+    await page.setContent(`<changebot-toast></changebot-toast><changebot-provider mock-data='${emptyMockData}'></changebot-provider>`);
 
     const component = await page.find('changebot-toast');
 
