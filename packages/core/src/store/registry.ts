@@ -136,6 +136,27 @@ export function getStore(scope: string = 'default'): Services | undefined {
   return registry.get(scope);
 }
 
+/** onStoreReady + data-changebot-state lifecycle for consumers. */
+export function connectConsumer(
+  el: HTMLElement,
+  scope: string,
+  onConnected: (services: Services) => void
+): () => void {
+  el.setAttribute('data-changebot-state', 'waiting-for-provider');
+  return onStoreReady(
+    scope,
+    services => {
+      el.setAttribute('data-changebot-state', 'connected');
+      onConnected(services);
+    },
+    {
+      onTimeout: () => {
+        el.setAttribute('data-changebot-state', 'provider-missing');
+      },
+    }
+  );
+}
+
 /** Test-only: drops all stores and pending subscribers without notifying them. */
 export function clearRegistry(): void {
   log.debug('Clearing registry');
