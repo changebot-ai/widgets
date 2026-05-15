@@ -193,7 +193,15 @@ Toast notification for highlighting updates. Automatically displays updates mark
 
 ## Opening the Drawer from Custom Elements
 
-You can trigger the drawer from **any element** on your page by dispatching a custom event:
+The simplest way is to set a `trigger` selector on the panel. Any click on a matching element opens it — including elements added to the DOM after mount, via event delegation:
+
+```html
+<button class="open-updates">View What's New</button>
+
+<changebot-panel trigger=".open-updates" />
+```
+
+For dynamic cases (keyboard shortcuts, programmatic flows, or when you don't control the trigger element's class), dispatch a custom event:
 
 ```html
 <!-- Custom button to open drawer -->
@@ -445,13 +453,14 @@ Badge that displays the count of new updates.
 
 Drawer/modal that displays the list of updates.
 
-| Prop    | Type   | Default          | Description                                             |
-| ------- | ------ | ---------------- | ------------------------------------------------------- |
-| `scope` | string | `"default"`      | Connect to matching provider                            |
-| `theme` | string | -                | Fixed theme name                                        |
-| `light` | string | -                | Theme for light mode                                    |
-| `dark`  | string | -                | Theme for dark mode                                     |
-| `mode`  | string | `"drawer-right"` | Display mode: `drawer-right`, `drawer-left`, or `modal` |
+| Prop      | Type   | Default          | Description                                                                  |
+| --------- | ------ | ---------------- | ---------------------------------------------------------------------------- |
+| `scope`   | string | `"default"`      | Connect to matching provider                                                 |
+| `theme`   | string | -                | Fixed theme name                                                             |
+| `light`   | string | -                | Theme for light mode                                                         |
+| `dark`    | string | -                | Theme for dark mode                                                          |
+| `mode`    | string | `"drawer-right"` | Display mode: `drawer-right`, `drawer-left`, or `modal`                      |
+| `trigger` | string | -                | CSS selector — clicking any matching element (now or later) opens the panel  |
 
 **Methods:**
 

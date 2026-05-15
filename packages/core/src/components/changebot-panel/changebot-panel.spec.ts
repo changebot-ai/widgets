@@ -397,6 +397,141 @@ describe('changebot-panel', () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
+  // Trigger prop tests
+  it('opens panel when a matching trigger element is clicked', async () => {
+    const page = await newSpecPage({
+      components: [ChangebotPanel],
+      html: '<changebot-panel trigger=".open-panel"></changebot-panel>',
+    });
+
+    const component = page.rootInstance;
+    const mockOpen = jest.spyOn(component, 'open').mockResolvedValue(undefined);
+
+    const btn = document.createElement('button');
+    btn.className = 'open-panel';
+    document.body.appendChild(btn);
+
+    btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(mockOpen).toHaveBeenCalled();
+    document.body.removeChild(btn);
+  });
+
+  it('does not open panel when a non-matching element is clicked', async () => {
+    const page = await newSpecPage({
+      components: [ChangebotPanel],
+      html: '<changebot-panel trigger=".open-panel"></changebot-panel>',
+    });
+
+    const component = page.rootInstance;
+    const mockOpen = jest.spyOn(component, 'open');
+
+    const btn = document.createElement('button');
+    btn.className = 'other-button';
+    document.body.appendChild(btn);
+
+    btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(mockOpen).not.toHaveBeenCalled();
+    document.body.removeChild(btn);
+  });
+
+  it('does nothing on document click when trigger prop is not set', async () => {
+    const page = await newSpecPage({
+      components: [ChangebotPanel],
+      html: '<changebot-panel></changebot-panel>',
+    });
+
+    const component = page.rootInstance;
+    const mockOpen = jest.spyOn(component, 'open');
+
+    const btn = document.createElement('button');
+    btn.className = 'any-button';
+    document.body.appendChild(btn);
+
+    btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(mockOpen).not.toHaveBeenCalled();
+    document.body.removeChild(btn);
+  });
+
+  it('opens panel when a child of a matching trigger element is clicked', async () => {
+    const page = await newSpecPage({
+      components: [ChangebotPanel],
+      html: '<changebot-panel trigger=".open-panel"></changebot-panel>',
+    });
+
+    const component = page.rootInstance;
+    const mockOpen = jest.spyOn(component, 'open').mockResolvedValue(undefined);
+
+    const btn = document.createElement('button');
+    btn.className = 'open-panel';
+    const span = document.createElement('span');
+    btn.appendChild(span);
+    document.body.appendChild(btn);
+
+    span.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(mockOpen).toHaveBeenCalled();
+    document.body.removeChild(btn);
+  });
+
+  it('warns once and does not throw when trigger is an invalid CSS selector', async () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+
+    await newSpecPage({
+      components: [ChangebotPanel],
+      html: '<changebot-panel trigger="[invalid"></changebot-panel>',
+    });
+
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid trigger selector'), expect.objectContaining({ trigger: '[invalid' }));
+
+    const btn = document.createElement('button');
+    document.body.appendChild(btn);
+
+    expect(() => {
+      btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    }).not.toThrow();
+
+    document.body.removeChild(btn);
+    warnSpy.mockRestore();
+  });
+
+  it('reacts to trigger prop changes after mount', async () => {
+    const page = await newSpecPage({
+      components: [ChangebotPanel],
+      html: '<changebot-panel trigger=".first"></changebot-panel>',
+    });
+
+    const component = page.rootInstance;
+    const mockOpen = jest.spyOn(component, 'open').mockResolvedValue(undefined);
+
+    const btn = document.createElement('button');
+    btn.className = 'second';
+    document.body.appendChild(btn);
+
+    // Initially does not match
+    btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(mockOpen).not.toHaveBeenCalled();
+
+    // Update trigger to match
+    const panel = page.root as HTMLChangebotPanelElement;
+    panel.trigger = '.second';
+    await page.waitForChanges();
+
+    btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(mockOpen).toHaveBeenCalledTimes(1);
+
+    // Clear trigger
+    panel.trigger = undefined;
+    await page.waitForChanges();
+
+    btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(mockOpen).toHaveBeenCalledTimes(1);
+
+    document.body.removeChild(btn);
+  });
+
   // ARIA and accessibility tests
   it('has proper ARIA attributes when open', async () => {
     const page = await newSpecPage({

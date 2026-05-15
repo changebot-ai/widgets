@@ -119,6 +119,17 @@ Drawer or modal that displays the full list of updates.
 | Prop | Values | Default |
 | --- | --- | --- |
 | `mode` | `"drawer-right"`, `"drawer-left"`, `"modal"` | `"drawer-right"` |
+| `trigger` | CSS selector string | - |
+
+**Opening from a custom element:**
+
+The easiest way to wire a button (or any element) to the panel is the `trigger` prop. Any click on a matching element opens the panel — works for elements added after mount, too:
+
+```html
+<button class="open-updates">What's new?</button>
+
+<changebot-panel trigger=".open-updates" />
+```
 
 **Programmatic control:**
 
