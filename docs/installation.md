@@ -10,7 +10,7 @@ Add this script tag to your HTML `<head>`:
 <script type="module" src="https://widgets.changebot.ai/latest/widgets.esm.js"></script>
 ```
 
-For production, pin to a specific version like `v0.2.0/widgets.esm.js`.
+For production, pin to a specific version like `v0.4.0/widgets.esm.js`.
 
 > **Using React or Vue?** Use the NPM packages instead of the script tag:
 > - `npm install` [@changebot/widgets-react](https://www.npmjs.com/package/@changebot/widgets-react)
@@ -165,7 +165,20 @@ Popup notification that automatically displays updates published with `highlight
 
 | Prop | Values | Default |
 | --- | --- | --- |
-| `position` | `"bottom-right"`, `"bottom-left"`, `"top-right"`, `"top-left"` | `"bottom-right"` |
+| `position` | `"bottom-right"`, `"bottom-left"`, `"top-right"`, `"top-left"`, `"center"` | `"bottom-right"` |
+| `confetti` | `true`, `false` | `false` |
+| `confetti-particle-count` | number | `351` |
+| `confetti-spread` | number | `130` |
+| `confetti-start-velocity` | number | `46` |
+| `confetti-scalar` | number | `0.8` |
+
+**Confetti:**
+
+Set `confetti` to fire a celebratory burst anchored to the toast each time one appears. The burst respects `prefers-reduced-motion` and skips when the user has it set. The `confetti-*` tuning props map directly to [canvas-confetti](https://github.com/catdad/canvas-confetti#options) options; the defaults above are tuned for the toast's anchor position.
+
+```html
+<changebot-toast position="center" confetti />
+```
 
 ## Complete example
 
