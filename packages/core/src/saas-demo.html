@@ -1,0 +1,393 @@
+<!doctype html>
+<html dir="ltr" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SaaS Layout Demo - Changebot Widgets</title>
+
+  <script type="module" src="/build/widgets.esm.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --navbar-height: 60px;
+      --sidebar-width: 240px;
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --accent: #ec4899;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: var(--sidebar-width) 1fr;
+      grid-template-rows: var(--navbar-height) 1fr;
+      grid-template-areas:
+        "sidebar navbar"
+        "sidebar main";
+      min-height: 100vh;
+    }
+
+    .navbar {
+      grid-area: navbar;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+
+    .navbar .title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .navbar .actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .navbar .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .sidebar {
+      grid-area: sidebar;
+      position: sticky;
+      top: 0;
+      align-self: start;
+      height: 100vh;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sidebar .brand {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+      padding: 4px 12px 20px 12px;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .sidebar a:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .sidebar a.active {
+      background: #eef2ff;
+      color: var(--primary-dark);
+      font-weight: 500;
+    }
+
+    .main {
+      grid-area: main;
+      padding: 32px;
+      overflow: hidden;
+    }
+
+    .page-header {
+      margin-bottom: 24px;
+    }
+
+    .page-header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .page-header p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .controls {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .controls label {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .controls select {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .controls button {
+      padding: 8px 14px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .controls button:hover {
+      background: var(--primary-dark);
+    }
+
+    .controls .hint {
+      flex-basis: 100%;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .card h3 {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .card .stat {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .filler {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 16px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .filler h2 {
+      font-size: 18px;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">◆ Acme</div>
+      <a href="#" class="active">Dashboard</a>
+      <a href="#">Customers</a>
+      <a href="#">Orders</a>
+      <a href="#">Analytics</a>
+      <a href="#">Settings</a>
+    </aside>
+
+    <header class="navbar">
+      <div class="title">Dashboard</div>
+      <div class="actions">
+        <span>ara@acme.test</span>
+        <div class="avatar">A</div>
+      </div>
+    </header>
+
+    <main class="main" id="main">
+      <div class="page-header">
+        <h1>Toast positioning inside a SaaS shell</h1>
+        <p>
+          The toast lives inside the <code>&lt;main&gt;</code> container and dodges the sidebar and navbar.
+          Scroll the page or resize the window to confirm it stays inside the visible portion of the container.
+        </p>
+      </div>
+
+      <div class="controls">
+        <label for="positionSelect">Position:</label>
+        <select id="positionSelect" onchange="updatePosition()">
+          <option value="top-left">top-left</option>
+          <option value="top-right" selected>top-right</option>
+          <option value="bottom-left">bottom-left</option>
+          <option value="bottom-right">bottom-right</option>
+          <option value="center">center</option>
+        </select>
+        <button onclick="fireToast()">Show toast</button>
+        <p class="hint">
+          The toast is rendered with <code>position: fixed</code>, but the component intersects its parent's
+          rect with the viewport — so it anchors inside the main content area while staying within the viewport.
+        </p>
+      </div>
+
+      <div class="cards">
+        <div class="card"><h3>MRR</h3><div class="stat">$48.2k</div></div>
+        <div class="card"><h3>Active users</h3><div class="stat">1,284</div></div>
+        <div class="card"><h3>Churn</h3><div class="stat">2.1%</div></div>
+        <div class="card"><h3>NPS</h3><div class="stat">62</div></div>
+      </div>
+
+      <div class="filler">
+        <h2>About this demo</h2>
+        <p>
+          A typical SaaS layout has a top navbar and a left sidebar, with the customer's primary content
+          flowing inside a main region that often extends below the fold. We want the toast to behave well
+          inside that layout — not slide under the navbar, not overlap the sidebar, and never escape the
+          viewport even when the page is scrolled.
+        </p>
+      </div>
+
+      <div class="filler">
+        <h2>Scroll down</h2>
+        <p>
+          Keep scrolling. The main container extends past the fold, but the toast remains pinned inside the
+          visible portion of the container at all four corners.
+        </p>
+      </div>
+
+      <div class="filler">
+        <h2>More filler content</h2>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris vitae sapien sed nibh ultrices
+          fermentum. Cras tincidunt magna at est consectetur, in pulvinar elit consequat. Praesent eget
+          velit nec orci tempor pretium. Aliquam erat volutpat. Curabitur vitae purus eu nulla porta
+          accumsan. Quisque nec mauris in libero pulvinar sodales. Vestibulum ante ipsum primis in
+          faucibus orci luctus et ultrices posuere cubilia curae.
+        </p>
+        <p>
+          Suspendisse potenti. Integer non purus sit amet sem hendrerit cursus. In hac habitasse platea
+          dictumst. Cras sit amet sodales sapien. Sed at consequat sapien. Vivamus tristique ultricies
+          ligula at consectetur. Aenean nec arcu vitae eros vehicula porta. Quisque non mauris eu erat
+          vulputate iaculis. Mauris quis lectus quam.
+        </p>
+      </div>
+
+      <div class="filler">
+        <h2>Even more</h2>
+        <p>
+          Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+          Donec faucibus, justo a pulvinar cursus, lorem velit blandit nibh, vel imperdiet velit eros
+          quis nulla. Sed tincidunt scelerisque eros, vitae sagittis erat tempor non. Fusce eget magna
+          posuere, dictum ligula et, sagittis odio. Ut nec mi nec quam pharetra fringilla.
+        </p>
+        <p>
+          Ut nec sapien convallis, mattis turpis nec, ornare nibh. Cras et urna sed eros gravida
+          tincidunt. Etiam dignissim ligula ut neque tristique tincidunt. Suspendisse potenti.
+          Vestibulum tincidunt felis at velit pretium, eget tristique nibh dignissim.
+        </p>
+      </div>
+
+      <div class="filler">
+        <h2>The bottom of the container</h2>
+        <p>
+          You should now be scrolled well past the original fold. Hit the button above to fire the toast
+          at the currently selected corner — it should still appear inside the visible portion of the
+          main region, not at the literal top of the page (which is now hidden behind the navbar) or
+          below the viewport.
+        </p>
+      </div>
+
+      <changebot-toast id="toast" scope="saas-demo" position="top-right"></changebot-toast>
+    </main>
+  </div>
+
+  <script>
+    const toast = document.getElementById('toast');
+
+    const sampleUpdate = {
+      id: 'saas-demo-1',
+      title: '🎉 New dashboard analytics',
+      content: 'We just shipped richer analytics with hourly granularity and CSV export.',
+      display_date: new Date().toISOString().split('T')[0],
+      published_at: new Date().toISOString(),
+      expires_on: null,
+      highlight_target: null,
+      hosted_url: null,
+      tags: []
+    };
+
+    async function fireToast() {
+      await toast.dismiss();
+      requestAnimationFrame(() => toast.show({ ...sampleUpdate, id: 'saas-demo-' + Date.now() }));
+    }
+
+    function updatePosition() {
+      toast.setAttribute('position', document.getElementById('positionSelect').value);
+    }
+  </script>
+</body>
+
+</html>
