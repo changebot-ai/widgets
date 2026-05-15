@@ -2,4 +2,4 @@
  * Widget version
  * This should match the version in package.json
  */
-export const VERSION = '0.3.0';
+export const VERSION = '0.4.0';
