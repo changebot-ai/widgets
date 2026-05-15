@@ -147,7 +147,11 @@ export function connectConsumer(
     scope,
     services => {
       el.setAttribute('data-changebot-state', 'connected');
-      onConnected(services);
+      try {
+        onConnected(services);
+      } catch (error) {
+        log.error('Consumer callback threw during onConnect', { element: el.tagName, scope: scope ?? 'default', error });
+      }
     },
     {
       onTimeout: () => {

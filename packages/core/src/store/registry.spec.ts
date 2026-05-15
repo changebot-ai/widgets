@@ -6,6 +6,7 @@ import {
   hasStore,
   getStore,
   clearRegistry,
+  connectConsumer,
 } from './registry';
 
 function makeServices(label: string = 'svc'): Services {
@@ -293,6 +294,43 @@ describe('store/registry', () => {
       });
 
       expect(() => registerStore('s', makeServices())).not.toThrow();
+    });
+  });
+
+  describe('connectConsumer', () => {
+    it('sets data-changebot-state to waiting-for-provider initially', () => {
+      const el = document.createElement('div');
+      connectConsumer(el, 'default', jest.fn());
+      expect(el.getAttribute('data-changebot-state')).toBe('waiting-for-provider');
+    });
+
+    it('sets data-changebot-state to connected when store registers', () => {
+      const el = document.createElement('div');
+      connectConsumer(el, 'default', jest.fn());
+      registerStore('default', makeServices());
+      expect(el.getAttribute('data-changebot-state')).toBe('connected');
+    });
+
+    it('sets data-changebot-state to provider-missing on timeout', () => {
+      jest.useFakeTimers();
+      jest.spyOn(console, 'warn').mockImplementation();
+      const el = document.createElement('div');
+      connectConsumer(el, 'default', jest.fn());
+      jest.advanceTimersByTime(5000);
+      expect(el.getAttribute('data-changebot-state')).toBe('provider-missing');
+    });
+
+    it('includes element tag name in error log when onConnected throws', () => {
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const el = document.createElement('changebot-badge');
+      connectConsumer(el, 'default', () => {
+        throw new Error('boom');
+      });
+      registerStore('default', makeServices());
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Consumer callback threw'),
+        expect.objectContaining({ element: 'CHANGEBOT-BADGE' })
+      );
     });
   });
 
