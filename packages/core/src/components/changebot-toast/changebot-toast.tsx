@@ -22,6 +22,10 @@ export class ChangebotToast {
   @Prop() dark?: Theme;
   @Prop() position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center' = 'bottom-right';
   @Prop() confetti: boolean = false;
+  @Prop() confettiParticleCount: number = 250;
+  @Prop() confettiSpread: number = 100;
+  @Prop() confettiStartVelocity: number = 65;
+  @Prop() confettiScalar: number = 1.2;
 
   @State() isVisible: boolean = false;
   @State() currentUpdate?: Update;
@@ -147,8 +151,14 @@ export class ChangebotToast {
 
     const { origin, angle } = this.getConfettiBurst();
     const fire = this.confettiFn.create(canvas, { resize: true, useWorker: false });
-    fire({ particleCount: 250, spread: 100, startVelocity: 65, scalar: 1.2, origin, angle })
-      ?.then(() => this.cleanupConfetti());
+    fire({
+      particleCount: this.confettiParticleCount,
+      spread: this.confettiSpread,
+      startVelocity: this.confettiStartVelocity,
+      scalar: this.confettiScalar,
+      origin,
+      angle,
+    })?.then(() => this.cleanupConfetti());
   }
 
   private getConfettiBurst(): { origin: { x: number; y: number }; angle: number } {
@@ -391,6 +401,10 @@ declare global {
     dark?: Theme;
     position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
     confetti: boolean;
+    confettiParticleCount: number;
+    confettiSpread: number;
+    confettiStartVelocity: number;
+    confettiScalar: number;
     preview?: boolean;
   }
 }
