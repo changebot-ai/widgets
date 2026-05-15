@@ -139,7 +139,7 @@ export function getStore(scope: string = 'default'): Services | undefined {
 /** onStoreReady + data-changebot-state lifecycle for consumers. */
 export function connectConsumer(
   el: HTMLElement,
-  scope: string,
+  scope: string | undefined,
   onConnected: (services: Services) => void
 ): () => void {
   el.setAttribute('data-changebot-state', 'waiting-for-provider');
