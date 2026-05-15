@@ -58,6 +58,8 @@ export class ChangebotBanner {
 
   private connectToProvider() {
     this.unsubscribeFromRegistry?.();
+    this.subscriptionCleanups.forEach(cleanup => cleanup());
+    this.subscriptionCleanups = [];
     this.unsubscribeFromRegistry = connectConsumer(this.el, this.scope, services => {
       this.services = services;
       log.debug('Connected to provider via registry', { scope: this.scope || 'default' });

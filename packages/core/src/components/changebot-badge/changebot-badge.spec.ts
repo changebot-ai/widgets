@@ -279,6 +279,35 @@ describe('changebot-badge', () => {
     expect(unsubscribe).toHaveBeenCalled();
   });
 
+  it('clears existing store subscriptions before reconnecting', async () => {
+    const unsubscribes: jest.Mock[] = [];
+    const mockStore = {
+      state: { updates: [], lastViewed: null, newUpdatesCount: 0 },
+      onChange: jest.fn().mockImplementation(() => {
+        const unsub = jest.fn();
+        unsubscribes.push(unsub);
+        return unsub;
+      }),
+    };
+    const services = { store: mockStore, display: { open: jest.fn(), close: jest.fn() } } as unknown as Services;
+    registerStore('default', services);
+
+    const page = await newSpecPage({
+      components: [ChangebotBadge],
+      html: '<changebot-badge></changebot-badge>',
+    });
+
+    await Promise.resolve(); // flush already-registered microtask
+    expect(unsubscribes).toHaveLength(1);
+
+    // Simulate a reconnect (e.g. framework remounting the component)
+    (page.rootInstance as any).connectToProvider();
+    await Promise.resolve();
+
+    // The first subscription must be torn down before the new one is created
+    expect(unsubscribes[0]).toHaveBeenCalled();
+  });
+
   it('cancels its pending registry subscription on disconnect', async () => {
     const page = await newSpecPage({
       components: [ChangebotBadge],
@@ -319,4 +348,6 @@ describe('changebot-badge', () => {
 
     expect(host.getAttribute('data-changebot-state')).toBe('connected');
   });
+
+
 });
