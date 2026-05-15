@@ -31,7 +31,8 @@ export const ChangebotPanel: StencilVueComponent<JSX.ChangebotPanel> = /*@__PURE
   'scope',
   'light',
   'dark',
-  'mode'
+  'mode',
+  'trigger'
 ]);
 
 

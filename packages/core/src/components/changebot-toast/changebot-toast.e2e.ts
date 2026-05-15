@@ -62,6 +62,27 @@ describe('changebot-toast e2e', () => {
     }
   });
 
+  it('applies center position class', async () => {
+    const page = await newE2EPage();
+    await page.setContent(`<changebot-toast position="center"></changebot-toast><changebot-provider mock-data='${emptyMockData}'></changebot-provider>`);
+
+    const component = await page.find('changebot-toast');
+
+    await component.setProperty('isVisible', true);
+    await component.setProperty('currentUpdate', {
+      id: '1',
+      title: 'Test',
+      date: new Date().toISOString(),
+      timestamp: Date.now()
+    });
+    await page.waitForChanges();
+
+    const toast = await page.find('changebot-toast >>> .toast');
+    if (toast) {
+      expect(toast).toHaveClass('toast--center');
+    }
+  });
+
   it('applies default position when not specified', async () => {
     const page = await newE2EPage();
     await page.setContent(`<changebot-toast></changebot-toast><changebot-provider mock-data='${emptyMockData}'></changebot-provider>`);

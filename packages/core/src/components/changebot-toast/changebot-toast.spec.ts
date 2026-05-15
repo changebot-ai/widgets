@@ -83,6 +83,33 @@ describe('changebot-toast', () => {
     expect(toast).toHaveClass('toast--top-left');
   });
 
+  it('applies center position class', async () => {
+    const mockUpdate = {
+      id: 1,
+      title: 'Update',
+      content: '',
+      display_date: new Date().toISOString().split('T')[0],
+      published_at: new Date().toISOString(),
+      expires_on: null,
+      highlight_target: null,
+      hosted_url: null,
+      tags: []
+    };
+
+    const page = await newSpecPage({
+      components: [ChangebotToast],
+      html: '<changebot-toast position="center"></changebot-toast>',
+    });
+
+    const component = page.rootInstance;
+    component.currentUpdate = mockUpdate;
+    component.isVisible = true;
+    await page.waitForChanges();
+
+    const toast = page.root.shadowRoot.querySelector('.toast');
+    expect(toast).toHaveClass('toast--center');
+  });
+
   it('applies default bottom-right position', async () => {
     const mockUpdate = {
       id: 1,
