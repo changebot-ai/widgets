@@ -58,15 +58,11 @@ export class ChangebotBanner {
 
   private connectToProvider() {
     this.unsubscribeFromRegistry?.();
-    this.unsubscribeFromRegistry = connectConsumer(
-      this.el,
-      this.scope || 'default',
-      services => {
-        this.services = services;
-        log.debug('Connected to provider via registry', { scope: this.scope || 'default' });
-        this.subscribeToStore();
-      },
-    );
+    this.unsubscribeFromRegistry = connectConsumer(this.el, this.scope, services => {
+      this.services = services;
+      log.debug('Connected to provider via registry', { scope: this.scope || 'default' });
+      this.subscribeToStore();
+    });
   }
 
   disconnectedCallback() {
