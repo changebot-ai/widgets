@@ -21,6 +21,7 @@ export class ChangebotToast {
   @Prop() light?: Theme;
   @Prop() dark?: Theme;
   @Prop() position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center' = 'bottom-right';
+  @Prop() confetti: boolean = false;
 
   @State() isVisible: boolean = false;
   @State() currentUpdate?: Update;
@@ -30,6 +31,8 @@ export class ChangebotToast {
   onVisibilityChange() {
     if (this.isVisible) {
       this.updateContainerBounds();
+    } else {
+      this.cleanupConfetti();
     }
   }
 
@@ -38,6 +41,9 @@ export class ChangebotToast {
   private themeManager?: ThemeManager;
   private resizeObserver?: ResizeObserver;
   private unsubscribeFromRegistry?: () => void;
+  private confettiFn?: typeof import('canvas-confetti');
+  private confettiCanvas?: HTMLCanvasElement;
+  private wasVisibleAtRender: boolean = false;
 
   @Watch('theme')
   @Watch('light')
@@ -49,6 +55,11 @@ export class ChangebotToast {
     });
   }
 
+  @Watch('confetti')
+  onConfettiGatePropChange() {
+    this.maybePreloadConfetti();
+  }
+
   componentWillLoad() {
     this.themeManager = createThemeManager(this, theme => {
       this.activeTheme = theme;
@@ -58,6 +69,8 @@ export class ChangebotToast {
     if (this.scope) {
       this.el.setAttribute('data-scope', this.scope);
     }
+
+    this.maybePreloadConfetti();
 
     // Connect to provider asynchronously (don't block rendering)
     this.connectToProvider();
@@ -79,6 +92,13 @@ export class ChangebotToast {
     this.setupContainerTracking();
   }
 
+  componentDidRender() {
+    if (this.isVisible && !this.wasVisibleAtRender) {
+      this.maybeFireConfetti();
+    }
+    this.wasVisibleAtRender = this.isVisible;
+  }
+
   disconnectedCallback() {
     this.unsubscribeFromRegistry?.();
     this.unsubscribeFromRegistry = undefined;
@@ -90,6 +110,86 @@ export class ChangebotToast {
     }
     window.removeEventListener('resize', this.updateContainerBounds);
     window.removeEventListener('scroll', this.updateContainerBounds);
+    this.cleanupConfetti();
+  }
+
+  private maybePreloadConfetti() {
+    if (!this.confetti || this.confettiFn) return;
+    import('canvas-confetti')
+      .then(mod => {
+        // canvas-confetti uses `export =`; bundlers may wrap as { default }.
+        this.confettiFn = (mod as any).default ?? mod;
+      })
+      .catch(err => log.warn('Failed to load canvas-confetti', err));
+  }
+
+  private maybeFireConfetti() {
+    if (!this.confetti) return;
+    if (!this.confettiFn) return;
+
+    const mm = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)')
+      : null;
+    if (mm?.matches) return;
+
+    this.cleanupConfetti();
+    const canvas = document.createElement('canvas');
+    Object.assign(canvas.style, {
+      position: 'fixed',
+      inset: '0',
+      width: '100vw',
+      height: '100vh',
+      pointerEvents: 'none',
+      zIndex: '9999',
+    });
+    document.body.appendChild(canvas);
+    this.confettiCanvas = canvas;
+
+    const { origin, angle } = this.getConfettiBurst();
+    const fire = this.confettiFn.create(canvas, { resize: true, useWorker: false });
+    fire({ particleCount: 250, spread: 100, startVelocity: 65, scalar: 1.2, origin, angle })
+      ?.then(() => this.cleanupConfetti());
+  }
+
+  private getConfettiBurst(): { origin: { x: number; y: number }; angle: number } {
+    const angleByPosition = {
+      'top-left': 315,
+      'top-right': 225,
+      'bottom-left': 45,
+      'bottom-right': 135,
+      'center': 90,
+    } as const;
+    const angle = angleByPosition[this.position] ?? 90;
+
+    const toastEl = this.el.shadowRoot?.querySelector('.toast') as HTMLElement | null;
+    const vw = window.innerWidth || 1;
+    const vh = window.innerHeight || 1;
+    const fallback = { origin: { x: 0.5, y: 0.5 }, angle };
+    if (!toastEl) return fallback;
+
+    const rect = toastEl.getBoundingClientRect();
+    if (!rect.width || !rect.height) return fallback;
+
+    const anchorX = this.position === 'top-left' || this.position === 'bottom-left'
+      ? rect.left
+      : this.position === 'top-right' || this.position === 'bottom-right'
+        ? rect.right
+        : rect.left + rect.width / 2;
+    const anchorY = this.position === 'top-left' || this.position === 'top-right'
+      ? rect.top
+      : this.position === 'bottom-left' || this.position === 'bottom-right'
+        ? rect.bottom
+        : rect.top + rect.height / 2;
+
+    return {
+      origin: { x: anchorX / vw, y: anchorY / vh },
+      angle,
+    };
+  }
+
+  private cleanupConfetti() {
+    this.confettiCanvas?.remove();
+    this.confettiCanvas = undefined;
   }
 
   private subscribeToStore() {
@@ -273,6 +373,7 @@ declare global {
     light?: Theme;
     dark?: Theme;
     position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
+    confetti: boolean;
     preview?: boolean;
   }
 }

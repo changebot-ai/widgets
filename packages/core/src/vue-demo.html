@@ -365,6 +365,7 @@
         const panelMode = ref('drawer-right');
         const bannerPosition = ref('top');
         const toastPosition = ref('bottom-right');
+        const toastConfetti = ref(false);
 
         // Preview mode
         const showPreviewToast = ref(false);
@@ -490,6 +491,7 @@
           panelMode,
           bannerPosition,
           toastPosition,
+          toastConfetti,
           themeMode,
           fixedTheme,
           lightTheme,
@@ -660,6 +662,10 @@
                   <option value="center">Center</option>
                 </select>
               </div>
+              <div class="control-row">
+                <input type="checkbox" v-model="toastConfetti" />
+                <label>Toast confetti</label>
+              </div>
             </div>
 
             <!-- Actions -->
@@ -747,6 +753,7 @@
           ref="toastRef"
           :scope="SCOPE"
           :position="toastPosition"
+          :confetti="toastConfetti ? 'true' : null"
           v-bind="themeProps"
         />
 
@@ -755,6 +762,7 @@
           v-if="showPreviewToast"
           preview="true"
           :position="toastPosition"
+          :confetti="toastConfetti ? 'true' : null"
           v-bind="themeProps"
         />
         <changebot-banner

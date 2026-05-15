@@ -38,6 +38,7 @@ export const config: Config = {
         { src: 'userid-demo.html' },
         { src: 'preview-demo.html' },
         { src: 'badge-demo.html' },
+        { src: 'confetti-demo.html' },
       ],
     },
   ],

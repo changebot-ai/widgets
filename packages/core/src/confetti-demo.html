@@ -1,0 +1,271 @@
+<!doctype html>
+<html dir="ltr" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confetti Toast Demo - Changebot Widgets</title>
+
+  <script type="module" src="/build/widgets.esm.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f0e17;
+      color: #fffffe;
+      min-height: 100vh;
+    }
+
+    .demo-header {
+      background: linear-gradient(135deg, #ff8906 0%, #f25f4c 50%, #e53170 100%);
+      color: white;
+      padding: 32px;
+      text-align: center;
+    }
+
+    .demo-header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .demo-header p {
+      font-size: 15px;
+      opacity: 0.95;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+
+    .info-box {
+      background: #1f1d2e;
+      border-left: 4px solid #ff8906;
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin-bottom: 24px;
+    }
+
+    .info-box h2 {
+      font-size: 15px;
+      color: #ff8906;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-box p {
+      font-size: 14px;
+      color: #a7a9be;
+      line-height: 1.6;
+    }
+
+    .info-box code {
+      background: #0f0e17;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #f25f4c;
+    }
+
+    .control-section {
+      background: #1f1d2e;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .control-section h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #a7a9be;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .control-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .control-row label {
+      min-width: 130px;
+      font-size: 14px;
+      color: #fffffe;
+    }
+
+    .control-row select {
+      flex: 1;
+      max-width: 260px;
+      padding: 9px 12px;
+      border: 1px solid #2e2c41;
+      border-radius: 6px;
+      font-size: 14px;
+      background: #0f0e17;
+      color: #fffffe;
+    }
+
+    .control-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #ff8906;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ff8906 0%, #e53170 100%);
+      color: white;
+      box-shadow: 0 4px 14px rgba(229, 49, 112, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(229, 49, 112, 0.5);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .hint {
+      font-size: 13px;
+      color: #a7a9be;
+      margin-top: 12px;
+      font-style: italic;
+    }
+  </style>
+</head>
+
+<body>
+  <changebot-provider id="provider" scope="confetti-demo" preview></changebot-provider>
+
+  <header class="demo-header">
+    <h1>🎉 Confetti Toast Demo</h1>
+    <p>Add a celebratory burst when announcing big releases</p>
+  </header>
+
+  <div class="container">
+    <div class="info-box">
+      <h2>How it works</h2>
+      <p>
+        Set <code>confetti="true"</code> on <code>&lt;changebot-toast&gt;</code> to fire a confetti burst when the
+        toast appears. Works with any <code>position</code>. The <code>canvas-confetti</code> module is
+        lazy-loaded only when the prop is enabled, so opted-out customers pay zero bundle cost. The burst is
+        also suppressed when <code>prefers-reduced-motion: reduce</code> is set.
+      </p>
+    </div>
+
+    <div class="control-section">
+      <h3>Configuration</h3>
+      <div class="control-row">
+        <label for="confettiToggle">Confetti enabled:</label>
+        <input type="checkbox" id="confettiToggle" checked onchange="updateConfetti()" />
+      </div>
+      <div class="control-row">
+        <label for="positionSelect">Toast position:</label>
+        <select id="positionSelect" onchange="updatePosition()">
+          <option value="center" selected>Center</option>
+          <option value="top-left">Top Left</option>
+          <option value="top-right">Top Right</option>
+          <option value="bottom-left">Bottom Left</option>
+          <option value="bottom-right">Bottom Right</option>
+        </select>
+      </div>
+      <div class="control-row">
+        <label for="themeSelect">Theme:</label>
+        <select id="themeSelect" onchange="updateTheme()">
+          <option value="catppuccin-mocha" selected>Catppuccin Mocha</option>
+          <option value="dracula">Dracula</option>
+          <option value="nord">Nord</option>
+          <option value="tokyo-night">Tokyo Night</option>
+          <option value="cyberpunk">Cyberpunk</option>
+          <option value="catppuccin-latte">Catppuccin Latte</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="control-section">
+      <h3>Fire</h3>
+      <button class="btn btn-primary" onclick="fireToast()">🚀 Show toast</button>
+      <p class="hint">
+        Click to call <code>toast.show(...)</code> with a sample update. Toggle the controls above and try again
+        to see how the confetti gate behaves.
+      </p>
+    </div>
+  </div>
+
+  <changebot-toast
+    id="toast"
+    scope="confetti-demo"
+    position="center"
+    confetti="true"
+    theme="catppuccin-mocha"
+  ></changebot-toast>
+
+  <script>
+    const toast = document.getElementById('toast');
+
+    const sampleUpdate = {
+      id: 'confetti-demo-1',
+      title: '🎊 v2.0 is live!',
+      content: 'We just shipped a major release. Thanks for being part of the journey.',
+      display_date: new Date().toISOString().split('T')[0],
+      published_at: new Date().toISOString(),
+      expires_on: null,
+      highlight_target: null,
+      hosted_url: null,
+      tags: []
+    };
+
+    async function fireToast() {
+      // Dismiss any current toast so the visibility flip retriggers
+      await toast.dismiss();
+      // Small delay to let the cleanup settle, then show
+      requestAnimationFrame(() => toast.show({ ...sampleUpdate }));
+    }
+
+    function updateConfetti() {
+      const enabled = document.getElementById('confettiToggle').checked;
+      if (enabled) {
+        toast.setAttribute('confetti', 'true');
+      } else {
+        toast.removeAttribute('confetti');
+      }
+    }
+
+    function updatePosition() {
+      toast.setAttribute('position', document.getElementById('positionSelect').value);
+    }
+
+    function updateTheme() {
+      toast.setAttribute('theme', document.getElementById('themeSelect').value);
+    }
+  </script>
+</body>
+
+</html>
