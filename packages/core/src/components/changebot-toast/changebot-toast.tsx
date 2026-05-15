@@ -280,13 +280,30 @@ export class ChangebotToast {
     if (!container) return;
 
     const rect = container.getBoundingClientRect();
-    const leftOffset = rect.left;
-    const rightOffset = window.innerWidth - rect.right;
-    const topOffset = rect.top;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
 
-    (this.el as HTMLElement).style.setProperty('--toast-container-left', `${leftOffset}px`);
-    (this.el as HTMLElement).style.setProperty('--toast-container-right-offset', `${rightOffset}px`);
-    (this.el as HTMLElement).style.setProperty('--toast-container-top', `${topOffset}px`);
+    // Intersect the container rect with the viewport, so the toast always
+    // anchors inside both. If there's no overlap on an axis (e.g. wrapper sits
+    // below the fold), fall back to viewport corners on that axis.
+    const visibleLeft = Math.max(0, rect.left);
+    const visibleRight = Math.min(vw, rect.right);
+    const visibleTop = Math.max(0, rect.top);
+    const visibleBottom = Math.min(vh, rect.bottom);
+
+    const hasHorzOverlap = visibleRight > visibleLeft;
+    const hasVertOverlap = visibleBottom > visibleTop;
+
+    const leftOffset = hasHorzOverlap ? visibleLeft : 0;
+    const rightOffset = hasHorzOverlap ? vw - visibleRight : 0;
+    const topOffset = hasVertOverlap ? visibleTop : 0;
+    const bottomOffset = hasVertOverlap ? vh - visibleBottom : 0;
+
+    const host = this.el as HTMLElement;
+    host.style.setProperty('--toast-container-left', `${leftOffset}px`);
+    host.style.setProperty('--toast-container-right-offset', `${rightOffset}px`);
+    host.style.setProperty('--toast-container-top', `${topOffset}px`);
+    host.style.setProperty('--toast-container-bottom-offset', `${bottomOffset}px`);
   };
 
   private setupContainerTracking() {
