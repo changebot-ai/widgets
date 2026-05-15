@@ -22,10 +22,10 @@ export class ChangebotToast {
   @Prop() dark?: Theme;
   @Prop() position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center' = 'bottom-right';
   @Prop() confetti: boolean = false;
-  @Prop() confettiParticleCount: number = 250;
-  @Prop() confettiSpread: number = 100;
-  @Prop() confettiStartVelocity: number = 65;
-  @Prop() confettiScalar: number = 1.2;
+  @Prop() confettiParticleCount: number = 351;
+  @Prop() confettiSpread: number = 130;
+  @Prop() confettiStartVelocity: number = 46;
+  @Prop() confettiScalar: number = 0.8;
 
   @State() isVisible: boolean = false;
   @State() currentUpdate?: Update;
@@ -150,11 +150,15 @@ export class ChangebotToast {
     this.confettiCanvas = canvas;
 
     const { origin, angle } = this.getConfettiBurst();
+    // Bottom positions fire upward; add a boost so gravity doesn't sap the burst.
+    const firesUpward = this.position === 'bottom-left' || this.position === 'bottom-right';
+    const startVelocity = this.confettiStartVelocity + (firesUpward ? 20 : 0);
+
     const fire = this.confettiFn.create(canvas, { resize: true, useWorker: false });
     fire({
       particleCount: this.confettiParticleCount,
       spread: this.confettiSpread,
-      startVelocity: this.confettiStartVelocity,
+      startVelocity,
       scalar: this.confettiScalar,
       origin,
       angle,

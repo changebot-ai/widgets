@@ -65,19 +65,19 @@ export namespace Components {
          */
         "confetti": boolean;
         /**
-          * @default 250
+          * @default 351
          */
         "confettiParticleCount": number;
         /**
-          * @default 1.2
+          * @default 0.8
          */
         "confettiScalar": number;
         /**
-          * @default 100
+          * @default 130
          */
         "confettiSpread": number;
         /**
-          * @default 65
+          * @default 46
          */
         "confettiStartVelocity": number;
         "dark"?: Theme;
@@ -181,19 +181,19 @@ declare namespace LocalJSX {
          */
         "confetti"?: boolean;
         /**
-          * @default 250
+          * @default 351
          */
         "confettiParticleCount"?: number;
         /**
-          * @default 1.2
+          * @default 0.8
          */
         "confettiScalar"?: number;
         /**
-          * @default 100
+          * @default 130
          */
         "confettiSpread"?: number;
         /**
-          * @default 65
+          * @default 46
          */
         "confettiStartVelocity"?: number;
         "dark"?: Theme;
