@@ -431,5 +431,96 @@ describe('changebot-toast', () => {
     expect(host.getAttribute('data-changebot-state')).toBe('connected');
   });
 
+  describe('confetti', () => {
+    const confettiUpdate = {
+      id: 1,
+      title: 'Celebration',
+      content: '',
+      display_date: new Date().toISOString().split('T')[0],
+      published_at: new Date().toISOString(),
+      expires_on: null,
+      highlight_target: null,
+      hosted_url: null,
+      tags: []
+    };
 
+    const makeFakeConfetti = () => {
+      const fire = jest.fn().mockReturnValue(Promise.resolve());
+      const fn: any = jest.fn();
+      fn.create = jest.fn().mockReturnValue(fire);
+      return { fn, fire };
+    };
+
+    it('fires confetti when becoming visible with confetti=true and position=center', async () => {
+      const { fn, fire } = makeFakeConfetti();
+      const page = await newSpecPage({
+        components: [ChangebotToast],
+        html: '<changebot-toast position="center" confetti="true"></changebot-toast>',
+      });
+
+      const component = page.rootInstance;
+      (component as any).confettiFn = fn;
+      component.currentUpdate = confettiUpdate;
+      component.isVisible = true;
+      await page.waitForChanges();
+
+      expect(fn.create).toHaveBeenCalled();
+      expect(fire).toHaveBeenCalled();
+    });
+
+    it('fires confetti for non-center positions', async () => {
+      const { fn, fire } = makeFakeConfetti();
+      const page = await newSpecPage({
+        components: [ChangebotToast],
+        html: '<changebot-toast position="bottom-right" confetti="true"></changebot-toast>',
+      });
+
+      const component = page.rootInstance;
+      (component as any).confettiFn = fn;
+      component.currentUpdate = confettiUpdate;
+      component.isVisible = true;
+      await page.waitForChanges();
+
+      expect(fn.create).toHaveBeenCalled();
+      expect(fire).toHaveBeenCalled();
+    });
+
+    it('does not fire confetti when confetti prop is false', async () => {
+      const { fn, fire } = makeFakeConfetti();
+      const page = await newSpecPage({
+        components: [ChangebotToast],
+        html: '<changebot-toast position="center"></changebot-toast>',
+      });
+
+      const component = page.rootInstance;
+      (component as any).confettiFn = fn;
+      component.currentUpdate = confettiUpdate;
+      component.isVisible = true;
+      await page.waitForChanges();
+
+      expect(fn.create).not.toHaveBeenCalled();
+      expect(fire).not.toHaveBeenCalled();
+    });
+
+    it('removes confetti canvas on dismiss', async () => {
+      const page = await newSpecPage({
+        components: [ChangebotToast],
+        html: '<changebot-toast position="center" confetti="true"></changebot-toast>',
+      });
+
+      const component = page.rootInstance;
+      const fakeCanvas = document.createElement('canvas');
+      document.body.appendChild(fakeCanvas);
+      (component as any).confettiCanvas = fakeCanvas;
+      component.currentUpdate = confettiUpdate;
+      component.isVisible = true;
+      await page.waitForChanges();
+
+      const closeButton = page.root.shadowRoot.querySelector('.toast-close') as HTMLElement;
+      closeButton.click();
+      await page.waitForChanges();
+
+      expect(document.body.contains(fakeCanvas)).toBe(false);
+    });
+  });
 });

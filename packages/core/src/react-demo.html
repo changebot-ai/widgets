@@ -419,6 +419,7 @@
       const [panelMode, setPanelMode] = useState('drawer-right');
       const [bannerPosition, setBannerPosition] = useState('top');
       const [toastPosition, setToastPosition] = useState('bottom-right');
+      const [toastConfetti, setToastConfetti] = useState(false);
 
       // Preview mode
       const [showPreviewToast, setShowPreviewToast] = useState(false);
@@ -685,6 +686,10 @@
                     <option value="center">Center</option>
                   </select>
                 </div>
+                <div className="control-row">
+                  <input type="checkbox" checked={toastConfetti} onChange={(e) => setToastConfetti(e.target.checked)} />
+                  <label>Toast confetti</label>
+                </div>
               </div>
 
               {/* Actions */}
@@ -776,6 +781,7 @@
               ref={toastRef}
               scope={SCOPE}
               position={toastPosition}
+              {...(toastConfetti ? { confetti: 'true' } : {})}
               {...themeProps}
             />
           )}
@@ -785,6 +791,7 @@
             <changebot-toast
               preview="true"
               position={toastPosition}
+              {...(toastConfetti ? { confetti: 'true' } : {})}
               {...themeProps}
             />
           )}

@@ -60,6 +60,10 @@ export namespace Components {
         "userId"?: string;
     }
     interface ChangebotToast {
+        /**
+          * @default false
+         */
+        "confetti": boolean;
         "dark"?: Theme;
         "dismiss": () => Promise<void>;
         "light"?: Theme;
@@ -156,6 +160,10 @@ declare namespace LocalJSX {
         "userId"?: string;
     }
     interface ChangebotToast {
+        /**
+          * @default false
+         */
+        "confetti"?: boolean;
         "dark"?: Theme;
         "light"?: Theme;
         /**
