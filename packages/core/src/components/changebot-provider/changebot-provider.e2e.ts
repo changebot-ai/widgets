@@ -1,8 +1,32 @@
-import { newE2EPage } from '@stencil/core/testing';
+import { newE2EPage, E2EPage } from '@stencil/core/testing';
+
+// Stub window.fetch before any document loads so the provider's auto-fetch
+// on mount never hits the real network (CORS-blocked, slow, flaky). Any
+// non-localhost request returns an empty publications payload. Stencil's
+// e2e harness owns request interception, so we patch at the fetch layer.
+async function newStubbedPage(): Promise<E2EPage> {
+  const page = await newE2EPage();
+  await page.evaluateOnNewDocument(() => {
+    const originalFetch = window.fetch;
+    window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+      if (!url.startsWith('http://localhost') && !url.startsWith('http://127.0.0.1')) {
+        return Promise.resolve(
+          new Response(JSON.stringify({ publications: [] }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          }),
+        );
+      }
+      return originalFetch(input, init);
+    };
+  });
+  return page;
+}
 
 describe('changebot-provider', () => {
   it('renders', async () => {
-    const page = await newE2EPage();
+    const page = await newStubbedPage();
     await page.setContent('<changebot-provider />');
 
     const element = await page.find('changebot-provider');
@@ -10,28 +34,7 @@ describe('changebot-provider', () => {
   });
 
   it('renders with baseUrl prop', async () => {
-    const page = await newE2EPage();
-
-    // Stub window.fetch before the page loads so the provider's auto-fetch
-    // on mount doesn't hit DNS for api.example.com and produce console noise
-    // that this test doesn't assert on. (Stencil's e2e harness already owns
-    // request interception, so we patch at the fetch layer instead.)
-    await page.evaluateOnNewDocument(() => {
-      const originalFetch = window.fetch;
-      window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
-        const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
-        if (url.startsWith('https://api.example.com/')) {
-          return Promise.resolve(
-            new Response(JSON.stringify({ publications: [] }), {
-              status: 200,
-              headers: { 'Content-Type': 'application/json' },
-            }),
-          );
-        }
-        return originalFetch(input, init);
-      };
-    });
-
+    const page = await newStubbedPage();
     await page.setContent('<changebot-provider base-url="https://api.example.com" />');
 
     const element = await page.find('changebot-provider');
@@ -40,7 +43,7 @@ describe('changebot-provider', () => {
   });
 
   it('renders with slug prop', async () => {
-    const page = await newE2EPage();
+    const page = await newStubbedPage();
     await page.setContent('<changebot-provider slug="test-team" />');
 
     const element = await page.find('changebot-provider');
@@ -49,7 +52,7 @@ describe('changebot-provider', () => {
   });
 
   it('renders with scope prop', async () => {
-    const page = await newE2EPage();
+    const page = await newStubbedPage();
     await page.setContent('<changebot-provider scope="custom-scope" />');
 
     const element = await page.find('changebot-provider');
@@ -58,7 +61,7 @@ describe('changebot-provider', () => {
   });
 
   it('renders with default scope when not provided', async () => {
-    const page = await newE2EPage();
+    const page = await newStubbedPage();
     await page.setContent('<changebot-provider />');
 
     const element = await page.find('changebot-provider');
@@ -67,7 +70,7 @@ describe('changebot-provider', () => {
 
   describe('store registration', () => {
     it('registers store in registry on load', async () => {
-      const page = await newE2EPage();
+      const page = await newStubbedPage();
       await page.setContent('<changebot-provider />');
 
       await page.waitForChanges();
@@ -91,7 +94,7 @@ describe('changebot-provider', () => {
 
   describe('multiple providers with different scopes', () => {
     it('allows multiple providers to coexist with different scopes', async () => {
-      const page = await newE2EPage();
+      const page = await newStubbedPage();
       await page.setContent(`
         <changebot-provider scope="scope-a" />
         <changebot-provider scope="scope-b" />
@@ -127,7 +130,7 @@ describe('changebot-provider', () => {
 
   describe('slot content', () => {
     it('renders slot content', async () => {
-      const page = await newE2EPage();
+      const page = await newStubbedPage();
       await page.setContent(`
         <changebot-provider />
         <div class="test-content">Test Content</div>
