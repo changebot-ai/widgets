@@ -20,8 +20,18 @@ aws s3 sync packages/core/dist/widgets "s3://${BUCKET}/v${VERSION}" \
 aws s3 sync packages/core/dist/widgets "s3://${BUCKET}/latest" \
   --endpoint-url "$ENDPOINT" \
   --region auto \
-  --cache-control "public, max-age=300, stale-if-error=86400" \
+  --cache-control "public, max-age=31536000, immutable, stale-if-error=604800" \
   --exclude "*.map"
+
+for loader in widgets.esm.js index.esm.js; do
+  src="packages/core/dist/widgets/${loader}"
+  [ -f "$src" ] || continue
+  aws s3 cp "$src" "s3://${BUCKET}/latest/${loader}" \
+    --endpoint-url "$ENDPOINT" \
+    --region auto \
+    --content-type "application/javascript" \
+    --cache-control "public, max-age=60, stale-while-revalidate=300, stale-if-error=86400"
+done
 
 echo "Deployed. Public URLs depend on the bucket's configured public access"
 echo "(custom domain or r2.dev subdomain). Paths:"
