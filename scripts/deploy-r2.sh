@@ -21,7 +21,6 @@ aws s3 sync packages/core/dist/widgets "s3://${BUCKET}/latest" \
   --endpoint-url "$ENDPOINT" \
   --region auto \
   --cache-control "public, max-age=300, stale-if-error=86400" \
-  --delete \
   --exclude "*.map"
 
 echo "Deployed. Public URLs depend on the bucket's configured public access"
