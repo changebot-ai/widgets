@@ -198,11 +198,6 @@
   text-decoration: underline;
 }
 
-.toast-content img,
-.toast-content figure {
-  display: none;
-}
-
 .toast-content ul,
 .toast-content ol {
   margin: 4px 0;

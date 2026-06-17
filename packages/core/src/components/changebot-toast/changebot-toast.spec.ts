@@ -56,6 +56,35 @@ describe('changebot-toast', () => {
     expect(content.innerHTML).toBe('Check out our new feature!');
   });
 
+  it('replaces images and figures with line breaks to preserve spacing', async () => {
+    const mockUpdate = {
+      id: 1,
+      title: 'New Feature',
+      content: '<p>First</p><img src="a.png" alt="a"><p>Second</p><figure><img src="b.png"><figcaption>cap</figcaption></figure><p>Third</p>',
+      display_date: new Date().toISOString().split('T')[0],
+      published_at: new Date().toISOString(),
+      expires_on: null,
+      highlight_target: null,
+      hosted_url: null,
+      tags: []
+    };
+
+    const page = await newSpecPage({
+      components: [ChangebotToast],
+      html: '<changebot-toast></changebot-toast>',
+    });
+
+    const component = page.rootInstance;
+    component.currentUpdate = mockUpdate;
+    component.isVisible = true;
+    await page.waitForChanges();
+
+    const content = page.root.shadowRoot.querySelector('.toast-content');
+    expect(content.innerHTML).toBe('<p>First</p><br><p>Second</p><br><p>Third</p>');
+    expect(content.querySelector('img')).toBeNull();
+    expect(content.querySelector('figure')).toBeNull();
+  });
+
   it('applies correct position class', async () => {
     const mockUpdate = {
       id: 1,

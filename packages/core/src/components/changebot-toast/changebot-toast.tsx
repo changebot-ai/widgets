@@ -275,6 +275,15 @@ export class ChangebotToast {
     this.handleDismiss();
   }
 
+  // The compact toast doesn't show images, but removing them outright collapses
+  // the whitespace they occupied and smooshes adjacent paragraphs together. Swap
+  // each image (and figure) for a <br> so its line break is preserved.
+  private formatContent(content: string): string {
+    return content
+      .replace(/<figure\b[^>]*>[\s\S]*?<\/figure>/gi, '<br>')
+      .replace(/<img\b[^>]*>/gi, '<br>');
+  }
+
   private getPositionClass(): string {
     switch (this.position) {
       case 'top-left':
@@ -389,7 +398,7 @@ export class ChangebotToast {
             </button>
           </div>
           {this.currentUpdate.content && (
-            <div class="toast-content" innerHTML={this.currentUpdate.content}></div>
+            <div class="toast-content" innerHTML={this.formatContent(this.currentUpdate.content)}></div>
           )}
           <time class="toast-date" dateTime={this.currentUpdate.display_date}>
             {formatDisplayDate(this.currentUpdate.display_date)}
