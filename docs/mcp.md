@@ -62,8 +62,9 @@ Run **MCP: Add Server** from the command palette, choose **HTTP**, and enter
   draft; `update_customer_update`, `archive_customer_update`, and
   `restore_customer_update` manage the lifecycle. Reading past updates
   (`read_customer_update`) helps your assistant match your changelog's voice.
-- **Publish** — `publish_customer_update` pushes an update to every enabled
-  destination (or a subset). Hosted changelog and widget publishes return live
+- **Publish** — `publish_customer_update` pushes an update to the
+  destinations you choose (when a team has exactly one enabled destination,
+  the choice is implicit). Hosted changelog and widget publishes return live
   URLs immediately; Slack, Discord, and Webflow complete in the background.
   `sync_publications` pushes edits to already-published copies;
   `unpublish_customer_update` takes them down.
