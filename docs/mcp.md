@@ -62,6 +62,9 @@ Run **MCP: Add Server** from the command palette, choose **HTTP**, and enter
   draft; `update_customer_update`, `archive_customer_update`, and
   `restore_customer_update` manage the lifecycle. Reading past updates
   (`read_customer_update`) helps your assistant match your changelog's voice.
+  To embed a screenshot, your assistant calls `create_image_upload`, uploads
+  the file to the returned URL, and drops the returned image reference into
+  the body — it renders everywhere the update publishes.
 - **Publish** — `publish_customer_update` pushes an update to the
   destinations you choose (when a team has exactly one enabled destination,
   the choice is implicit). Hosted changelog and widget publishes return live
@@ -77,8 +80,8 @@ Run **MCP: Add Server** from the command palette, choose **HTTP**, and enter
 
 ## Limitations
 
-- Images and file attachments in update bodies are not supported over MCP —
-  use the web editor for those.
+- Update bodies take images only (JPEG, PNG, GIF, WebP, up to 5MB and 5 per
+  update); other file attachments still need the web editor.
 - Webflow destinations are created and edited in the web app; MCP can list
   and publish to them.
 - Publishing to Slack/Discord requires the workspace/server to be connected
