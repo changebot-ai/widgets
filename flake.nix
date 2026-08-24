@@ -19,7 +19,7 @@
       in {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
-            nodejs_24
+            nodejs_26
             pnpm
             chromium
             awscli2

@@ -70,7 +70,7 @@
     "@stencil/vitest": "^1.15.0",
     "@stencil/vue-output-target": "^0.14.1",
     "@types/canvas-confetti": "^1.9.0",
-    "@types/node": "^24.13.3",
+    "@types/node": "^26.2.0",
     "vitest": "^4.1.11"
   },
   "license": "Apache-2.0",
