@@ -4,7 +4,7 @@
   "private": true,
   "description": "Changebot widgets component library monorepo",
   "scripts": {
-    "build": "pnpm --filter @changebot/core run build && pnpm --filter @changebot/widgets-react run build && pnpm --filter @changebot/widgets-vue run build",
+    "build": "pnpm --filter @changebot/core run build && pnpm --filter @changebot/widgets-react run build && pnpm --filter @changebot/widgets-vue run build && pnpm --filter @changebot/mock-server run build",
     "start": "pnpm --filter @changebot/core run start",
     "test": "pnpm --filter @changebot/core run test",
     "test.smoke": "pnpm --filter @changebot/core run test.smoke",

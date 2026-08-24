@@ -103,12 +103,8 @@ class MockStore {
   }
 
   setUser(userId: string, data: Partial<UserTracking>): void {
-    this.state.users[userId] = {
-      id: userId,
-      last_seen_at: null,
-      ...this.state.users[userId],
-      ...data,
-    };
+    const existing: UserTracking = this.state.users[userId] ?? { id: userId, last_seen_at: null };
+    this.state.users[userId] = { ...existing, ...data };
   }
 
   setUserLastSeen(userId: string, timestamp: string | null): void {

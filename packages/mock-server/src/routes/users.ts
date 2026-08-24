@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { mockStore } from '../data/store.js';
 
-const router = Router();
+const router: Router = Router();
 
 // GET /users/:userId - Get user tracking data
 router.get('/users/:userId', async (req: Request, res: Response) => {

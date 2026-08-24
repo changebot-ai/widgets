@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { mockStore } from '../data/store.js';
 
-const router = Router();
+const router: Router = Router();
 
 // GET /updates - Returns widget + publications (matches production API)
 router.get('/updates', async (req: Request, res: Response) => {

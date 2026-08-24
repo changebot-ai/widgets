@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { mockStore, ScenarioName, ErrorMode } from '../data/store.js';
 import { Update } from '../data/seed.js';
 
-const router = Router();
+const router: Router = Router();
 
 // GET /admin/api/state - Get full server state
 router.get('/state', (req: Request, res: Response) => {
