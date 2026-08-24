@@ -19,7 +19,7 @@
     "@stencil/vue-output-target": "^0.14.1"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
+    "typescript": "^7.0.2",
     "vue": "^3.3.0"
   },
   "publishConfig": {

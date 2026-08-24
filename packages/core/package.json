@@ -13,6 +13,10 @@
       "import": "./dist/widgets/widgets.esm.js",
       "require": "./dist/widgets/widgets.cjs.js"
     },
+    "./dist/components": {
+      "import": "./dist/components/index.js",
+      "types": "./dist/components/index.d.ts"
+    },
     "./dist/components/changebot-badge.js": {
       "import": "./dist/components/changebot-badge.js",
       "types": "./dist/components/changebot-badge.d.ts"
