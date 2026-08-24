@@ -222,12 +222,15 @@ export class ChangebotPanel {
       this.closePanel();
     }
 
-    // Focus trap for modal mode
+    // Focus trap for modal mode. The focusable elements live inside the
+    // shadow root, where document.activeElement only reports the host, so
+    // the shadow root's activeElement is the one to compare.
     if (this.mode === 'modal' && event.key === 'Tab') {
-      if (event.shiftKey && document.activeElement === this.firstFocusableElement) {
+      const activeElement = this.el.shadowRoot?.activeElement;
+      if (event.shiftKey && activeElement === this.firstFocusableElement) {
         event.preventDefault();
         this.lastFocusableElement?.focus();
-      } else if (!event.shiftKey && document.activeElement === this.lastFocusableElement) {
+      } else if (!event.shiftKey && activeElement === this.lastFocusableElement) {
         event.preventDefault();
         this.firstFocusableElement?.focus();
       }
