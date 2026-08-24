@@ -26,14 +26,12 @@
 
           # The browsers Playwright downloads link against libraries that are
           # not where they look for them on NixOS, so the browsers come from
-          # nixpkgs instead. Playwright finds them by revision number, which
-          # ties @playwright/test in packages/core to the version below --
-          # they are pinned to each other, and both move together.
+          # nixpkgs instead. Playwright finds them by revision number, so
+          # @playwright/test in packages/core is pinned to the exact version of
+          # pkgs.playwright-driver; the two move together or neither moves. A
+          # mismatch reads "Executable doesn't exist at ...".
           shellHook = ''
             export PLAYWRIGHT_BROWSERS_PATH=${pkgs.playwright-driver.browsers}
-            export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-            export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
-            echo "playwright-driver ${pkgs.playwright-driver.version} (must match @playwright/test)"
           '';
         };
       }

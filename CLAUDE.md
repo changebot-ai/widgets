@@ -106,7 +106,7 @@ Components use:
 
 Shared browser-test helpers live in `packages/core/src/test-utils/e2e-helpers.ts`: waiting on `data-changebot-state`, seeding localStorage before the document loads, mocking the widget API at the `fetch` layer, and reloading between visits in a multi-visit journey.
 
-Run the browser tests from inside `nix develop`. The browsers Playwright downloads will not start on NixOS, so the dev shell points `PLAYWRIGHT_BROWSERS_PATH` at the ones from nixpkgs. Playwright looks those up by revision number, so **`@playwright/test` in `packages/core/package.json` is pinned to the exact version of `pkgs.playwright-driver`** — 1.61.1 for both today. Bumping one without the other gives "Executable doesn't exist at ...". `nix develop` prints the driver version on entry. CI installs browsers the normal way and is not affected.
+Run the browser tests from inside `nix develop`. The browsers Playwright downloads will not start on NixOS, so the dev shell points `PLAYWRIGHT_BROWSERS_PATH` at the ones from nixpkgs. Playwright looks those up by revision number, so **`@playwright/test` in `packages/core/package.json` is pinned to the exact version of `pkgs.playwright-driver`** — 1.61.1 for both today. Bumping one without the other gives "Executable doesn't exist at ...". Check with `nix eval nixpkgs#playwright-driver.version`. CI installs browsers the normal way and is not affected.
 
 ## TypeScript Configuration
 

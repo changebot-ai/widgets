@@ -113,7 +113,7 @@ describe('changebot-badge', () => {
         ],
         lastViewed: Date.now() - 86400000 // 1 day ago
       },
-      onChange: vi.fn()
+      onChange: vi.fn(() => vi.fn())
     };
 
     const page = await render('<changebot-badge></changebot-badge>');
@@ -131,7 +131,7 @@ describe('changebot-badge', () => {
     const mockOpen = vi.fn();
     const mockStore = {
       state: { updates: [], lastViewed: Date.now(), newUpdatesCount: 3 },
-      onChange: vi.fn()
+      onChange: vi.fn(() => vi.fn())
     };
 
     const page = await render('<changebot-badge count="3"></changebot-badge>');
@@ -167,7 +167,7 @@ describe('changebot-badge', () => {
     const mockOpen = vi.fn();
     const mockStore = {
       state: { updates: [], lastViewed: Date.now(), newUpdatesCount: 3 },
-      onChange: vi.fn()
+      onChange: vi.fn(() => vi.fn())
     };
 
     const page = await render('<changebot-badge count="3"></changebot-badge>');
@@ -191,7 +191,7 @@ describe('changebot-badge', () => {
     const mockOpen = vi.fn();
     const mockStore = {
       state: { updates: [], lastViewed: Date.now(), newUpdatesCount: 3 },
-      onChange: vi.fn()
+      onChange: vi.fn(() => vi.fn())
     };
 
     const page = await render('<changebot-badge count="3"></changebot-badge>');

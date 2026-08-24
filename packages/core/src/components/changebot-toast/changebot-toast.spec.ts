@@ -340,7 +340,7 @@ describe('changebot-toast', () => {
           }
         ]
       },
-      onChange: vi.fn()
+      onChange: vi.fn(() => vi.fn())
     };
 
     const page = await render('<changebot-toast></changebot-toast>');

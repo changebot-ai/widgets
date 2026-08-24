@@ -87,7 +87,7 @@ describe('changebot-panel', () => {
         updates: [],
         mode: 'drawer-right'
       },
-      onChange: vi.fn()
+      onChange: vi.fn(() => vi.fn())
     };
 
     const page = await render('<changebot-panel></changebot-panel>');
@@ -108,7 +108,7 @@ describe('changebot-panel', () => {
         updates: [],
         mode: 'drawer-right'
       },
-      onChange: vi.fn()
+      onChange: vi.fn(() => vi.fn())
     };
 
     const page = await render('<changebot-panel></changebot-panel>');
@@ -297,7 +297,7 @@ describe('changebot-panel', () => {
         isLoading: false,
         mode: 'drawer-right'
       },
-      onChange: vi.fn()
+      onChange: vi.fn(() => vi.fn())
         .mockReturnValueOnce(unsubscribeIsOpen)
         .mockReturnValueOnce(unsubscribeUpdates)
         .mockReturnValueOnce(unsubscribeWidget)

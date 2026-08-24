@@ -350,7 +350,7 @@ describe('changebot-banner', () => {
           }
         ]
       },
-      onChange: vi.fn()
+      onChange: vi.fn(() => vi.fn())
     };
 
     const page = await render('<changebot-banner></changebot-banner>');
