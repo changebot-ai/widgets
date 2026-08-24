@@ -21,13 +21,19 @@
           packages = with pkgs; [
             nodejs_26
             pnpm
-            chromium
             awscli2
           ];
 
+          # The browsers Playwright downloads link against libraries that are
+          # not where they look for them on NixOS, so the browsers come from
+          # nixpkgs instead. Playwright finds them by revision number, which
+          # ties @playwright/test in packages/core to the version below --
+          # they are pinned to each other, and both move together.
           shellHook = ''
+            export PLAYWRIGHT_BROWSERS_PATH=${pkgs.playwright-driver.browsers}
             export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-            export PLAYWRIGHT_CHROMIUM_PATH=${pkgs.chromium}/bin/chromium
+            export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
+            echo "playwright-driver ${pkgs.playwright-driver.version} (must match @playwright/test)"
           '';
         };
       }

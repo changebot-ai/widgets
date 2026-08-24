@@ -63,7 +63,7 @@
     "generate": "stencil generate"
   },
   "devDependencies": {
-    "@playwright/test": "^1.62.1",
+    "@playwright/test": "1.61.1",
     "@stencil/core": "^4.44.1",
     "@stencil/playwright": "^0.5.1",
     "@stencil/react-output-target": "^1.6.2",

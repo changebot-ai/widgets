@@ -17,18 +17,5 @@ export default createConfig({
   use: {
     trace: 'on-first-retry',
   },
-  projects: [
-    {
-      name: 'chromium',
-      use: {
-        browserName: 'chromium',
-        // Playwright's downloaded Chromium expects system libraries that a Nix
-        // dev shell does not put where it looks. The shell exports a browser
-        // path; when it is set, use that browser instead of the bundled one.
-        launchOptions: process.env.PLAYWRIGHT_CHROMIUM_PATH
-          ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH }
-          : {},
-      },
-    },
-  ],
+  projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
 });

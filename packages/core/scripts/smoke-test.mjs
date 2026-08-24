@@ -132,9 +132,7 @@ async function run() {
 
   const server = await startServer();
   const { port } = server.address();
-  const browser = await chromium.launch({
-    executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
-  });
+  const browser = await chromium.launch();
 
   try {
     const page = await browser.newPage();
