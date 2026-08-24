@@ -205,23 +205,68 @@ declare namespace LocalJSX {
         "scope"?: string;
         "theme"?: Theme;
     }
+
+    interface ChangebotBadgeAttributes {
+        "theme": Theme;
+        "scope": string;
+        "light": Theme;
+        "dark": Theme;
+        "indicator": 'count' | 'dot';
+        "count": number;
+    }
+    interface ChangebotBannerAttributes {
+        "theme": Theme;
+        "scope": string;
+        "light": Theme;
+        "dark": Theme;
+    }
+    interface ChangebotPanelAttributes {
+        "theme": Theme;
+        "scope": string;
+        "light": Theme;
+        "dark": Theme;
+        "mode": 'modal' | 'drawer-left' | 'drawer-right';
+        "trigger": string;
+    }
+    interface ChangebotProviderAttributes {
+        "slug": string;
+        "userId": string;
+        "userData": string;
+        "scope": string;
+        "baseUrl": string;
+        "mockData": string;
+        "preview": boolean;
+    }
+    interface ChangebotToastAttributes {
+        "theme": Theme;
+        "scope": string;
+        "light": Theme;
+        "dark": Theme;
+        "position": 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
+        "confetti": boolean;
+        "confettiParticleCount": number;
+        "confettiSpread": number;
+        "confettiStartVelocity": number;
+        "confettiScalar": number;
+    }
+
     interface IntrinsicElements {
-        "changebot-badge": ChangebotBadge;
-        "changebot-banner": ChangebotBanner;
-        "changebot-panel": ChangebotPanel;
-        "changebot-provider": ChangebotProvider;
-        "changebot-toast": ChangebotToast;
+        "changebot-badge": Omit<ChangebotBadge, keyof ChangebotBadgeAttributes> & { [K in keyof ChangebotBadge & keyof ChangebotBadgeAttributes]?: ChangebotBadge[K] } & { [K in keyof ChangebotBadge & keyof ChangebotBadgeAttributes as `attr:${K}`]?: ChangebotBadgeAttributes[K] } & { [K in keyof ChangebotBadge & keyof ChangebotBadgeAttributes as `prop:${K}`]?: ChangebotBadge[K] };
+        "changebot-banner": Omit<ChangebotBanner, keyof ChangebotBannerAttributes> & { [K in keyof ChangebotBanner & keyof ChangebotBannerAttributes]?: ChangebotBanner[K] } & { [K in keyof ChangebotBanner & keyof ChangebotBannerAttributes as `attr:${K}`]?: ChangebotBannerAttributes[K] } & { [K in keyof ChangebotBanner & keyof ChangebotBannerAttributes as `prop:${K}`]?: ChangebotBanner[K] };
+        "changebot-panel": Omit<ChangebotPanel, keyof ChangebotPanelAttributes> & { [K in keyof ChangebotPanel & keyof ChangebotPanelAttributes]?: ChangebotPanel[K] } & { [K in keyof ChangebotPanel & keyof ChangebotPanelAttributes as `attr:${K}`]?: ChangebotPanelAttributes[K] } & { [K in keyof ChangebotPanel & keyof ChangebotPanelAttributes as `prop:${K}`]?: ChangebotPanel[K] };
+        "changebot-provider": Omit<ChangebotProvider, keyof ChangebotProviderAttributes> & { [K in keyof ChangebotProvider & keyof ChangebotProviderAttributes]?: ChangebotProvider[K] } & { [K in keyof ChangebotProvider & keyof ChangebotProviderAttributes as `attr:${K}`]?: ChangebotProviderAttributes[K] } & { [K in keyof ChangebotProvider & keyof ChangebotProviderAttributes as `prop:${K}`]?: ChangebotProvider[K] };
+        "changebot-toast": Omit<ChangebotToast, keyof ChangebotToastAttributes> & { [K in keyof ChangebotToast & keyof ChangebotToastAttributes]?: ChangebotToast[K] } & { [K in keyof ChangebotToast & keyof ChangebotToastAttributes as `attr:${K}`]?: ChangebotToastAttributes[K] } & { [K in keyof ChangebotToast & keyof ChangebotToastAttributes as `prop:${K}`]?: ChangebotToast[K] };
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "changebot-badge": LocalJSX.ChangebotBadge & JSXBase.HTMLAttributes<HTMLChangebotBadgeElement>;
-            "changebot-banner": LocalJSX.ChangebotBanner & JSXBase.HTMLAttributes<HTMLChangebotBannerElement>;
-            "changebot-panel": LocalJSX.ChangebotPanel & JSXBase.HTMLAttributes<HTMLChangebotPanelElement>;
-            "changebot-provider": LocalJSX.ChangebotProvider & JSXBase.HTMLAttributes<HTMLChangebotProviderElement>;
-            "changebot-toast": LocalJSX.ChangebotToast & JSXBase.HTMLAttributes<HTMLChangebotToastElement>;
+            "changebot-badge": LocalJSX.IntrinsicElements["changebot-badge"] & JSXBase.HTMLAttributes<HTMLChangebotBadgeElement>;
+            "changebot-banner": LocalJSX.IntrinsicElements["changebot-banner"] & JSXBase.HTMLAttributes<HTMLChangebotBannerElement>;
+            "changebot-panel": LocalJSX.IntrinsicElements["changebot-panel"] & JSXBase.HTMLAttributes<HTMLChangebotPanelElement>;
+            "changebot-provider": LocalJSX.IntrinsicElements["changebot-provider"] & JSXBase.HTMLAttributes<HTMLChangebotProviderElement>;
+            "changebot-toast": LocalJSX.IntrinsicElements["changebot-toast"] & JSXBase.HTMLAttributes<HTMLChangebotToastElement>;
         }
     }
 }

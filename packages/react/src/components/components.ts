@@ -7,18 +7,20 @@
 
 /* eslint-disable */
 
+import type { StencilReactComponent } from '@stencil/react-output-target/runtime';
+import { createComponent } from '@stencil/react-output-target/runtime';
+import React from 'react';
+
+import type { Components } from "@changebot/core/dist/components";
 import { ChangebotBadge as ChangebotBadgeElement, defineCustomElement as defineChangebotBadge } from "@changebot/core/dist/components/changebot-badge.js";
 import { ChangebotBanner as ChangebotBannerElement, defineCustomElement as defineChangebotBanner } from "@changebot/core/dist/components/changebot-banner.js";
 import { ChangebotPanel as ChangebotPanelElement, defineCustomElement as defineChangebotPanel } from "@changebot/core/dist/components/changebot-panel.js";
 import { ChangebotProvider as ChangebotProviderElement, defineCustomElement as defineChangebotProvider } from "@changebot/core/dist/components/changebot-provider.js";
 import { ChangebotToast as ChangebotToastElement, defineCustomElement as defineChangebotToast } from "@changebot/core/dist/components/changebot-toast.js";
-import type { StencilReactComponent } from '@stencil/react-output-target/runtime';
-import { createComponent } from '@stencil/react-output-target/runtime';
-import React from 'react';
 
 export type ChangebotBadgeEvents = NonNullable<unknown>;
 
-export const ChangebotBadge: StencilReactComponent<ChangebotBadgeElement, ChangebotBadgeEvents> = /*@__PURE__*/ createComponent<ChangebotBadgeElement, ChangebotBadgeEvents>({
+export const ChangebotBadge: StencilReactComponent<ChangebotBadgeElement, ChangebotBadgeEvents, Components.ChangebotBadge> = /*@__PURE__*/ createComponent<ChangebotBadgeElement, ChangebotBadgeEvents, Components.ChangebotBadge>({
     tagName: 'changebot-badge',
     elementClass: ChangebotBadgeElement,
     // @ts-ignore - ignore potential React type mismatches between the Stencil Output Target and your project.
@@ -29,7 +31,7 @@ export const ChangebotBadge: StencilReactComponent<ChangebotBadgeElement, Change
 
 export type ChangebotBannerEvents = NonNullable<unknown>;
 
-export const ChangebotBanner: StencilReactComponent<ChangebotBannerElement, ChangebotBannerEvents> = /*@__PURE__*/ createComponent<ChangebotBannerElement, ChangebotBannerEvents>({
+export const ChangebotBanner: StencilReactComponent<ChangebotBannerElement, ChangebotBannerEvents, Components.ChangebotBanner> = /*@__PURE__*/ createComponent<ChangebotBannerElement, ChangebotBannerEvents, Components.ChangebotBanner>({
     tagName: 'changebot-banner',
     elementClass: ChangebotBannerElement,
     // @ts-ignore - ignore potential React type mismatches between the Stencil Output Target and your project.
@@ -40,7 +42,7 @@ export const ChangebotBanner: StencilReactComponent<ChangebotBannerElement, Chan
 
 export type ChangebotPanelEvents = NonNullable<unknown>;
 
-export const ChangebotPanel: StencilReactComponent<ChangebotPanelElement, ChangebotPanelEvents> = /*@__PURE__*/ createComponent<ChangebotPanelElement, ChangebotPanelEvents>({
+export const ChangebotPanel: StencilReactComponent<ChangebotPanelElement, ChangebotPanelEvents, Components.ChangebotPanel> = /*@__PURE__*/ createComponent<ChangebotPanelElement, ChangebotPanelEvents, Components.ChangebotPanel>({
     tagName: 'changebot-panel',
     elementClass: ChangebotPanelElement,
     // @ts-ignore - ignore potential React type mismatches between the Stencil Output Target and your project.
@@ -51,7 +53,7 @@ export const ChangebotPanel: StencilReactComponent<ChangebotPanelElement, Change
 
 export type ChangebotProviderEvents = NonNullable<unknown>;
 
-export const ChangebotProvider: StencilReactComponent<ChangebotProviderElement, ChangebotProviderEvents> = /*@__PURE__*/ createComponent<ChangebotProviderElement, ChangebotProviderEvents>({
+export const ChangebotProvider: StencilReactComponent<ChangebotProviderElement, ChangebotProviderEvents, Components.ChangebotProvider> = /*@__PURE__*/ createComponent<ChangebotProviderElement, ChangebotProviderEvents, Components.ChangebotProvider>({
     tagName: 'changebot-provider',
     elementClass: ChangebotProviderElement,
     // @ts-ignore - ignore potential React type mismatches between the Stencil Output Target and your project.
@@ -62,7 +64,7 @@ export const ChangebotProvider: StencilReactComponent<ChangebotProviderElement, 
 
 export type ChangebotToastEvents = NonNullable<unknown>;
 
-export const ChangebotToast: StencilReactComponent<ChangebotToastElement, ChangebotToastEvents> = /*@__PURE__*/ createComponent<ChangebotToastElement, ChangebotToastEvents>({
+export const ChangebotToast: StencilReactComponent<ChangebotToastElement, ChangebotToastEvents, Components.ChangebotToast> = /*@__PURE__*/ createComponent<ChangebotToastElement, ChangebotToastEvents, Components.ChangebotToast>({
     tagName: 'changebot-toast',
     elementClass: ChangebotToastElement,
     // @ts-ignore - ignore potential React type mismatches between the Stencil Output Target and your project.

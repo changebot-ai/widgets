@@ -8,6 +8,7 @@ import type { JSX } from '@changebot/core';
 
 
 
+
 export const ChangebotBadge: StencilVueComponent<JSX.ChangebotBadge> = /*@__PURE__*/ defineContainer<JSX.ChangebotBadge>('changebot-badge', undefined, [
   'theme',
   'scope',
@@ -59,4 +60,5 @@ export const ChangebotToast: StencilVueComponent<JSX.ChangebotToast> = /*@__PURE
   'confettiStartVelocity',
   'confettiScalar'
 ]);
+
 
