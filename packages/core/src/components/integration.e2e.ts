@@ -1,22 +1,5 @@
-import { newE2EPage, E2EPage } from '@stencil/core/testing';
-
-/**
- * TECH DEBT: Timing-based delays
- *
- * This file uses setTimeout delays (e.g., `await new Promise(resolve => setTimeout(resolve, 300))`)
- * for async operations. This is a known tech debt item that can cause flaky tests on slow CI runners.
- *
- * Preferred approach would be to use condition-based polling:
- *
- *   async function waitForPanelOpen(page) {
- *     await page.waitForFunction(() => {
- *       const panel = document.querySelector('changebot-panel');
- *       return panel?.shadowRoot?.querySelector('.panel--open');
- *     }, { timeout: 5000 });
- *   }
- *
- * Or use Stencil's built-in waitForChanges with proper state checks.
- */
+import { newE2EPage } from '@stencil/core/testing';
+import { injectFetchMock, waitForConnected, waitForPanelOpen, waitForPanelClosed, waitForShadow } from '../test-utils/e2e-helpers';
 
 describe('Integration Tests - Full System', () => {
   describe('Provider-Badge-Drawer Integration', () => {
@@ -52,12 +35,12 @@ describe('Integration Tests - Full System', () => {
       `);
 
       await page.waitForChanges();
+      await waitForConnected(page, 'changebot-panel');
 
       // Open panel programmatically using the open() method
       await page.$eval('changebot-panel', (el: any) => el.open());
 
-      await page.waitForChanges();
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await waitForPanelOpen(page);
 
       // Verify drawer opened
       const drawer = await page.find('changebot-panel >>> .panel');
@@ -75,15 +58,14 @@ describe('Integration Tests - Full System', () => {
       `);
 
       await page.waitForChanges();
-      // Wait for async provider connections to complete
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await waitForConnected(page, 'changebot-badge');
+      await waitForConnected(page, 'changebot-panel');
 
       // Click the badge
       const badgeButton = await page.find('changebot-badge >>> .badge');
       await badgeButton.click();
 
-      await page.waitForChanges();
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await waitForPanelOpen(page);
 
       // Verify drawer opened
       const drawer = await page.find('changebot-panel >>> .panel');
@@ -102,6 +84,7 @@ describe('Integration Tests - Full System', () => {
       `);
 
       await page.waitForChanges();
+      await waitForConnected(page, 'changebot-badge');
 
       // Badge should be hydrated and connected to provider
       const badge = await page.find('changebot-badge');
@@ -125,15 +108,14 @@ describe('Integration Tests - Full System', () => {
       `);
 
       await page.waitForChanges();
-      // Wait for async provider connections to complete
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await waitForConnected(page, 'changebot-badge');
+      await waitForConnected(page, 'changebot-panel');
 
       // Click badge in scope-a
       const badges = await page.findAll('changebot-badge >>> .badge');
       await badges[0].click();
 
-      await page.waitForChanges();
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await waitForPanelOpen(page, 0);
 
       // Verify only scope-a panel opened
       const panels = await page.findAll('changebot-panel >>> .panel');
@@ -156,24 +138,11 @@ describe('Integration Tests - Full System', () => {
       `);
 
       await page.waitForChanges();
-      // Wait for async provider connections to complete before calling panel methods.
-      // Matches the pattern used by other tests in this file (tech debt — see file header).
-      // We can't use condition-based polling for the services-ready signal because
-      // the panel's `services` field is private and not exposed on the host element,
-      // and the provider doesn't set a DOM-observable readiness marker on its host.
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await waitForConnected(page, 'changebot-panel');
 
       // Open drawer programmatically
       await page.$eval('changebot-panel', (el: any) => el.open());
-
-      // Wait for the panel to transition to open
-      await page.waitForFunction(
-        () => {
-          const panel = document.querySelector('changebot-panel')?.shadowRoot?.querySelector('.panel');
-          return panel?.classList.contains('panel--open');
-        },
-        { timeout: 5000, polling: 50 },
-      );
+      await waitForPanelOpen(page);
 
       // Verify drawer is open
       const drawer = await page.find('changebot-panel >>> .panel');
@@ -182,15 +151,7 @@ describe('Integration Tests - Full System', () => {
 
       // Close drawer programmatically
       await page.$eval('changebot-panel', (el: any) => el.close());
-
-      // Wait for the panel to transition to closed
-      await page.waitForFunction(
-        () => {
-          const panel = document.querySelector('changebot-panel')?.shadowRoot?.querySelector('.panel');
-          return panel?.classList.contains('panel--closed') && !panel?.classList.contains('panel--open');
-        },
-        { timeout: 5000, polling: 50 },
-      );
+      await waitForPanelClosed(page);
 
       // Verify drawer is closed
       const closedDrawer = await page.find('changebot-panel >>> .panel');
@@ -213,13 +174,13 @@ describe('Integration Tests - Full System', () => {
       `);
 
       await page.waitForChanges();
+      await waitForConnected(page, 'changebot-panel');
 
       // Verify both systems are independent by opening app1 panel only
       const panels = await page.findAll('changebot-panel');
       await panels[0].callMethod('open');
 
-      await page.waitForChanges();
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await waitForPanelOpen(page, 0);
 
       // Check only app1 panel is open
       const panelElements = await page.findAll('changebot-panel >>> .panel');
@@ -242,13 +203,13 @@ describe('Integration Tests - Full System', () => {
       `);
 
       await page.waitForChanges();
+      await waitForConnected(page, 'changebot-panel');
 
       // Open only app1 drawer using the first panel's open method
       const panels = await page.findAll('changebot-panel');
       await panels[0].callMethod('open');
 
-      await page.waitForChanges();
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await waitForPanelOpen(page, 0);
 
       // Check app1 drawer is open
       const drawers = await page.findAll('changebot-panel >>> .panel');
@@ -289,12 +250,11 @@ describe('Integration Tests - Full System', () => {
       `);
 
       await page.waitForChanges();
+      await waitForConnected(page, 'changebot-panel');
 
       // Open drawer programmatically
       await page.$eval('changebot-panel', (el: any) => el.open());
-
-      await page.waitForChanges();
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await waitForPanelOpen(page);
 
       // Verify drawer is open
       let drawer = await page.find('changebot-panel >>> .panel');
@@ -303,8 +263,7 @@ describe('Integration Tests - Full System', () => {
 
       // Press ESC key
       await page.keyboard.press('Escape');
-      await page.waitForChanges();
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await waitForPanelClosed(page);
 
       // Verify drawer closed
       drawer = await page.find('changebot-panel >>> .panel');
@@ -322,15 +281,14 @@ describe('Integration Tests - Full System', () => {
       `);
 
       await page.waitForChanges();
-      // Wait for async provider connections to complete
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await waitForConnected(page, 'changebot-badge');
+      await waitForConnected(page, 'changebot-panel');
 
       // Focus badge and press Enter
       await page.focus('changebot-badge >>> .badge');
       await page.keyboard.press('Enter');
 
-      await page.waitForChanges();
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await waitForPanelOpen(page);
 
       // Verify drawer opened
       const drawer = await page.find('changebot-panel >>> .panel');
@@ -510,79 +468,6 @@ describe('Integration Tests - Full System', () => {
       ];
     }
 
-    /**
-     * Injects a fetch mock into the browser context before the component loads.
-     * This is necessary because Stencil's newE2EPage already sets up request
-     * interception, preventing us from adding custom Puppeteer interceptors.
-     * See: https://github.com/ionic-team/stencil/issues/2434
-     */
-    async function injectFetchMock(
-      page: E2EPage,
-      options: {
-        publications: any[];
-        userLastSeenAt: string | null;
-      },
-    ): Promise<{ getPatchedData: () => Promise<any> }> {
-      // Inject mock before page content is set
-      await page.evaluateOnNewDocument(
-        (apiBase, userId, publications, userLastSeenAt) => {
-          // Store patched data for retrieval
-          (window as any).__patchedUserData = null;
-
-          const originalFetch = window.fetch;
-          window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-            const url = typeof input === 'string' ? input : input.toString();
-            const method = init?.method || 'GET';
-
-            // Mock GET /updates
-            if (url === `${apiBase}/updates` && method === 'GET') {
-              return new Response(JSON.stringify(publications), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' },
-              });
-            }
-
-            // Mock GET /users/:userId
-            if (url === `${apiBase}/users/${encodeURIComponent(userId)}` && method === 'GET') {
-              return new Response(
-                JSON.stringify({
-                  id: userId,
-                  last_seen_at: userLastSeenAt,
-                }),
-                {
-                  status: 200,
-                  headers: { 'Content-Type': 'application/json' },
-                },
-              );
-            }
-
-            // Mock PATCH /users/:userId
-            if (url === `${apiBase}/users/${encodeURIComponent(userId)}` && method === 'PATCH') {
-              const body = init?.body ? JSON.parse(init.body as string) : null;
-              (window as any).__patchedUserData = body;
-              return new Response(JSON.stringify({ success: true }), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' },
-              });
-            }
-
-            // Pass through other requests
-            return originalFetch(input, init);
-          };
-        },
-        API_BASE,
-        USER_ID,
-        options.publications,
-        options.userLastSeenAt,
-      );
-
-      return {
-        getPatchedData: async () => {
-          return page.evaluate(() => (window as any).__patchedUserData);
-        },
-      };
-    }
-
     it('should show no badge count on first visit for new user, then show 1 after new update, then clear after viewing', async () => {
       // Create initial publications dated before "now"
       const testStartTime = new Date().toISOString();
@@ -593,9 +478,10 @@ describe('Integration Tests - Full System', () => {
       // ============================================
       let page = await newE2EPage();
 
-      const { getPatchedData: getPatchedData1 } = await injectFetchMock(page, {
-        publications: initialPublications,
-        userLastSeenAt: null, // New user - never seen before
+      const mock1 = await injectFetchMock(page, {
+        apiBase: API_BASE,
+        updates: initialPublications,
+        user: { last_seen_at: null }, // New user - never seen before
       });
 
       await page.setContent(`
@@ -605,7 +491,9 @@ describe('Integration Tests - Full System', () => {
       `);
 
       await page.waitForChanges();
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await waitForConnected(page, 'changebot-badge');
+      // The provider sets the new user's initial last_seen_at via PATCH
+      await mock1.waitForPatch();
 
       // Badge should be hidden (count = 0) because new user hasn't seen anything yet
       // and their last_seen_at gets set to "now" on first sync
@@ -613,11 +501,10 @@ describe('Integration Tests - Full System', () => {
       let badgeClasses = await badge.getProperty('className');
       expect(badgeClasses).toContain('badge--hidden');
 
-      // Verify the API was called to set their initial last_seen_at
-      const patchedData1 = await getPatchedData1();
+      const patchedData1 = await mock1.getLastPatchBody();
       expect(patchedData1).not.toBeNull();
       expect(patchedData1.last_seen_at).toBeDefined();
-      const firstVisitTimestamp = patchedData1.last_seen_at;
+      const firstVisitTimestamp = patchedData1.last_seen_at as string;
 
       // User does NOT click/open the panel - they just leave
       await page.close();
@@ -630,9 +517,10 @@ describe('Integration Tests - Full System', () => {
 
       page = await newE2EPage();
 
-      const { getPatchedData: getPatchedData2 } = await injectFetchMock(page, {
-        publications: publicationsWithNewUpdate, // Now includes the new update
-        userLastSeenAt: firstVisitTimestamp, // Their last_seen_at from first visit
+      const mock2 = await injectFetchMock(page, {
+        apiBase: API_BASE,
+        updates: publicationsWithNewUpdate, // Now includes the new update
+        user: { last_seen_at: firstVisitTimestamp }, // Their last_seen_at from first visit
       });
 
       await page.setContent(`
@@ -642,12 +530,10 @@ describe('Integration Tests - Full System', () => {
       `);
 
       await page.waitForChanges();
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await waitForConnected(page, 'changebot-badge');
 
       // Badge should show count of 1 (one new update since their last visit)
-      badge = await page.find('changebot-badge >>> .badge');
-      badgeClasses = await badge.getProperty('className');
-      expect(badgeClasses).not.toContain('badge--hidden');
+      await waitForShadow(page, 'changebot-badge', '.badge:not(.badge--hidden)');
 
       const countElement = await page.find('changebot-badge >>> .badge__count');
       const countText = await countElement.textContent;
@@ -657,34 +543,21 @@ describe('Integration Tests - Full System', () => {
       const badgeButton = await page.find('changebot-badge >>> .badge');
       await badgeButton.click();
 
-      await page.waitForChanges();
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      await page.waitForChanges(); // Wait again for reactive updates
-
-      // Panel should be open
-      const panel = await page.find('changebot-panel >>> .panel');
-      const panelClasses = await panel.getProperty('className');
-      expect(panelClasses).toContain('panel--open');
-
-      // Wait for the store to recalculate and badge to update
-      await new Promise((resolve) => setTimeout(resolve, 200));
-      await page.waitForChanges();
+      await waitForPanelOpen(page);
 
       // Badge should now be hidden (count cleared after viewing)
-      badge = await page.find('changebot-badge >>> .badge');
-      badgeClasses = await badge.getProperty('className');
-      expect(badgeClasses).toContain('badge--hidden');
+      await waitForShadow(page, 'changebot-badge', '.badge.badge--hidden');
 
       // Verify last_seen_at was updated via PATCH
-      const patchedData2 = await getPatchedData2();
+      await mock2.waitForPatch();
+      const patchedData2 = await mock2.getLastPatchBody();
       expect(patchedData2).not.toBeNull();
-      const secondVisitTimestamp = patchedData2.last_seen_at;
+      const secondVisitTimestamp = patchedData2.last_seen_at as string;
       expect(new Date(secondVisitTimestamp).getTime()).toBeGreaterThan(new Date(firstVisitTimestamp).getTime());
 
       // User closes the panel
       await page.keyboard.press('Escape');
-      await page.waitForChanges();
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await waitForPanelClosed(page);
 
       // Badge should still be hidden after closing
       badge = await page.find('changebot-badge >>> .badge');
@@ -699,8 +572,9 @@ describe('Integration Tests - Full System', () => {
       page = await newE2EPage();
 
       await injectFetchMock(page, {
-        publications: publicationsWithNewUpdate, // Same publications
-        userLastSeenAt: secondVisitTimestamp, // Their updated last_seen_at
+        apiBase: API_BASE,
+        updates: publicationsWithNewUpdate, // Same publications
+        user: { last_seen_at: secondVisitTimestamp }, // Their updated last_seen_at
       });
 
       await page.setContent(`
@@ -710,12 +584,10 @@ describe('Integration Tests - Full System', () => {
       `);
 
       await page.waitForChanges();
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await waitForConnected(page, 'changebot-badge');
 
       // Badge should still be hidden (no new updates since last view)
-      badge = await page.find('changebot-badge >>> .badge');
-      badgeClasses = await badge.getProperty('className');
-      expect(badgeClasses).toContain('badge--hidden');
+      await waitForShadow(page, 'changebot-badge', '.badge.badge--hidden');
 
       await page.close();
     });
@@ -754,8 +626,10 @@ describe('Integration Tests - Full System', () => {
       `);
 
       await page.waitForChanges();
+      await waitForConnected(page, 'changebot-badge');
+      await waitForConnected(page, 'changebot-panel');
 
-      // Verify badge initially shows 0 (lastViewed is null on first load)
+      // Verify badge initially shows 0 (lastViewed initializes to "now" on first load)
       let badge = await page.find('changebot-badge >>> .badge');
       let badgeClasses = await badge.getProperty('className');
       expect(badgeClasses).toContain('badge--hidden'); // Hidden when count is 0
@@ -765,13 +639,7 @@ describe('Integration Tests - Full System', () => {
         return el.open();
       });
 
-      await page.waitForChanges();
-      await new Promise(resolve => setTimeout(resolve, 200));
-
-      // Verify panel is open
-      const panel = await page.find('changebot-panel >>> .panel');
-      const panelClasses = await panel.getProperty('className');
-      expect(panelClasses).toContain('panel--open');
+      await waitForPanelOpen(page);
 
       // Verify badge count is cleared (should be 0 and hidden)
       badge = await page.find('changebot-badge >>> .badge');
@@ -791,8 +659,8 @@ describe('Integration Tests - Full System', () => {
       `);
 
       await page.waitForChanges();
-      // Wait for async provider connections to complete
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await waitForConnected(page, 'changebot-badge');
+      await waitForConnected(page, 'changebot-panel');
 
       // Verify badge is visible with count
       let badge = await page.find('changebot-badge >>> .badge');
@@ -803,13 +671,7 @@ describe('Integration Tests - Full System', () => {
       const badgeButton = await page.find('changebot-badge >>> .badge');
       await badgeButton.click();
 
-      await page.waitForChanges();
-      await new Promise(resolve => setTimeout(resolve, 200));
-
-      // Verify panel is open
-      const panel = await page.find('changebot-panel >>> .panel');
-      const panelClasses = await panel.getProperty('className');
-      expect(panelClasses).toContain('panel--open');
+      await waitForPanelOpen(page);
 
       // Badge count remains visible since it uses explicit count prop
       // (count prop is for standalone mode, not store-managed)
@@ -829,6 +691,8 @@ describe('Integration Tests - Full System', () => {
       `);
 
       await page.waitForChanges();
+      await waitForConnected(page, 'changebot-badge');
+      await waitForConnected(page, 'changebot-panel');
 
       // Verify badge initially shows count
       let badge = await page.find('changebot-badge >>> .badge');
@@ -850,7 +714,6 @@ describe('Integration Tests - Full System', () => {
       await badgeButton.click();
 
       await page.waitForChanges();
-      await new Promise(resolve => setTimeout(resolve, 200));
 
       // Verify panel is still closed (different scope prevents opening)
       panel = await page.find('changebot-panel >>> .panel');
@@ -863,13 +726,7 @@ describe('Integration Tests - Full System', () => {
         return el.open();
       });
 
-      await page.waitForChanges();
-      await new Promise(resolve => setTimeout(resolve, 200));
-
-      // Verify panel is now open
-      panel = await page.find('changebot-panel >>> .panel');
-      panelClasses = await panel.getProperty('className');
-      expect(panelClasses).toContain('panel--open');
+      await waitForPanelOpen(page);
 
       // Verify badge count is NOT cleared (different scope prevents clearing)
       badge = await page.find('changebot-badge >>> .badge');
