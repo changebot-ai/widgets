@@ -5,12 +5,12 @@
  * services from a provider (see store/registry.ts `connectConsumer`), so tests
  * wait on that attribute instead of sleeping.
  *
- * Fetch mocking: Stencil's e2e harness owns Puppeteer request interception, so
- * network mocks are installed by patching `window.fetch` before the document
- * loads (via `evaluateOnNewDocument`).
+ * Fetch mocking: network mocks are installed by patching `window.fetch` before
+ * the document loads (via `addInitScript`), which leaves Playwright's own
+ * routing free for the dev server's requests.
  */
 
-import type { E2EPage } from '@stencil/core/testing';
+import type { E2EPage } from '@stencil/playwright';
 
 const WAIT_OPTIONS = { timeout: 5000, polling: 50 };
 
@@ -23,8 +23,8 @@ export async function waitForConnected(page: E2EPage, tag: string): Promise<void
       const els = Array.from(document.querySelectorAll(t));
       return els.length > 0 && els.every(el => el.getAttribute('data-changebot-state') === 'connected');
     },
-    WAIT_OPTIONS,
     tag,
+    WAIT_OPTIONS,
   );
 }
 
@@ -34,14 +34,12 @@ export async function waitForConnected(page: E2EPage, tag: string): Promise<void
  */
 export async function waitForShadow(page: E2EPage, tag: string, selector: string, index: number = 0): Promise<void> {
   await page.waitForFunction(
-    (t: string, sel: string, i: number) => {
+    ({ t, sel, i }: { t: string; sel: string; i: number }) => {
       const host = document.querySelectorAll(t)[i];
       return !!host?.shadowRoot?.querySelector(sel);
     },
+    { t: tag, sel: selector, i: index },
     WAIT_OPTIONS,
-    tag,
-    selector,
-    index,
   );
 }
 
@@ -51,14 +49,12 @@ export async function waitForShadow(page: E2EPage, tag: string, selector: string
  */
 export async function waitForShadowGone(page: E2EPage, tag: string, selector: string, index: number = 0): Promise<void> {
   await page.waitForFunction(
-    (t: string, sel: string, i: number) => {
+    ({ t, sel, i }: { t: string; sel: string; i: number }) => {
       const host = document.querySelectorAll(t)[i];
       return !!host && !host.shadowRoot?.querySelector(sel);
     },
+    { t: tag, sel: selector, i: index },
     WAIT_OPTIONS,
-    tag,
-    selector,
-    index,
   );
 }
 
@@ -77,11 +73,25 @@ export async function waitForPanelClosed(page: E2EPage, index: number = 0): Prom
  * visit).
  */
 export async function seedLocalStorage(page: E2EPage, entries: Record<string, string>): Promise<void> {
-  await page.evaluateOnNewDocument((toSet: Record<string, string>) => {
+  await page.addInitScript((toSet: Record<string, string>) => {
     for (const [key, value] of Object.entries(toSet)) {
       localStorage.setItem(key, value);
     }
   }, entries);
+}
+
+/**
+ * Loads the page that the preceding `setContent` staged, for tests that walk a
+ * visitor through more than one visit. `setContent` serves its markup from the
+ * dev server root, and navigating to the URL already open is not a navigation,
+ * so the second `setContent` in a test replaces what the server will send
+ * without replacing the document on screen. Reloading fetches it, which also
+ * runs the init scripts registered since the last load — see `seedLocalStorage`
+ * and `injectFetchMock`. localStorage survives, which is exactly what a
+ * returning visitor brings with them.
+ */
+export async function reloadForNextVisit(page: E2EPage): Promise<void> {
+  await page.reload();
 }
 
 export interface FetchMockOptions {
@@ -117,7 +127,7 @@ export interface FetchMockHandle {
  * requests fall through to the real fetch. Call before `page.setContent`.
  */
 export async function injectFetchMock(page: E2EPage, options: FetchMockOptions): Promise<FetchMockHandle> {
-  await page.evaluateOnNewDocument((opts: FetchMockOptions) => {
+  await page.addInitScript((opts: FetchMockOptions) => {
     (window as any).__changebotPatches = [];
 
     const originalFetch = window.fetch;
@@ -162,7 +172,7 @@ export async function injectFetchMock(page: E2EPage, options: FetchMockOptions):
 
       return originalFetch(input, init);
     };
-  }, options as any);
+  }, options);
 
   return {
     getPatchBodies: () => page.evaluate(() => (window as any).__changebotPatches ?? []),
@@ -171,7 +181,7 @@ export async function injectFetchMock(page: E2EPage, options: FetchMockOptions):
       return patches.length > 0 ? patches[patches.length - 1] : null;
     },
     waitForPatch: async (count: number = 1) => {
-      await page.waitForFunction((n: number) => ((window as any).__changebotPatches ?? []).length >= n, WAIT_OPTIONS, count);
+      await page.waitForFunction((n: number) => ((window as any).__changebotPatches ?? []).length >= n, count, WAIT_OPTIONS);
     },
   };
 }

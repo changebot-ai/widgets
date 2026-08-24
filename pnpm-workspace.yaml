@@ -2,6 +2,3 @@ packages:
   - 'packages/*'
 allowBuilds:
   esbuild: true
-  # Chrome is installed explicitly via `puppeteer browsers install`, so the
-  # postinstall download is not needed.
-  puppeteer: false

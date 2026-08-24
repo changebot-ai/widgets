@@ -1,10 +1,10 @@
-import { newE2EPage } from '@stencil/core/testing';
-import { injectFetchMock, seedLocalStorage, waitForConnected, waitForPanelOpen, waitForPanelClosed, waitForShadow } from '../test-utils/e2e-helpers';
+import { expect } from '@playwright/test';
+import { test } from '@stencil/playwright';
+import { reloadForNextVisit, injectFetchMock, seedLocalStorage, waitForConnected, waitForPanelOpen, waitForPanelClosed, waitForShadow } from '../test-utils/e2e-helpers';
 
-describe('Integration Tests - Full System', () => {
-  describe('Provider-Badge-Drawer Integration', () => {
-    it('should allow badge and drawer to communicate through provider', async () => {
-      const page = await newE2EPage();
+test.describe('Integration Tests - Full System', () => {
+  test.describe('Provider-Badge-Drawer Integration', () => {
+    test('should allow badge and drawer to communicate through provider', async ({ page }) => {
 
       // Setup: Create a complete system with all three components
       await page.setContent(`
@@ -16,17 +16,16 @@ describe('Integration Tests - Full System', () => {
       await page.waitForChanges();
 
       // Verify all components are hydrated
-      const provider = await page.find('changebot-provider');
-      const badge = await page.find('changebot-badge');
-      const drawer = await page.find('changebot-panel');
+      const provider = page.locator('changebot-provider');
+      const badge = page.locator('changebot-badge');
+      const drawer = page.locator('changebot-panel');
 
-      expect(provider).toHaveClass('hydrated');
-      expect(badge).toHaveClass('hydrated');
-      expect(drawer).toHaveClass('hydrated');
+      await expect(provider).toContainClass('hydrated');
+      await expect(badge).toContainClass('hydrated');
+      await expect(drawer).toContainClass('hydrated');
     });
 
-    it('should share state between badge and drawer through provider', async () => {
-      const page = await newE2EPage();
+    test('should share state between badge and drawer through provider', async ({ page }) => {
 
       await page.setContent(`
         <changebot-provider scope="test" />
@@ -43,13 +42,12 @@ describe('Integration Tests - Full System', () => {
       await waitForPanelOpen(page);
 
       // Verify drawer opened
-      const drawer = await page.find('changebot-panel >>> .panel');
-      const className = await drawer.getProperty('className');
+      const drawer = page.locator('changebot-panel .panel');
+      const className = await drawer.evaluate((el: any) => el.className);
       expect(className).toContain('panel--open');
     });
 
-    it('should handle badge click to open drawer', async () => {
-      const page = await newE2EPage();
+    test('should handle badge click to open drawer', async ({ page }) => {
 
       await page.setContent(`
         <changebot-provider scope="test" />
@@ -62,21 +60,20 @@ describe('Integration Tests - Full System', () => {
       await waitForConnected(page, 'changebot-panel');
 
       // Click the badge
-      const badgeButton = await page.find('changebot-badge >>> .badge');
+      const badgeButton = page.locator('changebot-badge .badge');
       await badgeButton.click();
 
       await waitForPanelOpen(page);
 
       // Verify drawer opened
-      const drawer = await page.find('changebot-panel >>> .panel');
-      const className = await drawer.getProperty('className');
+      const drawer = page.locator('changebot-panel .panel');
+      const className = await drawer.evaluate((el: any) => el.className);
       expect(className).toContain('panel--open');
     });
   });
 
-  describe('Registry-Based Service Discovery', () => {
-    it('should allow consumers to discover provider via registry', async () => {
-      const page = await newE2EPage();
+  test.describe('Registry-Based Service Discovery', () => {
+    test('should allow consumers to discover provider via registry', async ({ page }) => {
 
       await page.setContent(`
         <changebot-provider scope="discovery-test" />
@@ -87,16 +84,15 @@ describe('Integration Tests - Full System', () => {
       await waitForConnected(page, 'changebot-badge');
 
       // Badge should be hydrated and connected to provider
-      const badge = await page.find('changebot-badge');
-      expect(badge).toHaveClass('hydrated');
+      const badge = page.locator('changebot-badge');
+      await expect(badge).toContainClass('hydrated');
 
       // Badge should have received services (can open panel)
-      const badgeButton = await page.find('changebot-badge >>> .badge');
-      expect(badgeButton).not.toBeNull();
+      const badgeButton = page.locator('changebot-badge .badge');
+      await expect(badgeButton).toHaveCount(1);
     });
 
-    it('should prevent context leakage between different scopes', async () => {
-      const page = await newE2EPage();
+    test('should prevent context leakage between different scopes', async ({ page }) => {
 
       await page.setContent(`
         <changebot-provider scope="scope-a" />
@@ -112,24 +108,23 @@ describe('Integration Tests - Full System', () => {
       await waitForConnected(page, 'changebot-panel');
 
       // Click badge in scope-a
-      const badges = await page.findAll('changebot-badge >>> .badge');
-      await badges[0].click();
+      const badges = page.locator('changebot-badge .badge');
+      await badges.nth(0).click();
 
       await waitForPanelOpen(page, 0);
 
       // Verify only scope-a panel opened
-      const panels = await page.findAll('changebot-panel >>> .panel');
-      const panel1Classes = await panels[0].getProperty('className');
-      const panel2Classes = await panels[1].getProperty('className');
+      const panels = page.locator('changebot-panel .panel');
+      const panel1Classes = await panels.nth(0).evaluate((el: any) => el.className);
+      const panel2Classes = await panels.nth(1).evaluate((el: any) => el.className);
 
       expect(panel1Classes).toContain('panel--open');
       expect(panel2Classes).toContain('panel--closed');
     });
   });
 
-  describe('Shared State Management and Reactivity', () => {
-    it('should keep drawer and badge in sync', async () => {
-      const page = await newE2EPage();
+  test.describe('Shared State Management and Reactivity', () => {
+    test('should keep drawer and badge in sync', async ({ page }) => {
 
       await page.setContent(`
         <changebot-provider scope="sync-test" />
@@ -145,8 +140,8 @@ describe('Integration Tests - Full System', () => {
       await waitForPanelOpen(page);
 
       // Verify drawer is open
-      const drawer = await page.find('changebot-panel >>> .panel');
-      const drawerClasses = await drawer.getProperty('className');
+      const drawer = page.locator('changebot-panel .panel');
+      const drawerClasses = await drawer.evaluate((el: any) => el.className);
       expect(drawerClasses).toContain('panel--open');
 
       // Close drawer programmatically
@@ -154,15 +149,14 @@ describe('Integration Tests - Full System', () => {
       await waitForPanelClosed(page);
 
       // Verify drawer is closed
-      const closedDrawer = await page.find('changebot-panel >>> .panel');
-      const closedClasses = await closedDrawer.getProperty('className');
+      const closedDrawer = page.locator('changebot-panel .panel');
+      const closedClasses = await closedDrawer.evaluate((el: any) => el.className);
       expect(closedClasses).toContain('panel--closed');
     });
   });
 
-  describe('Multiple Provider Scenarios', () => {
-    it('should support multiple independent provider instances', async () => {
-      const page = await newE2EPage();
+  test.describe('Multiple Provider Scenarios', () => {
+    test('should support multiple independent provider instances', async ({ page }) => {
 
       await page.setContent(`
         <changebot-provider scope="app1" />
@@ -177,22 +171,21 @@ describe('Integration Tests - Full System', () => {
       await waitForConnected(page, 'changebot-panel');
 
       // Verify both systems are independent by opening app1 panel only
-      const panels = await page.findAll('changebot-panel');
-      await panels[0].callMethod('open');
+      const panels = page.locator('changebot-panel');
+      await panels.nth(0).evaluate((el: any) => el.open());
 
       await waitForPanelOpen(page, 0);
 
       // Check only app1 panel is open
-      const panelElements = await page.findAll('changebot-panel >>> .panel');
-      const panel1Classes = await panelElements[0].getProperty('className');
-      const panel2Classes = await panelElements[1].getProperty('className');
+      const panelElements = page.locator('changebot-panel .panel');
+      const panel1Classes = await panelElements.nth(0).evaluate((el: any) => el.className);
+      const panel2Classes = await panelElements.nth(1).evaluate((el: any) => el.className);
 
       expect(panel1Classes).toContain('panel--open');
       expect(panel2Classes).toContain('panel--closed');
     });
 
-    it('should handle actions independently per scope', async () => {
-      const page = await newE2EPage();
+    test('should handle actions independently per scope', async ({ page }) => {
 
       await page.setContent(`
         <changebot-provider scope="app1" />
@@ -206,24 +199,23 @@ describe('Integration Tests - Full System', () => {
       await waitForConnected(page, 'changebot-panel');
 
       // Open only app1 drawer using the first panel's open method
-      const panels = await page.findAll('changebot-panel');
-      await panels[0].callMethod('open');
+      const panels = page.locator('changebot-panel');
+      await panels.nth(0).evaluate((el: any) => el.open());
 
       await waitForPanelOpen(page, 0);
 
       // Check app1 drawer is open
-      const drawers = await page.findAll('changebot-panel >>> .panel');
-      const drawer1Classes = await drawers[0].getProperty('className');
-      const drawer2Classes = await drawers[1].getProperty('className');
+      const drawers = page.locator('changebot-panel .panel');
+      const drawer1Classes = await drawers.nth(0).evaluate((el: any) => el.className);
+      const drawer2Classes = await drawers.nth(1).evaluate((el: any) => el.className);
 
       expect(drawer1Classes).toContain('panel--open');
       expect(drawer2Classes).toContain('panel--closed');
     });
   });
 
-  describe('Components without Provider (Standalone Mode)', () => {
-    it('should allow badge to render standalone with count prop', async () => {
-      const page = await newE2EPage();
+  test.describe('Components without Provider (Standalone Mode)', () => {
+    test('should allow badge to render standalone with count prop', async ({ page }) => {
 
       await page.setContent(`
         <changebot-badge count="5" indicator="count"></changebot-badge>
@@ -231,18 +223,17 @@ describe('Integration Tests - Full System', () => {
 
       await page.waitForChanges();
 
-      const badge = await page.find('changebot-badge >>> .badge');
-      const count = await page.find('changebot-badge >>> .badge__count');
+      const badge = page.locator('changebot-badge .badge');
+      const count = page.locator('changebot-badge .badge__count');
 
-      expect(badge).not.toBeNull();
-      const countText = await count.textContent;
+      await expect(badge).toHaveCount(1);
+      const countText = await count.textContent();
       expect(countText).toBe('5');
     });
   });
 
-  describe('Accessibility and Keyboard Navigation', () => {
-    it('should handle ESC key to close drawer', async () => {
-      const page = await newE2EPage();
+  test.describe('Accessibility and Keyboard Navigation', () => {
+    test('should handle ESC key to close drawer', async ({ page }) => {
 
       await page.setContent(`
         <changebot-provider scope="a11y-test" />
@@ -257,8 +248,8 @@ describe('Integration Tests - Full System', () => {
       await waitForPanelOpen(page);
 
       // Verify drawer is open
-      let drawer = await page.find('changebot-panel >>> .panel');
-      let className = await drawer.getProperty('className');
+      let drawer = page.locator('changebot-panel .panel');
+      let className = await drawer.evaluate((el: any) => el.className);
       expect(className).toContain('panel--open');
 
       // Press ESC key
@@ -266,13 +257,12 @@ describe('Integration Tests - Full System', () => {
       await waitForPanelClosed(page);
 
       // Verify drawer closed
-      drawer = await page.find('changebot-panel >>> .panel');
-      className = await drawer.getProperty('className');
+      drawer = page.locator('changebot-panel .panel');
+      className = await drawer.evaluate((el: any) => el.className);
       expect(className).toContain('panel--closed');
     });
 
-    it('should support keyboard navigation on badge', async () => {
-      const page = await newE2EPage();
+    test('should support keyboard navigation on badge', async ({ page }) => {
 
       await page.setContent(`
         <changebot-provider scope="kbd-test" />
@@ -285,19 +275,18 @@ describe('Integration Tests - Full System', () => {
       await waitForConnected(page, 'changebot-panel');
 
       // Focus badge and press Enter
-      await page.focus('changebot-badge >>> .badge');
+      await page.focus('changebot-badge .badge');
       await page.keyboard.press('Enter');
 
       await waitForPanelOpen(page);
 
       // Verify drawer opened
-      const drawer = await page.find('changebot-panel >>> .panel');
-      const className = await drawer.getProperty('className');
+      const drawer = page.locator('changebot-panel .panel');
+      const className = await drawer.evaluate((el: any) => el.className);
       expect(className).toContain('panel--open');
     });
 
-    it('should have proper ARIA attributes', async () => {
-      const page = await newE2EPage();
+    test('should have proper ARIA attributes', async ({ page }) => {
 
       await page.setContent(`
         <changebot-badge count="3"></changebot-badge>
@@ -307,21 +296,20 @@ describe('Integration Tests - Full System', () => {
       await page.waitForChanges();
 
       // Check badge ARIA
-      const badge = await page.find('changebot-badge >>> .badge');
+      const badge = page.locator('changebot-badge .badge');
       expect(await badge.getAttribute('aria-label')).toBe('3 new updates');
       expect(await badge.getAttribute('role')).toBe('status');
       expect(await badge.getAttribute('aria-live')).toBe('polite');
 
       // Check drawer ARIA
-      const drawer = await page.find('changebot-panel >>> .panel');
+      const drawer = page.locator('changebot-panel .panel');
       expect(await drawer.getAttribute('role')).toBe('dialog');
       expect(await drawer.getAttribute('aria-label')).toBe('Product Updates');
     });
   });
 
-  describe('Display Modes', () => {
-    it('should render drawer in left position', async () => {
-      const page = await newE2EPage();
+  test.describe('Display Modes', () => {
+    test('should render drawer in left position', async ({ page }) => {
 
       await page.setContent(`
         <changebot-panel mode="drawer-left"></changebot-panel>
@@ -329,13 +317,12 @@ describe('Integration Tests - Full System', () => {
 
       await page.waitForChanges();
 
-      const drawer = await page.find('changebot-panel >>> .panel');
-      const className = await drawer.getProperty('className');
+      const drawer = page.locator('changebot-panel .panel');
+      const className = await drawer.evaluate((el: any) => el.className);
       expect(className).toContain('panel--left');
     });
 
-    it('should render drawer in right position', async () => {
-      const page = await newE2EPage();
+    test('should render drawer in right position', async ({ page }) => {
 
       await page.setContent(`
         <changebot-panel mode="drawer-right"></changebot-panel>
@@ -343,15 +330,14 @@ describe('Integration Tests - Full System', () => {
 
       await page.waitForChanges();
 
-      const drawer = await page.find('changebot-panel >>> .panel');
-      const className = await drawer.getProperty('className');
+      const drawer = page.locator('changebot-panel .panel');
+      const className = await drawer.evaluate((el: any) => el.className);
       expect(className).toContain('panel--right');
     });
   });
 
-  describe('Error Handling', () => {
-    it('should handle missing provider gracefully', async () => {
-      const page = await newE2EPage();
+  test.describe('Error Handling', () => {
+    test('should handle missing provider gracefully', async ({ page }) => {
 
       // Badge without provider should still render
       await page.setContent(`
@@ -360,49 +346,39 @@ describe('Integration Tests - Full System', () => {
 
       await page.waitForChanges();
 
-      const badge = await page.find('changebot-badge');
-      expect(badge).toHaveClass('hydrated');
+      const badge = page.locator('changebot-badge');
+      await expect(badge).toContainClass('hydrated');
 
-      const badgeElement = await page.find('changebot-badge >>> .badge');
-      expect(badgeElement).not.toBeNull();
+      const badgeElement = page.locator('changebot-badge .badge');
+      await expect(badgeElement).toHaveCount(1);
     });
 
-    it('should handle panel operations without provider gracefully', async () => {
-      // Silence expected "no services available" warnings bridged from the
-      // browser by Stencil's e2e harness (panel.tsx open/close paths).
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-      try {
-        const page = await newE2EPage();
+    test('should handle panel operations without provider gracefully', async ({ page }) => {
+      // Panel without provider should still render and not crash
+      await page.setContent(`
+        <changebot-panel></changebot-panel>
+      `);
 
-        // Panel without provider should still render and not crash
-        await page.setContent(`
-          <changebot-panel></changebot-panel>
-        `);
+      await page.waitForChanges();
 
-        await page.waitForChanges();
+      const panel = page.locator('changebot-panel');
+      await expect(panel).toContainClass('hydrated');
 
-        const panel = await page.find('changebot-panel');
-        expect(panel).toHaveClass('hydrated');
+      // Calling open/close without provider should not crash
+      await page.$eval('changebot-panel', (el: any) => el.open());
+      await page.waitForChanges();
 
-        // Calling open/close without provider should not crash
-        await page.$eval('changebot-panel', (el: any) => el.open());
-        await page.waitForChanges();
+      await page.$eval('changebot-panel', (el: any) => el.close());
+      await page.waitForChanges();
 
-        await page.$eval('changebot-panel', (el: any) => el.close());
-        await page.waitForChanges();
-
-        // Panel should still be in a valid state
-        const panelElement = await page.find('changebot-panel >>> .panel');
-        expect(panelElement).not.toBeNull();
-      } finally {
-        warnSpy.mockRestore();
-      }
+      // Panel should still be in a valid state
+      const panelElement = page.locator('changebot-panel .panel');
+      await expect(panelElement).toHaveCount(1);
     });
   });
 
-  describe('Theme Support', () => {
-    it('should apply catppuccin theme to badge', async () => {
-      const page = await newE2EPage();
+  test.describe('Theme Support', () => {
+    test('should apply catppuccin theme to badge', async ({ page }) => {
 
       await page.setContent(`
         <changebot-badge theme="catppuccin-mocha" count="1"></changebot-badge>
@@ -410,13 +386,12 @@ describe('Integration Tests - Full System', () => {
 
       await page.waitForChanges();
 
-      const badge = await page.find('changebot-badge >>> .badge');
-      const className = await badge.getProperty('className');
+      const badge = page.locator('changebot-badge .badge');
+      const className = await badge.evaluate((el: any) => el.className);
       expect(className).toContain('theme--catppuccin-mocha');
     });
 
-    it('should apply catppuccin theme to drawer', async () => {
-      const page = await newE2EPage();
+    test('should apply catppuccin theme to drawer', async ({ page }) => {
 
       await page.setContent(`
         <changebot-panel theme="catppuccin-mocha"></changebot-panel>
@@ -424,13 +399,13 @@ describe('Integration Tests - Full System', () => {
 
       await page.waitForChanges();
 
-      const drawer = await page.find('changebot-panel >>> .panel');
-      const className = await drawer.getProperty('className');
+      const drawer = page.locator('changebot-panel .panel');
+      const className = await drawer.evaluate((el: any) => el.className);
       expect(className).toContain('theme--catppuccin-mocha');
     });
   });
 
-  describe('UserId Tracking - New User Journey', () => {
+  test.describe('UserId Tracking - New User Journey', () => {
     const API_BASE = 'https://api.changebot.ai/v1/widgets/test-widget';
     const USER_ID = 'new-user-123';
     const SCOPE = 'userid-test';
@@ -468,7 +443,7 @@ describe('Integration Tests - Full System', () => {
       ];
     }
 
-    it('should show no badge count on first visit for new user, then show 1 after new update, then clear after viewing', async () => {
+    test('should show no badge count on first visit for new user, then show 1 after new update, then clear after viewing', async ({ page }) => {
       // Create initial publications dated before "now"
       const testStartTime = new Date().toISOString();
       const initialPublications = createInitialPublications(testStartTime);
@@ -476,7 +451,6 @@ describe('Integration Tests - Full System', () => {
       // ============================================
       // VISIT 1: New user visits for the first time
       // ============================================
-      let page = await newE2EPage();
 
       const mock1 = await injectFetchMock(page, {
         apiBase: API_BASE,
@@ -497,8 +471,8 @@ describe('Integration Tests - Full System', () => {
 
       // Badge should be hidden (count = 0) because new user hasn't seen anything yet
       // and their last_seen_at gets set to "now" on first sync
-      let badge = await page.find('changebot-badge >>> .badge');
-      let badgeClasses = await badge.getProperty('className');
+      let badge = page.locator('changebot-badge .badge');
+      let badgeClasses = await badge.evaluate((el: any) => el.className);
       expect(badgeClasses).toContain('badge--hidden');
 
       const patchedData1 = await mock1.getLastPatchBody();
@@ -507,7 +481,6 @@ describe('Integration Tests - Full System', () => {
       const firstVisitTimestamp = patchedData1.last_seen_at as string;
 
       // User does NOT click/open the panel - they just leave
-      await page.close();
 
       // ============================================
       // VISIT 2: User returns after a new update was published
@@ -515,7 +488,6 @@ describe('Integration Tests - Full System', () => {
       // Create publications with a new update published AFTER the user's first visit
       const publicationsWithNewUpdate = createPublicationsWithNewUpdate(firstVisitTimestamp, initialPublications);
 
-      page = await newE2EPage();
 
       const mock2 = await injectFetchMock(page, {
         apiBase: API_BASE,
@@ -528,6 +500,7 @@ describe('Integration Tests - Full System', () => {
         <changebot-badge scope="${SCOPE}" />
         <changebot-panel scope="${SCOPE}" />
       `);
+      await reloadForNextVisit(page);
 
       await page.waitForChanges();
       await waitForConnected(page, 'changebot-badge');
@@ -535,12 +508,12 @@ describe('Integration Tests - Full System', () => {
       // Badge should show count of 1 (one new update since their last visit)
       await waitForShadow(page, 'changebot-badge', '.badge:not(.badge--hidden)');
 
-      const countElement = await page.find('changebot-badge >>> .badge__count');
-      const countText = await countElement.textContent;
+      const countElement = page.locator('changebot-badge .badge__count');
+      const countText = await countElement.textContent();
       expect(countText).toBe('1');
 
       // User clicks to open the panel
-      const badgeButton = await page.find('changebot-badge >>> .badge');
+      const badgeButton = page.locator('changebot-badge .badge');
       await badgeButton.click();
 
       await waitForPanelOpen(page);
@@ -560,16 +533,14 @@ describe('Integration Tests - Full System', () => {
       await waitForPanelClosed(page);
 
       // Badge should still be hidden after closing
-      badge = await page.find('changebot-badge >>> .badge');
-      badgeClasses = await badge.getProperty('className');
+      badge = page.locator('changebot-badge .badge');
+      badgeClasses = await badge.evaluate((el: any) => el.className);
       expect(badgeClasses).toContain('badge--hidden');
 
-      await page.close();
 
       // ============================================
       // VISIT 3: User returns again (no new updates)
       // ============================================
-      page = await newE2EPage();
 
       await injectFetchMock(page, {
         apiBase: API_BASE,
@@ -582,6 +553,7 @@ describe('Integration Tests - Full System', () => {
         <changebot-badge scope="${SCOPE}" />
         <changebot-panel scope="${SCOPE}" />
       `);
+      await reloadForNextVisit(page);
 
       await page.waitForChanges();
       await waitForConnected(page, 'changebot-badge');
@@ -589,11 +561,10 @@ describe('Integration Tests - Full System', () => {
       // Badge should still be hidden (no new updates since last view)
       await waitForShadow(page, 'changebot-badge', '.badge.badge--hidden');
 
-      await page.close();
     });
   });
 
-  describe('Anonymous User Journey (no userId)', () => {
+  test.describe('Anonymous User Journey (no userId)', () => {
     const SCOPE = 'anon-journey';
     const STORAGE_KEY = `changebot:lastViewed:${SCOPE}`;
 
@@ -613,9 +584,8 @@ describe('Integration Tests - Full System', () => {
       tags: [],
     };
 
-    it('initializes lastViewed on first visit, counts a newer publication on the next, and clears after opening the panel', async () => {
+    test('initializes lastViewed on first visit, counts a newer publication on the next, and clears after opening the panel', async ({ page }) => {
       // ===== Visit 1: first visit initializes lastViewed and hides the badge =====
-      let page = await newE2EPage();
 
       await page.setContent(`
         <changebot-provider scope="${SCOPE}" mock-data='${mockDataWith([oldPublication])}' />
@@ -631,7 +601,6 @@ describe('Integration Tests - Full System', () => {
       const firstVisitTimestamp = parseInt(stored1, 10);
       expect(firstVisitTimestamp).toBeGreaterThan(new Date(oldPublication.published_at).getTime());
 
-      await page.close();
 
       // ===== Visit 2: a publication newer than the first visit shows a count =====
       const newPublication = {
@@ -645,7 +614,6 @@ describe('Integration Tests - Full System', () => {
         tags: [],
       };
 
-      page = await newE2EPage();
       await seedLocalStorage(page, { [STORAGE_KEY]: String(firstVisitTimestamp) });
 
       await page.setContent(`
@@ -653,15 +621,16 @@ describe('Integration Tests - Full System', () => {
         <changebot-badge scope="${SCOPE}" />
         <changebot-panel scope="${SCOPE}" />
       `);
+      await reloadForNextVisit(page);
       await page.waitForChanges();
       await waitForConnected(page, 'changebot-badge');
       await waitForShadow(page, 'changebot-badge', '.badge:not(.badge--hidden)');
 
-      const count = await page.find('changebot-badge >>> .badge__count');
-      expect(await count.textContent).toBe('1');
+      const count = page.locator('changebot-badge .badge__count');
+      expect(await count.textContent()).toBe('1');
 
       // Opening the panel clears the count and persists the new timestamp
-      const badgeButton = await page.find('changebot-badge >>> .badge');
+      const badgeButton = page.locator('changebot-badge .badge');
       await badgeButton.click();
       await waitForPanelOpen(page);
       await waitForShadow(page, 'changebot-badge', '.badge.badge--hidden');
@@ -670,10 +639,8 @@ describe('Integration Tests - Full System', () => {
       const secondVisitTimestamp = parseInt(stored2, 10);
       expect(secondVisitTimestamp).toBeGreaterThan(firstVisitTimestamp);
 
-      await page.close();
 
       // ===== Visit 3: nothing new — the badge stays hidden =====
-      page = await newE2EPage();
       await seedLocalStorage(page, { [STORAGE_KEY]: String(secondVisitTimestamp) });
 
       await page.setContent(`
@@ -685,13 +652,11 @@ describe('Integration Tests - Full System', () => {
       await waitForConnected(page, 'changebot-badge');
       await waitForShadow(page, 'changebot-badge', '.badge.badge--hidden');
 
-      await page.close();
     });
   });
 
-  describe('Badge Count Clearing', () => {
-    it('should clear badge count when panel opens programmatically', async () => {
-      const page = await newE2EPage();
+  test.describe('Badge Count Clearing', () => {
+    test('should clear badge count when panel opens programmatically', async ({ page }) => {
 
       const mockData = JSON.stringify({
         widget: { title: 'Updates', slug: 'test' },
@@ -726,8 +691,8 @@ describe('Integration Tests - Full System', () => {
       await waitForConnected(page, 'changebot-panel');
 
       // Verify badge initially shows 0 (lastViewed initializes to "now" on first load)
-      let badge = await page.find('changebot-badge >>> .badge');
-      let badgeClasses = await badge.getProperty('className');
+      let badge = page.locator('changebot-badge .badge');
+      let badgeClasses = await badge.evaluate((el: any) => el.className);
       expect(badgeClasses).toContain('badge--hidden'); // Hidden when count is 0
 
       // Open panel programmatically using the open() method
@@ -738,13 +703,12 @@ describe('Integration Tests - Full System', () => {
       await waitForPanelOpen(page);
 
       // Verify badge count is cleared (should be 0 and hidden)
-      badge = await page.find('changebot-badge >>> .badge');
-      badgeClasses = await badge.getProperty('className');
+      badge = page.locator('changebot-badge .badge');
+      badgeClasses = await badge.evaluate((el: any) => el.className);
       expect(badgeClasses).toContain('badge--hidden');
     });
 
-    it('should clear badge count when panel opens via badge click', async () => {
-      const page = await newE2EPage();
+    test('should clear badge count when panel opens via badge click', async ({ page }) => {
 
       // Use explicit count prop to ensure badge is visible and clickable
       // This test focuses on verifying the click opens the panel
@@ -759,25 +723,24 @@ describe('Integration Tests - Full System', () => {
       await waitForConnected(page, 'changebot-panel');
 
       // Verify badge is visible with count
-      let badge = await page.find('changebot-badge >>> .badge');
-      let badgeClasses = await badge.getProperty('className');
+      let badge = page.locator('changebot-badge .badge');
+      let badgeClasses = await badge.evaluate((el: any) => el.className);
       expect(badgeClasses).not.toContain('badge--hidden');
 
       // Click the badge to open panel
-      const badgeButton = await page.find('changebot-badge >>> .badge');
+      const badgeButton = page.locator('changebot-badge .badge');
       await badgeButton.click();
 
       await waitForPanelOpen(page);
 
       // Badge count remains visible since it uses explicit count prop
       // (count prop is for standalone mode, not store-managed)
-      badge = await page.find('changebot-badge >>> .badge');
-      badgeClasses = await badge.getProperty('className');
+      badge = page.locator('changebot-badge .badge');
+      badgeClasses = await badge.evaluate((el: any) => el.className);
       expect(badgeClasses).not.toContain('badge--hidden');
     });
 
-    it('should not interact when badge and panel have different scopes', async () => {
-      const page = await newE2EPage();
+    test('should not interact when badge and panel have different scopes', async ({ page }) => {
 
       await page.setContent(`
         <changebot-provider scope="badge-scope" />
@@ -791,29 +754,29 @@ describe('Integration Tests - Full System', () => {
       await waitForConnected(page, 'changebot-panel');
 
       // Verify badge initially shows count
-      let badge = await page.find('changebot-badge >>> .badge');
-      let badgeClasses = await badge.getProperty('className');
+      let badge = page.locator('changebot-badge .badge');
+      let badgeClasses = await badge.evaluate((el: any) => el.className);
       expect(badgeClasses).not.toContain('badge--hidden');
 
-      let badgeCount = await page.find('changebot-badge >>> .badge__count');
-      let countText = await badgeCount.textContent;
+      let badgeCount = page.locator('changebot-badge .badge__count');
+      let countText = await badgeCount.textContent();
       expect(countText).toBe('5');
 
       // Verify panel is initially closed
-      let panel = await page.find('changebot-panel >>> .panel');
-      let panelClasses = await panel.getProperty('className');
+      let panel = page.locator('changebot-panel .panel');
+      let panelClasses = await panel.evaluate((el: any) => el.className);
       expect(panelClasses).toContain('panel--closed');
       expect(panelClasses).not.toContain('panel--open');
 
       // Click the badge - this should NOT open the panel (different scope)
-      const badgeButton = await page.find('changebot-badge >>> .badge');
+      const badgeButton = page.locator('changebot-badge .badge');
       await badgeButton.click();
 
       await page.waitForChanges();
 
       // Verify panel is still closed (different scope prevents opening)
-      panel = await page.find('changebot-panel >>> .panel');
-      panelClasses = await panel.getProperty('className');
+      panel = page.locator('changebot-panel .panel');
+      panelClasses = await panel.evaluate((el: any) => el.className);
       expect(panelClasses).toContain('panel--closed');
       expect(panelClasses).not.toContain('panel--open');
 
@@ -825,12 +788,12 @@ describe('Integration Tests - Full System', () => {
       await waitForPanelOpen(page);
 
       // Verify badge count is NOT cleared (different scope prevents clearing)
-      badge = await page.find('changebot-badge >>> .badge');
-      badgeClasses = await badge.getProperty('className');
+      badge = page.locator('changebot-badge .badge');
+      badgeClasses = await badge.evaluate((el: any) => el.className);
       expect(badgeClasses).not.toContain('badge--hidden');
 
-      badgeCount = await page.find('changebot-badge >>> .badge__count');
-      countText = await badgeCount.textContent;
+      badgeCount = page.locator('changebot-badge .badge__count');
+      countText = await badgeCount.textContent();
       expect(countText).toBe('5');
     });
   });

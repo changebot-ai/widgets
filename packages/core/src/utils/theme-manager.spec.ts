@@ -23,7 +23,7 @@ function installMatchMedia(initialMatches: boolean): MatchMediaStub {
     },
   };
 
-  (window as any).matchMedia = jest.fn().mockReturnValue(mql);
+  (window as any).matchMedia = vi.fn().mockReturnValue(mql);
 
   return {
     setMatches(value: boolean) {
@@ -42,7 +42,7 @@ describe('createThemeManager', () => {
   });
 
   function manage(component: ThemeableComponent) {
-    const onThemeChange = jest.fn();
+    const onThemeChange = vi.fn();
     const manager = createThemeManager(component, onThemeChange);
     return { manager, onThemeChange };
   }

@@ -77,8 +77,8 @@ When running `pnpm start`, the dev server serves at `http://localhost:<port>` (p
 Components live in `packages/core/src/components/[component-name]/`:
 - `[component-name].tsx` - Component implementation using `@Component` decorator, JSX with `h` function
 - `[component-name].css` - Component styles
-- `[component-name].spec.ts` - Unit tests using `newSpecPage` from `@stencil/core/testing`
-- `[component-name].e2e.ts` - E2E tests using Puppeteer
+- `[component-name].spec.ts` - Unit tests using `render` from `@stencil/vitest`
+- `[component-name].e2e.ts` - Browser tests using `@stencil/playwright`
 
 Components use:
 - `@Prop()` decorator for properties
@@ -95,14 +95,18 @@ Components use:
 ### Testing
 
 **Running Tests:**
-- `pnpm test` - Runs all tests (both spec and e2e), equivalent to `stencil test --spec --e2e`
-- `pnpm run test.watch` - Runs tests in watch mode for development
+- `pnpm test` - Runs the spec tests, then the browser tests
+- `pnpm run test.spec` - Spec tests only
+- `pnpm run test.e2e` - Browser tests only
+- `pnpm run test.watch` - Spec tests in watch mode for development
 
 **Test Types:**
-- **Spec tests** (`.spec.ts`) - Unit tests using `newSpecPage` from `@stencil/core/testing` for component snapshot testing
-- **E2E tests** (`.e2e.ts`) - End-to-end tests using Puppeteer for browser automation testing
+- **Spec tests** (`.spec.ts`) - Run under Vitest in a mock DOM. `render('<changebot-badge count="5" />')` from `@stencil/vitest` returns `root`, `instance`, and `waitForChanges`. Config in `packages/core/vitest.config.mts`, setup in `packages/core/vitest-setup.ts`. The Stencil Vite plugin compiles component `.tsx` on the fly, so a spec and the component it renders share one copy of `src/store/registry`.
+- **Browser tests** (`.e2e.ts`) - Run under Playwright against a real Chromium. Config in `packages/core/playwright.config.ts`. `createConfig` starts `stencil build --dev --watch --serve` and each test builds its page with `page.setContent(...)`. Playwright's CSS selectors reach into open shadow roots, so `page.locator('changebot-badge .badge')` finds the button inside the badge.
 
-Tests run in headless shell mode (configured in `stencil.config.ts`).
+Shared browser-test helpers live in `packages/core/src/test-utils/e2e-helpers.ts`: waiting on `data-changebot-state`, seeding localStorage before the document loads, mocking the widget API at the `fetch` layer, and reloading between visits in a multi-visit journey.
+
+On NixOS, Playwright's downloaded Chromium will not start. The dev shell exports `PLAYWRIGHT_CHROMIUM_PATH`, and the Playwright config and smoke test use that browser when it is set.
 
 ## TypeScript Configuration
 

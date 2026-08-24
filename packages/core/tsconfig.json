@@ -4,9 +4,14 @@
     "allowUnreachableCode": false,
     "declaration": false,
     "experimentalDecorators": true,
+    "types": [
+      "vitest/globals",
+      "node"
+    ],
     "lib": [
       "dom",
-      "es2022"
+      "es2022",
+      "ESNext.Disposable"
     ],
     "moduleResolution": "bundler",
     "module": "esnext",

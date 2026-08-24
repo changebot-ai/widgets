@@ -26,8 +26,8 @@
           ];
 
           shellHook = ''
-            export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-            export PUPPETEER_EXECUTABLE_PATH=${pkgs.chromium}/bin/chromium
+            export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+            export PLAYWRIGHT_CHROMIUM_PATH=${pkgs.chromium}/bin/chromium
           '';
         };
       }

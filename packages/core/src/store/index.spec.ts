@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest';
 import { createScopedStore, getStorageKey } from './index';
 
 describe('getStorageKey', () => {
@@ -96,7 +97,7 @@ describe('newUpdatesCount calculation', () => {
   });
 
   it('skips updates with missing or invalid published_at', () => {
-    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
       const { store, actions } = storeWith([
         { id: 1, title: 'No date', tags: [] },
@@ -149,10 +150,10 @@ describe('display actions', () => {
 });
 
 describe('loadUpdates', () => {
-  let fetchMock: jest.Mock;
+  let fetchMock: Mock;
 
   beforeEach(() => {
-    fetchMock = jest.fn();
+    fetchMock = vi.fn();
     global.fetch = fetchMock as any;
   });
 
@@ -195,7 +196,7 @@ describe('loadUpdates', () => {
   });
 
   it('sets an error when neither slug nor baseUrl is given', async () => {
-    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
       const { store, actions } = createScopedStore();
 
@@ -227,7 +228,7 @@ describe('loadUpdates', () => {
   });
 
   it('records an error on a non-ok response and stops loading', async () => {
-    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
       fetchMock.mockResolvedValue({ ok: false, statusText: 'Internal Server Error' });
       const { store, actions } = createScopedStore();
@@ -243,7 +244,7 @@ describe('loadUpdates', () => {
   });
 
   it('records an error when the network fails', async () => {
-    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
       fetchMock.mockRejectedValue(new TypeError('Failed to fetch'));
       const { store, actions } = createScopedStore();

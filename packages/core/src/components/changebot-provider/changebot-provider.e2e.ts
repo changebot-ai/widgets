@@ -1,12 +1,12 @@
-import { newE2EPage, E2EPage } from '@stencil/core/testing';
+import { expect } from '@playwright/test';
+import { test, type E2EPage } from '@stencil/playwright';
 
 // Stub window.fetch before any document loads so the provider's auto-fetch
 // on mount never hits the real network (CORS-blocked, slow, flaky). Any
-// non-localhost request returns an empty publications payload. Stencil's
-// e2e harness owns request interception, so we patch at the fetch layer.
-async function newStubbedPage(): Promise<E2EPage> {
-  const page = await newE2EPage();
-  await page.evaluateOnNewDocument(() => {
+// non-localhost request returns an empty publications payload. Patching at
+// the fetch layer leaves Playwright's routing free for the dev server.
+async function stubFetch(page: E2EPage): Promise<void> {
+  await page.addInitScript(() => {
     const originalFetch = window.fetch;
     window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
       const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
@@ -21,56 +21,55 @@ async function newStubbedPage(): Promise<E2EPage> {
       return originalFetch(input, init);
     };
   });
-  return page;
 }
 
-describe('changebot-provider', () => {
-  it('renders', async () => {
-    const page = await newStubbedPage();
+test.describe('changebot-provider', () => {
+  test('renders', async ({ page }) => {
+    await stubFetch(page);
     await page.setContent('<changebot-provider />');
 
-    const element = await page.find('changebot-provider');
-    expect(element).toHaveClass('hydrated');
+    const element = page.locator('changebot-provider');
+    await expect(element).toContainClass('hydrated');
   });
 
-  it('renders with baseUrl prop', async () => {
-    const page = await newStubbedPage();
+  test('renders with baseUrl prop', async ({ page }) => {
+    await stubFetch(page);
     await page.setContent('<changebot-provider base-url="https://api.example.com" />');
 
-    const element = await page.find('changebot-provider');
-    expect(element).toHaveClass('hydrated');
-    expect(await element.getProperty('baseUrl')).toBe('https://api.example.com');
+    const element = page.locator('changebot-provider');
+    await expect(element).toContainClass('hydrated');
+    expect(await element.evaluate((el: any) => el.baseUrl)).toBe('https://api.example.com');
   });
 
-  it('renders with slug prop', async () => {
-    const page = await newStubbedPage();
+  test('renders with slug prop', async ({ page }) => {
+    await stubFetch(page);
     await page.setContent('<changebot-provider slug="test-team" />');
 
-    const element = await page.find('changebot-provider');
-    expect(element).toHaveClass('hydrated');
-    expect(await element.getProperty('slug')).toBe('test-team');
+    const element = page.locator('changebot-provider');
+    await expect(element).toContainClass('hydrated');
+    expect(await element.evaluate((el: any) => el.slug)).toBe('test-team');
   });
 
-  it('renders with scope prop', async () => {
-    const page = await newStubbedPage();
+  test('renders with scope prop', async ({ page }) => {
+    await stubFetch(page);
     await page.setContent('<changebot-provider scope="custom-scope" />');
 
-    const element = await page.find('changebot-provider');
-    expect(element).toHaveClass('hydrated');
-    expect(await element.getProperty('scope')).toBe('custom-scope');
+    const element = page.locator('changebot-provider');
+    await expect(element).toContainClass('hydrated');
+    expect(await element.evaluate((el: any) => el.scope)).toBe('custom-scope');
   });
 
-  it('renders with default scope when not provided', async () => {
-    const page = await newStubbedPage();
+  test('renders with default scope when not provided', async ({ page }) => {
+    await stubFetch(page);
     await page.setContent('<changebot-provider />');
 
-    const element = await page.find('changebot-provider');
-    expect(await element.getProperty('scope')).toBe('default');
+    const element = page.locator('changebot-provider');
+    expect(await element.evaluate((el: any) => el.scope)).toBe('default');
   });
 
-  describe('store registration', () => {
-    it('registers store in registry on load', async () => {
-      const page = await newStubbedPage();
+  test.describe('store registration', () => {
+    test('registers store in registry on load', async ({ page }) => {
+      await stubFetch(page);
       await page.setContent('<changebot-provider />');
 
       await page.waitForChanges();
@@ -92,9 +91,9 @@ describe('changebot-provider', () => {
     });
   });
 
-  describe('multiple providers with different scopes', () => {
-    it('allows multiple providers to coexist with different scopes', async () => {
-      const page = await newStubbedPage();
+  test.describe('multiple providers with different scopes', () => {
+    test('allows multiple providers to coexist with different scopes', async ({ page }) => {
+      await stubFetch(page);
       await page.setContent(`
         <changebot-provider scope="scope-a" />
         <changebot-provider scope="scope-b" />
@@ -102,43 +101,43 @@ describe('changebot-provider', () => {
         <changebot-panel scope="scope-b" />
       `);
 
-      const providers = await page.findAll('changebot-provider');
-      expect(providers).toHaveLength(2);
+      const providers = page.locator('changebot-provider');
+      await expect(providers).toHaveCount(2);
 
-      expect(await providers[0].getProperty('scope')).toBe('scope-a');
-      expect(await providers[1].getProperty('scope')).toBe('scope-b');
+      expect(await providers.nth(0).evaluate((el: any) => el.scope)).toBe('scope-a');
+      expect(await providers.nth(1).evaluate((el: any) => el.scope)).toBe('scope-b');
 
       await page.waitForChanges();
 
       // Test that each panel is connected to the correct provider
       // by opening one panel and verifying only it opens
-      const panels = await page.findAll('changebot-panel');
-      await panels[0].callMethod('open');
+      const panels = page.locator('changebot-panel');
+      await panels.nth(0).evaluate((el: any) => el.open());
 
       await page.waitForChanges();
       await new Promise(resolve => setTimeout(resolve, 200));
 
       // Only scope-a panel should be open
-      const panelElements = await page.findAll('changebot-panel >>> .panel');
-      const panel1Classes = await panelElements[0].getProperty('className');
-      const panel2Classes = await panelElements[1].getProperty('className');
+      const panelElements = page.locator('changebot-panel .panel');
+      const panel1Classes = await panelElements.nth(0).evaluate((el: any) => el.className);
+      const panel2Classes = await panelElements.nth(1).evaluate((el: any) => el.className);
 
       expect(panel1Classes).toContain('panel--open');
       expect(panel2Classes).toContain('panel--closed');
     });
   });
 
-  describe('slot content', () => {
-    it('renders slot content', async () => {
-      const page = await newStubbedPage();
+  test.describe('slot content', () => {
+    test('renders slot content', async ({ page }) => {
+      await stubFetch(page);
       await page.setContent(`
         <changebot-provider />
         <div class="test-content">Test Content</div>
       `);
 
-      const slotContent = await page.find('.test-content');
-      expect(slotContent).not.toBeNull();
-      expect(await slotContent.textContent).toBe('Test Content');
+      const slotContent = page.locator('.test-content');
+      await expect(slotContent).toHaveCount(1);
+      expect(await slotContent.textContent()).toBe('Test Content');
     });
   });
 });

@@ -83,7 +83,7 @@ describe('findHighlightedUpdate', () => {
   });
 
   it('skips updates with a missing or invalid published_at', () => {
-    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
       const noDate = update({ id: 1, highlight_target: 'banner', published_at: undefined as any });
       const badDate = update({ id: 2, highlight_target: 'banner', published_at: 'not-a-date' });

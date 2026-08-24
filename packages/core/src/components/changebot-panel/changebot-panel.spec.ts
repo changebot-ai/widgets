@@ -1,5 +1,5 @@
-import { newSpecPage } from '@stencil/core/testing';
-import { ChangebotPanel } from './changebot-panel';
+import { render } from '@stencil/vitest';
+import './changebot-panel';
 import { Services } from '../../types';
 import { clearRegistry, registerStore } from '../../store/registry';
 
@@ -14,80 +14,56 @@ describe('changebot-panel', () => {
 
   // Basic rendering tests
   it('renders closed by default', async () => {
-    const { root } = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel></changebot-panel>',
-    });
+    const { root } = await render('<changebot-panel></changebot-panel>');
 
     const drawer = root.shadowRoot.querySelector('.panel');
     expect(drawer).toHaveClass('panel--closed');
   });
 
   it('applies drawer-left mode', async () => {
-    const { root } = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel mode="drawer-left"></changebot-panel>',
-    });
+    const { root } = await render('<changebot-panel mode="drawer-left"></changebot-panel>');
 
     const drawer = root.shadowRoot.querySelector('.panel');
     expect(drawer).toHaveClass('panel--left');
   });
 
   it('applies drawer-right mode', async () => {
-    const { root } = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel mode="drawer-right"></changebot-panel>',
-    });
+    const { root } = await render('<changebot-panel mode="drawer-right"></changebot-panel>');
 
     const drawer = root.shadowRoot.querySelector('.panel');
     expect(drawer).toHaveClass('panel--right');
   });
 
   it('applies modal mode', async () => {
-    const { root } = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel mode="modal"></changebot-panel>',
-    });
+    const { root } = await render('<changebot-panel mode="modal"></changebot-panel>');
 
     const modal = root.shadowRoot.querySelector('.panel');
     expect(modal).toHaveClass('panel--modal');
   });
 
   it('applies custom scope attribute', async () => {
-    const { root } = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel scope="admin"></changebot-panel>',
-    });
+    const { root } = await render('<changebot-panel scope="admin"></changebot-panel>');
 
     expect(root.getAttribute('data-scope')).toBe('admin');
   });
 
   it('applies theme class when provided', async () => {
-    const { root } = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel theme="catppuccin-mocha"></changebot-panel>',
-    });
+    const { root } = await render('<changebot-panel theme="catppuccin-mocha"></changebot-panel>');
 
     const display = root.shadowRoot.querySelector('.panel');
     expect(display).toHaveClass('theme--catppuccin-mocha');
   });
 
   it('applies light theme when system prefers light', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel light="catppuccin-latte" dark="catppuccin-mocha"></changebot-panel>',
-    });
+    const page = await render('<changebot-panel light="catppuccin-latte" dark="catppuccin-mocha"></changebot-panel>');
 
     // Component should have activeTheme set (either light or dark based on system preference)
-    const component = page.rootInstance;
+    const component = page.instance;
     expect(component.activeTheme).toMatch(/catppuccin-(latte|mocha)/);
   });
 
   it('prioritizes theme prop over light/dark', async () => {
-    const { root } = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel theme="catppuccin-frappe" light="catppuccin-latte" dark="catppuccin-mocha"></changebot-panel>',
-    });
+    const { root } = await render('<changebot-panel theme="catppuccin-frappe" light="catppuccin-latte" dark="catppuccin-mocha"></changebot-panel>');
 
     const display = root.shadowRoot.querySelector('.panel');
     expect(display).toHaveClass('theme--catppuccin-frappe');
@@ -95,16 +71,13 @@ describe('changebot-panel', () => {
 
   // Store integration tests
   it('loads without provider (services remain undefined)', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel></changebot-panel>',
-    });
+    const page = await render('<changebot-panel></changebot-panel>');
 
     // Verify component loaded successfully
-    expect(page.rootInstance).toBeDefined();
+    expect(page.instance).toBeDefined();
 
     // Services should be undefined since no provider registered a store
-    expect(page.rootInstance.services).toBeUndefined();
+    expect(page.instance.services).toBeUndefined();
   });
 
   it('subscribes to isOpen state when context is received', async () => {
@@ -114,15 +87,12 @@ describe('changebot-panel', () => {
         updates: [],
         mode: 'drawer-right'
       },
-      onChange: jest.fn()
+      onChange: vi.fn()
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel></changebot-panel>',
-    });
+    const page = await render('<changebot-panel></changebot-panel>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
 
     // Simulate receiving context
     component.services = { store: mockStore };
@@ -138,15 +108,12 @@ describe('changebot-panel', () => {
         updates: [],
         mode: 'drawer-right'
       },
-      onChange: jest.fn()
+      onChange: vi.fn()
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel></changebot-panel>',
-    });
+    const page = await render('<changebot-panel></changebot-panel>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
 
     // Simulate receiving context
     component.services = { store: mockStore };
@@ -163,7 +130,7 @@ describe('changebot-panel', () => {
         updates: [],
         mode: 'drawer-right'
       },
-      onChange: jest.fn((key, callback) => {
+      onChange: vi.fn((key, callback) => {
         if (key === 'isOpen') {
           isOpenCallback = callback;
         }
@@ -171,12 +138,9 @@ describe('changebot-panel', () => {
       })
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel></changebot-panel>',
-    });
+    const page = await render('<changebot-panel></changebot-panel>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.services = { store: mockStore };
     component.subscribeToStore();
 
@@ -216,15 +180,12 @@ describe('changebot-panel', () => {
         updates: mockUpdates,
         mode: 'drawer-right'
       },
-      onChange: jest.fn().mockReturnValue(() => {})
+      onChange: vi.fn().mockReturnValue(() => {})
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel></changebot-panel>',
-    });
+    const page = await render('<changebot-panel></changebot-panel>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.services = { store: mockStore };
     component.subscribeToStore();
     component.isOpen = true;
@@ -238,18 +199,15 @@ describe('changebot-panel', () => {
 
   // Close interaction tests
   it('calls display.close on close button click', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel></changebot-panel>',
-    });
+    const page = await render('<changebot-panel></changebot-panel>');
 
-    const component = page.rootInstance;
-    const mockClose = jest.fn();
+    const component = page.instance;
+    const mockClose = vi.fn();
 
     // Mock services with display
     component.services = {
       store: { state: {} },
-      display: { open: jest.fn(), close: mockClose }
+      display: { open: vi.fn(), close: mockClose }
     };
     component.isOpen = true;
 
@@ -263,18 +221,15 @@ describe('changebot-panel', () => {
   });
 
   it('calls display.close on ESC key', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel></changebot-panel>',
-    });
+    const page = await render('<changebot-panel></changebot-panel>');
 
-    const component = page.rootInstance;
-    const mockClose = jest.fn();
+    const component = page.instance;
+    const mockClose = vi.fn();
 
     // Mock services with display
     component.services = {
       store: { state: {} },
-      display: { open: jest.fn(), close: mockClose }
+      display: { open: vi.fn(), close: mockClose }
     };
     component.isOpen = true;
 
@@ -288,12 +243,9 @@ describe('changebot-panel', () => {
   });
 
   it('closes directly when no provider (standalone mode)', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel></changebot-panel>',
-    });
+    const page = await render('<changebot-panel></changebot-panel>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     // No services mock - standalone mode
     component.isOpen = true;
 
@@ -311,17 +263,14 @@ describe('changebot-panel', () => {
   });
 
   it('calls display.close on backdrop click (modal only)', async () => {
-    const mockClose = jest.fn();
+    const mockClose = vi.fn();
 
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel mode="modal"></changebot-panel>',
-    });
+    const page = await render('<changebot-panel mode="modal"></changebot-panel>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.services = {
       store: { state: {} },
-      display: { open: jest.fn(), close: mockClose }
+      display: { open: vi.fn(), close: mockClose }
     };
     component.isOpen = true;
 
@@ -336,10 +285,10 @@ describe('changebot-panel', () => {
 
   // Cleanup test
   it('cleans up store subscriptions on disconnect', async () => {
-    const unsubscribeIsOpen = jest.fn();
-    const unsubscribeUpdates = jest.fn();
-    const unsubscribeWidget = jest.fn();
-    const unsubscribeIsLoading = jest.fn();
+    const unsubscribeIsOpen = vi.fn();
+    const unsubscribeUpdates = vi.fn();
+    const unsubscribeWidget = vi.fn();
+    const unsubscribeIsLoading = vi.fn();
     const mockStore = {
       state: {
         isOpen: false,
@@ -348,19 +297,16 @@ describe('changebot-panel', () => {
         isLoading: false,
         mode: 'drawer-right'
       },
-      onChange: jest.fn()
+      onChange: vi.fn()
         .mockReturnValueOnce(unsubscribeIsOpen)
         .mockReturnValueOnce(unsubscribeUpdates)
         .mockReturnValueOnce(unsubscribeWidget)
         .mockReturnValueOnce(unsubscribeIsLoading)
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel></changebot-panel>',
-    });
+    const page = await render('<changebot-panel></changebot-panel>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.services = { store: mockStore };
     component.subscribeToStore();
 
@@ -374,17 +320,14 @@ describe('changebot-panel', () => {
   });
 
   it('cancels its pending registry subscription on disconnect', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel></changebot-panel>',
-    });
+    const page = await render('<changebot-panel></changebot-panel>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     expect(component.services).toBeUndefined();
 
     component.disconnectedCallback();
 
-    const onChange = jest.fn().mockReturnValue(jest.fn());
+    const onChange = vi.fn().mockReturnValue(vi.fn());
     const services = {
       store: {
         state: { isOpen: false, updates: [], widget: null, isLoading: false },
@@ -399,13 +342,10 @@ describe('changebot-panel', () => {
 
   // Trigger prop tests
   it('opens panel when a matching trigger element is clicked', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel trigger=".open-panel"></changebot-panel>',
-    });
+    const page = await render('<changebot-panel trigger=".open-panel"></changebot-panel>');
 
-    const component = page.rootInstance;
-    const mockOpen = jest.spyOn(component, 'open').mockResolvedValue(undefined);
+    const component = page.instance;
+    const mockOpen = vi.spyOn(component, 'open').mockResolvedValue(undefined);
 
     const btn = document.createElement('button');
     btn.className = 'open-panel';
@@ -418,13 +358,10 @@ describe('changebot-panel', () => {
   });
 
   it('does not open panel when a non-matching element is clicked', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel trigger=".open-panel"></changebot-panel>',
-    });
+    const page = await render('<changebot-panel trigger=".open-panel"></changebot-panel>');
 
-    const component = page.rootInstance;
-    const mockOpen = jest.spyOn(component, 'open');
+    const component = page.instance;
+    const mockOpen = vi.spyOn(component, 'open');
 
     const btn = document.createElement('button');
     btn.className = 'other-button';
@@ -437,13 +374,10 @@ describe('changebot-panel', () => {
   });
 
   it('does nothing on document click when trigger prop is not set', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel></changebot-panel>',
-    });
+    const page = await render('<changebot-panel></changebot-panel>');
 
-    const component = page.rootInstance;
-    const mockOpen = jest.spyOn(component, 'open');
+    const component = page.instance;
+    const mockOpen = vi.spyOn(component, 'open');
 
     const btn = document.createElement('button');
     btn.className = 'any-button';
@@ -456,13 +390,10 @@ describe('changebot-panel', () => {
   });
 
   it('opens panel when a child of a matching trigger element is clicked', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel trigger=".open-panel"></changebot-panel>',
-    });
+    const page = await render('<changebot-panel trigger=".open-panel"></changebot-panel>');
 
-    const component = page.rootInstance;
-    const mockOpen = jest.spyOn(component, 'open').mockResolvedValue(undefined);
+    const component = page.instance;
+    const mockOpen = vi.spyOn(component, 'open').mockResolvedValue(undefined);
 
     const btn = document.createElement('button');
     btn.className = 'open-panel';
@@ -477,12 +408,9 @@ describe('changebot-panel', () => {
   });
 
   it('warns once and does not throw when trigger is an invalid CSS selector', async () => {
-    const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-    await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel trigger="[invalid"></changebot-panel>',
-    });
+    await render('<changebot-panel trigger="[invalid"></changebot-panel>');
 
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid trigger selector'), expect.objectContaining({ trigger: '[invalid' }));
 
@@ -498,13 +426,10 @@ describe('changebot-panel', () => {
   });
 
   it('reacts to trigger prop changes after mount', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel trigger=".first"></changebot-panel>',
-    });
+    const page = await render('<changebot-panel trigger=".first"></changebot-panel>');
 
-    const component = page.rootInstance;
-    const mockOpen = jest.spyOn(component, 'open').mockResolvedValue(undefined);
+    const component = page.instance;
+    const mockOpen = vi.spyOn(component, 'open').mockResolvedValue(undefined);
 
     const btn = document.createElement('button');
     btn.className = 'second';
@@ -534,12 +459,9 @@ describe('changebot-panel', () => {
 
   // ARIA and accessibility tests
   it('has proper ARIA attributes when open', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel mode="modal"></changebot-panel>',
-    });
+    const page = await render('<changebot-panel mode="modal"></changebot-panel>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.isOpen = true;
 
     await page.waitForChanges();
@@ -551,31 +473,26 @@ describe('changebot-panel', () => {
   });
 
   it('has aria-live region for announcements', async () => {
-    const { root } = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel></changebot-panel>',
-    });
+    const { root } = await render('<changebot-panel></changebot-panel>');
 
     const liveRegion = root.shadowRoot.querySelector('[aria-live]');
     expect(liveRegion).toBeDefined();
   });
 
   it('exposes connection state via data-changebot-state', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotPanel],
-      html: '<changebot-panel></changebot-panel>',
-    });
+    const page = await render('<changebot-panel></changebot-panel>');
 
     const host = page.root;
     expect(host.getAttribute('data-changebot-state')).toBe('waiting-for-provider');
 
-    const onChange = jest.fn().mockReturnValue(jest.fn());
+    const onChange = vi.fn().mockReturnValue(vi.fn());
     const services = {
       store: { state: { updates: [], isOpen: false, isLoading: false, error: null, widget: null, lastViewed: null, newUpdatesCount: 0 }, onChange },
-      display: { open: jest.fn(), close: jest.fn() },
+      display: { open: vi.fn(), close: vi.fn() },
     } as unknown as Services;
     registerStore('default', services);
 
+    await page.waitForChanges();
     expect(host.getAttribute('data-changebot-state')).toBe('connected');
   });
 

@@ -1,13 +1,14 @@
-import { newSpecPage } from '@stencil/core/testing';
-import { ChangebotBadge } from './changebot-badge';
+import type { MockInstance, Mock } from 'vitest';
+import { render } from '@stencil/vitest';
+import './changebot-badge';
 import { Services } from '../../types';
 import { clearRegistry, registerStore } from '../../store/registry';
 
 describe('changebot-badge', () => {
-  let warnSpy: jest.SpyInstance;
+  let warnSpy: MockInstance;
 
   beforeEach(() => {
-    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     clearRegistry();
   });
 
@@ -17,23 +18,15 @@ describe('changebot-badge', () => {
   });
 
   it('renders with hidden badge when count is 0', async () => {
-    const { root } = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge></changebot-badge>',
-    });
+    const { root } = await render('<changebot-badge></changebot-badge>');
 
     expect(root).toEqualHtml(`
-      <changebot-badge data-changebot-state="waiting-for-provider">
+      <changebot-badge data-changebot-state="waiting-for-provider" class="hydrated">
         <mock:shadow-root>
-          <button
-            class="badge badge--hidden"
-            type="button"
-            role="status"
-            aria-label="No new updates"
-            aria-live="polite"
-            tabindex="0"
-          >
-            <span class="badge__count">0</span>
+          <button class="badge badge--hidden" type="button" role="status" aria-label="No new updates" aria-live="polite" tabindex="0">
+            <span class="badge__count">
+              0
+            </span>
           </button>
         </mock:shadow-root>
       </changebot-badge>
@@ -41,10 +34,7 @@ describe('changebot-badge', () => {
   });
 
   it('shows badge with count when updates are available', async () => {
-    const { root } = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge count="5"></changebot-badge>',
-    });
+    const { root } = await render('<changebot-badge count="5"></changebot-badge>');
 
     const badge = root.shadowRoot.querySelector('.badge');
     expect(badge).not.toHaveClass('badge--hidden');
@@ -55,10 +45,7 @@ describe('changebot-badge', () => {
   });
 
   it('displays 9+ for counts over 9', async () => {
-    const { root } = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge count="15"></changebot-badge>',
-    });
+    const { root } = await render('<changebot-badge count="15"></changebot-badge>');
 
     const count = root.shadowRoot.querySelector('.badge__count');
     expect(count.textContent).toBe('9+');
@@ -66,40 +53,28 @@ describe('changebot-badge', () => {
   });
 
   it('applies custom scope attribute', async () => {
-    const { root } = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge scope="admin"></changebot-badge>',
-    });
+    const { root } = await render('<changebot-badge scope="admin"></changebot-badge>');
 
     expect(root.getAttribute('data-scope')).toBe('admin');
   });
 
   it('applies theme class when provided', async () => {
-    const { root } = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge theme="catppuccin-mocha"></changebot-badge>',
-    });
+    const { root } = await render('<changebot-badge theme="catppuccin-mocha"></changebot-badge>');
 
     const badge = root.shadowRoot.querySelector('.badge');
     expect(badge).toHaveClass('theme--catppuccin-mocha');
   });
 
   it('applies light theme when system prefers light', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge light="catppuccin-latte" dark="catppuccin-mocha"></changebot-badge>',
-    });
+    const page = await render('<changebot-badge light="catppuccin-latte" dark="catppuccin-mocha"></changebot-badge>');
 
     // Component should have activeTheme set (either light or dark based on system preference)
-    const component = page.rootInstance;
+    const component = page.instance;
     expect(component.activeTheme).toMatch(/catppuccin-(latte|mocha)/);
   });
 
   it('prioritizes theme prop over light/dark', async () => {
-    const { root } = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge theme="catppuccin-frappe" light="catppuccin-latte" dark="catppuccin-mocha"></changebot-badge>',
-    });
+    const { root } = await render('<changebot-badge theme="catppuccin-frappe" light="catppuccin-latte" dark="catppuccin-mocha"></changebot-badge>');
 
     const badge = root.shadowRoot.querySelector('.badge');
     expect(badge).toHaveClass('theme--catppuccin-frappe');
@@ -107,10 +82,7 @@ describe('changebot-badge', () => {
 
 
   it('shows dot when indicator is "dot"', async () => {
-    const { root } = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge indicator="dot" count="5"></changebot-badge>',
-    });
+    const { root } = await render('<changebot-badge indicator="dot" count="5"></changebot-badge>');
 
     const badge = root.shadowRoot.querySelector('.badge');
     expect(badge).not.toHaveClass('badge--hidden');
@@ -123,16 +95,13 @@ describe('changebot-badge', () => {
   it('loads without provider (services remain undefined)', async () => {
     // When badge loads without a provider, services should be undefined
     // but the component should still render correctly
-    const page = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge></changebot-badge>',
-    });
+    const page = await render('<changebot-badge></changebot-badge>');
 
     // Verify component loaded successfully
-    expect(page.rootInstance).toBeDefined();
+    expect(page.instance).toBeDefined();
 
     // Services should be undefined since no provider registered a store
-    expect(page.rootInstance.services).toBeUndefined();
+    expect(page.instance.services).toBeUndefined();
   });
 
   it('subscribes to store changes when context is received', async () => {
@@ -144,15 +113,12 @@ describe('changebot-badge', () => {
         ],
         lastViewed: Date.now() - 86400000 // 1 day ago
       },
-      onChange: jest.fn()
+      onChange: vi.fn()
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge></changebot-badge>',
-    });
+    const page = await render('<changebot-badge></changebot-badge>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
 
     // Simulate receiving context
     component.services = { store: mockStore };
@@ -162,23 +128,20 @@ describe('changebot-badge', () => {
   });
 
   it('calls display.open on click when services available', async () => {
-    const mockOpen = jest.fn();
+    const mockOpen = vi.fn();
     const mockStore = {
       state: { updates: [], lastViewed: Date.now(), newUpdatesCount: 3 },
-      onChange: jest.fn()
+      onChange: vi.fn()
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge count="3"></changebot-badge>',
-    });
+    const page = await render('<changebot-badge count="3"></changebot-badge>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
 
     // Simulate having services
     component.services = {
       store: mockStore,
-      display: { open: mockOpen, close: jest.fn() }
+      display: { open: mockOpen, close: vi.fn() }
     };
 
     const badge = page.root.shadowRoot.querySelector('.badge') as HTMLElement;
@@ -190,12 +153,9 @@ describe('changebot-badge', () => {
   });
 
   it('handles click gracefully without services', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge count="3"></changebot-badge>',
-    });
+    const page = await render('<changebot-badge count="3"></changebot-badge>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     expect(component.services).toBeUndefined();
 
     // Click should not throw when services are undefined
@@ -204,21 +164,18 @@ describe('changebot-badge', () => {
   });
 
   it('handles keyboard navigation with Enter key', async () => {
-    const mockOpen = jest.fn();
+    const mockOpen = vi.fn();
     const mockStore = {
       state: { updates: [], lastViewed: Date.now(), newUpdatesCount: 3 },
-      onChange: jest.fn()
+      onChange: vi.fn()
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge count="3"></changebot-badge>',
-    });
+    const page = await render('<changebot-badge count="3"></changebot-badge>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.services = {
       store: mockStore,
-      display: { open: mockOpen, close: jest.fn() }
+      display: { open: mockOpen, close: vi.fn() }
     };
 
     const badge = page.root.shadowRoot.querySelector('.badge') as HTMLElement;
@@ -231,21 +188,18 @@ describe('changebot-badge', () => {
   });
 
   it('handles keyboard navigation with Space key', async () => {
-    const mockOpen = jest.fn();
+    const mockOpen = vi.fn();
     const mockStore = {
       state: { updates: [], lastViewed: Date.now(), newUpdatesCount: 3 },
-      onChange: jest.fn()
+      onChange: vi.fn()
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge count="3"></changebot-badge>',
-    });
+    const page = await render('<changebot-badge count="3"></changebot-badge>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.services = {
       store: mockStore,
-      display: { open: mockOpen, close: jest.fn() }
+      display: { open: mockOpen, close: vi.fn() }
     };
 
     const badge = page.root.shadowRoot.querySelector('.badge') as HTMLElement;
@@ -258,18 +212,15 @@ describe('changebot-badge', () => {
   });
 
   it('cleans up store subscription on disconnect', async () => {
-    const unsubscribe = jest.fn();
+    const unsubscribe = vi.fn();
     const mockStore = {
       state: { updates: [], lastViewed: Date.now() },
-      onChange: jest.fn().mockReturnValue(unsubscribe)
+      onChange: vi.fn().mockReturnValue(unsubscribe)
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge></changebot-badge>',
-    });
+    const page = await render('<changebot-badge></changebot-badge>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.services = { store: mockStore };
     component.subscribeToStore();
 
@@ -280,28 +231,25 @@ describe('changebot-badge', () => {
   });
 
   it('clears existing store subscriptions before reconnecting', async () => {
-    const unsubscribes: jest.Mock[] = [];
+    const unsubscribes: Mock[] = [];
     const mockStore = {
       state: { updates: [], lastViewed: null, newUpdatesCount: 0 },
-      onChange: jest.fn().mockImplementation(() => {
-        const unsub = jest.fn();
+      onChange: vi.fn().mockImplementation(() => {
+        const unsub = vi.fn();
         unsubscribes.push(unsub);
         return unsub;
       }),
     };
-    const services = { store: mockStore, display: { open: jest.fn(), close: jest.fn() } } as unknown as Services;
+    const services = { store: mockStore, display: { open: vi.fn(), close: vi.fn() } } as unknown as Services;
     registerStore('default', services);
 
-    const page = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge></changebot-badge>',
-    });
+    const page = await render('<changebot-badge></changebot-badge>');
 
     await Promise.resolve(); // flush already-registered microtask
     expect(unsubscribes).toHaveLength(1);
 
     // Simulate a reconnect (e.g. framework remounting the component)
-    (page.rootInstance as any).connectToProvider();
+    (page.instance as any).connectToProvider();
     await Promise.resolve();
 
     // The first subscription must be torn down before the new one is created
@@ -309,17 +257,14 @@ describe('changebot-badge', () => {
   });
 
   it('cancels its pending registry subscription on disconnect', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge></changebot-badge>',
-    });
+    const page = await render('<changebot-badge></changebot-badge>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     expect(component.services).toBeUndefined();
 
     component.disconnectedCallback();
 
-    const onChange = jest.fn().mockReturnValue(jest.fn());
+    const onChange = vi.fn().mockReturnValue(vi.fn());
     const services = {
       store: { state: { updates: [], lastViewed: null }, onChange },
     } as unknown as Services;
@@ -330,10 +275,7 @@ describe('changebot-badge', () => {
   });
 
   it('exposes connection state via data-changebot-state', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotBadge],
-      html: '<changebot-badge></changebot-badge>',
-    });
+    const page = await render('<changebot-badge></changebot-badge>');
 
     const host = page.root;
     expect(host.getAttribute('data-changebot-state')).toBe('waiting-for-provider');
@@ -341,11 +283,12 @@ describe('changebot-badge', () => {
     const services = {
       store: {
         state: { updates: [], lastViewed: null },
-        onChange: jest.fn().mockReturnValue(jest.fn()),
+        onChange: vi.fn().mockReturnValue(vi.fn()),
       },
     } as unknown as Services;
     registerStore('default', services);
 
+    await page.waitForChanges();
     expect(host.getAttribute('data-changebot-state')).toBe('connected');
   });
 

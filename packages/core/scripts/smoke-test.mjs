@@ -14,7 +14,7 @@ import http from 'node:http';
 import { createReadStream, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import puppeteer from 'puppeteer';
+import { chromium } from '@playwright/test';
 
 const coreDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const distDir = path.join(coreDir, 'dist');
@@ -116,9 +116,9 @@ function startServer() {
   });
 }
 
-async function waitFor(page, description, fn, ...args) {
+async function waitFor(page, description, fn, arg) {
   try {
-    await page.waitForFunction(fn, { timeout: 10_000, polling: 100 }, ...args);
+    await page.waitForFunction(fn, arg, { timeout: 10_000, polling: 100 });
     console.log(`ok: ${description}`);
   } catch (error) {
     throw new Error(`FAILED: ${description}\n${error.message}`);
@@ -132,14 +132,16 @@ async function run() {
 
   const server = await startServer();
   const { port } = server.address();
-  const browser = await puppeteer.launch({ headless: 'shell' });
+  const browser = await chromium.launch({
+    executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
+  });
 
   try {
     const page = await browser.newPage();
     const pageErrors = [];
     page.on('pageerror', error => pageErrors.push(error.message));
 
-    await page.evaluateOnNewDocument(lastViewed => {
+    await page.addInitScript(lastViewed => {
       localStorage.clear();
       localStorage.setItem('changebot:lastViewed:default', String(lastViewed));
     }, OLD_LAST_VIEWED);

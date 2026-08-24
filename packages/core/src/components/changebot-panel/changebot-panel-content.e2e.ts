@@ -1,4 +1,5 @@
-import { newE2EPage } from '@stencil/core/testing';
+import { expect } from '@playwright/test';
+import { test } from '@stencil/playwright';
 import { injectFetchMock, waitForConnected, waitForPanelOpen, waitForShadow } from '../../test-utils/e2e-helpers';
 
 /**
@@ -30,9 +31,8 @@ const richMockData = JSON.stringify({
   ],
 });
 
-describe('changebot-panel content rendering', () => {
-  it('renders widget metadata, transformed content, tags, and the branded footer', async () => {
-    const page = await newE2EPage();
+test.describe('changebot-panel content rendering', () => {
+  test('renders widget metadata, transformed content, tags, and the branded footer', async ({ page }) => {
     const scope = 'panel-rich';
 
     await page.setContent(`
@@ -46,29 +46,29 @@ describe('changebot-panel content rendering', () => {
     await waitForPanelOpen(page);
 
     // Widget title and subheading
-    const title = await page.find('changebot-panel >>> .panel-title');
-    expect(await title.textContent).toBe('Release Notes');
-    const subheading = await page.find('changebot-panel >>> .panel-subheading');
-    expect(await subheading.textContent).toBe('All the news');
+    const title = page.locator('changebot-panel .panel-title');
+    expect(await title.textContent()).toBe('Release Notes');
+    const subheading = page.locator('changebot-panel .panel-subheading');
+    expect(await subheading.textContent()).toBe('All the news');
 
     // hosted_url renders the title as an external link
-    const titleLink = await page.find('changebot-panel >>> .update-title-link');
+    const titleLink = page.locator('changebot-panel .update-title-link');
     expect(await titleLink.getAttribute('href')).toBe('https://example.com/changelog/rich-update');
     expect(await titleLink.getAttribute('target')).toBe('_blank');
     expect(await titleLink.getAttribute('rel')).toBe('noopener noreferrer');
-    expect(await titleLink.textContent).toBe('Rich Update');
+    expect(await titleLink.textContent()).toBe('Rich Update');
 
     // ActionText attachment converted to figure > img with rewritten src
-    const figureImg = await page.find('changebot-panel >>> .update-description figure.attachment-figure img');
+    const figureImg = page.locator('changebot-panel .update-description figure.attachment-figure img');
     expect(await figureImg.getAttribute('src')).toBe('https://app.changebot.ai/rails/active_storage/blobs/abc.png');
     expect(await figureImg.getAttribute('alt')).toBe('screenshot.png');
-    const figcaption = await page.find('changebot-panel >>> .update-description figure.attachment-figure figcaption');
-    expect(await figcaption.textContent).toBe('screenshot.png');
+    const figcaption = page.locator('changebot-panel .update-description figure.attachment-figure figcaption');
+    expect(await figcaption.textContent()).toBe('screenshot.png');
 
     // Relative link and image URLs rewritten to app.changebot.ai
-    const bodyLink = await page.find('changebot-panel >>> .update-description p a');
+    const bodyLink = page.locator('changebot-panel .update-description p a');
     expect(await bodyLink.getAttribute('href')).toBe('https://app.changebot.ai/changelog/1');
-    const bodyImg = await page.find('changebot-panel >>> .update-description p img');
+    const bodyImg = page.locator('changebot-panel .update-description p img');
     expect(await bodyImg.getAttribute('src')).toBe('https://app.changebot.ai/uploads/pic.png');
 
     // Tags with contrast colors: white text on navy, black text on yellow
@@ -86,12 +86,11 @@ describe('changebot-panel content rendering', () => {
     ]);
 
     // branded: true renders the footer
-    const footer = await page.find('changebot-panel >>> .panel-footer');
-    expect(footer).not.toBeNull();
+    const footer = page.locator('changebot-panel .panel-footer');
+    await expect(footer).toHaveCount(1);
   });
 
-  it('hides the footer when the widget is not branded', async () => {
-    const page = await newE2EPage();
+  test('hides the footer when the widget is not branded', async ({ page }) => {
     const scope = 'panel-unbranded';
     const mockData = JSON.stringify({
       widget: { title: 'Updates', slug: 'test', branded: false },
@@ -105,12 +104,11 @@ describe('changebot-panel content rendering', () => {
     await page.waitForChanges();
     await waitForConnected(page, 'changebot-panel');
 
-    const footer = await page.find('changebot-panel >>> .panel-footer');
-    expect(footer).toBeNull();
+    const footer = page.locator('changebot-panel .panel-footer');
+    await expect(footer).toHaveCount(0);
   });
 
-  it('shows the loading state while updates are being fetched', async () => {
-    const page = await newE2EPage();
+  test('shows the loading state while updates are being fetched', async ({ page }) => {
     const scope = 'panel-loading';
 
     await injectFetchMock(page, {
@@ -129,12 +127,11 @@ describe('changebot-panel content rendering', () => {
     await waitForPanelOpen(page);
 
     await waitForShadow(page, 'changebot-panel', '.loading-state .loading-spinner');
-    const loadingText = await page.find('changebot-panel >>> .loading-state p');
-    expect(await loadingText.textContent).toBe('Loading updates...');
+    const loadingText = page.locator('changebot-panel .loading-state p');
+    expect(await loadingText.textContent()).toBe('Loading updates...');
   });
 
-  it('shows the empty state when there are no updates', async () => {
-    const page = await newE2EPage();
+  test('shows the empty state when there are no updates', async ({ page }) => {
     const scope = 'panel-empty';
     const mockData = JSON.stringify({ widget: { title: 'Updates', slug: 'test' }, publications: [] });
 
@@ -148,12 +145,11 @@ describe('changebot-panel content rendering', () => {
     await page.$eval('changebot-panel', (el: any) => el.open());
     await waitForPanelOpen(page);
 
-    const emptyState = await page.find('changebot-panel >>> .empty-state');
-    expect(await emptyState.textContent).toContain('No updates available');
+    const emptyState = page.locator('changebot-panel .empty-state');
+    expect(await emptyState.textContent()).toContain('No updates available');
   });
 
-  it('handles a server error: badge stays hidden, panel opens to the empty state', async () => {
-    const page = await newE2EPage();
+  test('handles a server error: badge stays hidden, panel opens to the empty state', async ({ page }) => {
     const scope = 'panel-api-500';
 
     await injectFetchMock(page, {
@@ -181,8 +177,7 @@ describe('changebot-panel content rendering', () => {
     await waitForShadow(page, 'changebot-panel', '.panel.panel--closed:not(.panel--open)');
   });
 
-  it('handles a network failure: badge stays hidden, panel opens to the empty state', async () => {
-    const page = await newE2EPage();
+  test('handles a network failure: badge stays hidden, panel opens to the empty state', async ({ page }) => {
     const scope = 'panel-api-down';
 
     await injectFetchMock(page, {

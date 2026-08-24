@@ -1,3 +1,4 @@
+import type { MockInstance } from 'vitest';
 import { formatDisplayDate, validatePublishedAt } from './date-utils';
 
 describe('formatDisplayDate', () => {
@@ -13,10 +14,10 @@ describe('formatDisplayDate', () => {
 });
 
 describe('validatePublishedAt', () => {
-  let warnSpy: jest.SpyInstance;
+  let warnSpy: MockInstance;
 
   beforeEach(() => {
-    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   afterEach(() => {

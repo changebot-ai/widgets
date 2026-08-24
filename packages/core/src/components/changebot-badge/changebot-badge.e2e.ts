@@ -1,4 +1,5 @@
-import { newE2EPage } from '@stencil/core/testing';
+import { expect } from '@playwright/test';
+import { test } from '@stencil/playwright';
 import { seedLocalStorage, waitForConnected, waitForShadow } from '../../test-utils/e2e-helpers';
 
 const mockData = JSON.stringify({
@@ -11,52 +12,46 @@ const mockData = JSON.stringify({
 
 const emptyMockData = JSON.stringify({ publications: [], widget: { name: 'Test' } });
 
-describe('changebot-badge e2e', () => {
-  it('renders and displays badge correctly', async () => {
-    const page = await newE2EPage();
+test.describe('changebot-badge e2e', () => {
+  test('renders and displays badge correctly', async ({ page }) => {
     await page.setContent(`<changebot-badge></changebot-badge><changebot-provider mock-data='${emptyMockData}'></changebot-provider>`);
 
-    const component = await page.find('changebot-badge');
-    const badge = await page.find('changebot-badge >>> .badge');
+    const component = page.locator('changebot-badge');
+    const badge = page.locator('changebot-badge .badge');
 
-    expect(component).toHaveClass('hydrated');
-    expect(badge).toHaveClass('badge--hidden');
+    await expect(component).toContainClass('hydrated');
+    await expect(badge).toContainClass('badge--hidden');
   });
 
-  it('applies theme prop correctly', async () => {
-    const page = await newE2EPage();
+  test('applies theme prop correctly', async ({ page }) => {
     await page.setContent(`<changebot-badge theme="catppuccin-mocha"></changebot-badge><changebot-provider mock-data='${emptyMockData}'></changebot-provider>`);
 
-    const badge = await page.find('changebot-badge >>> .badge');
-    expect(badge).toHaveClass('theme--catppuccin-mocha');
+    const badge = page.locator('changebot-badge .badge');
+    await expect(badge).toContainClass('theme--catppuccin-mocha');
   });
 
-  it('has correct initial aria-label', async () => {
-    const page = await newE2EPage();
+  test('has correct initial aria-label', async ({ page }) => {
     await page.setContent(`<changebot-badge></changebot-badge><changebot-provider mock-data='${emptyMockData}'></changebot-provider>`);
 
-    const badge = await page.find('changebot-badge >>> .badge');
+    const badge = page.locator('changebot-badge .badge');
     expect(await badge.getAttribute('aria-label')).toBe('No new updates');
   });
 
-  it('handles scope attribute correctly', async () => {
-    const page = await newE2EPage();
+  test('handles scope attribute correctly', async ({ page }) => {
     await page.setContent(`<changebot-badge scope="dashboard"></changebot-badge><changebot-provider scope="dashboard" mock-data='${emptyMockData}'></changebot-provider>`);
 
-    const component = await page.find('changebot-badge');
+    const component = page.locator('changebot-badge');
     expect(await component.getAttribute('data-scope')).toBe('dashboard');
   });
 
-  it('renders with indicator prop', async () => {
-    const page = await newE2EPage();
+  test('renders with indicator prop', async ({ page }) => {
     await page.setContent(`<changebot-badge indicator="dot"></changebot-badge><changebot-provider mock-data='${emptyMockData}'></changebot-provider>`);
 
-    const component = await page.find('changebot-badge');
-    expect(await component.getProperty('indicator')).toBe('dot');
+    const component = page.locator('changebot-badge');
+    expect(await component.evaluate((el: any) => el.indicator)).toBe('dot');
   });
 
-  it('displays correct count after badge re-renders', async () => {
-    const page = await newE2EPage();
+  test('displays correct count after badge re-renders', async ({ page }) => {
     const scope = 'badge-remount';
 
     // A lastViewed older than both publications, so the count is 2
@@ -91,7 +86,7 @@ describe('changebot-badge e2e', () => {
     await waitForConnected(page, 'changebot-badge');
     await waitForShadow(page, 'changebot-badge', '.badge:not(.badge--hidden)');
 
-    const count = await page.find('changebot-badge >>> .badge__count');
-    expect(await count.innerText).toBe('2');
+    const count = page.locator('changebot-badge .badge__count');
+    expect(await count.innerText()).toBe('2');
   });
 });

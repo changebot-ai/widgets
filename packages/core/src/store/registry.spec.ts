@@ -20,15 +20,15 @@ function flushMicrotasks(): Promise<void> {
 describe('store/registry', () => {
   beforeEach(() => {
     clearRegistry();
-    jest.spyOn(console, 'log').mockImplementation();
-    jest.spyOn(console, 'warn').mockImplementation();
-    jest.spyOn(console, 'error').mockImplementation();
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
     clearRegistry();
-    jest.restoreAllMocks();
-    jest.useRealTimers();
+    vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   describe('registerStore + hasStore + getStore', () => {
@@ -57,7 +57,7 @@ describe('store/registry', () => {
 
   describe('onStoreReady — late-arriving provider', () => {
     it('fires onConnect when registerStore runs after subscribe', () => {
-      const onConnect = jest.fn();
+      const onConnect = vi.fn();
       onStoreReady('s', onConnect);
       expect(onConnect).not.toHaveBeenCalled();
 
@@ -69,9 +69,9 @@ describe('store/registry', () => {
     });
 
     it('notifies all pending subscribers in the same scope', () => {
-      const a = jest.fn();
-      const b = jest.fn();
-      const c = jest.fn();
+      const a = vi.fn();
+      const b = vi.fn();
+      const c = vi.fn();
       onStoreReady('s', a);
       onStoreReady('s', b);
       onStoreReady('s', c);
@@ -85,8 +85,8 @@ describe('store/registry', () => {
     });
 
     it('only notifies subscribers for the registered scope', () => {
-      const onS = jest.fn();
-      const onT = jest.fn();
+      const onS = vi.fn();
+      const onT = vi.fn();
       onStoreReady('s', onS);
       onStoreReady('t', onT);
 
@@ -102,7 +102,7 @@ describe('store/registry', () => {
       const services = makeServices();
       registerStore('s', services);
 
-      const onConnect = jest.fn();
+      const onConnect = vi.fn();
       onStoreReady('s', onConnect);
 
       expect(onConnect).not.toHaveBeenCalled();
@@ -114,7 +114,7 @@ describe('store/registry', () => {
 
   describe('onStoreReady — unsubscribe', () => {
     it('does not fire onConnect when unsubscribed before provider registers', () => {
-      const onConnect = jest.fn();
+      const onConnect = vi.fn();
       const unsubscribe = onStoreReady('s', onConnect);
 
       unsubscribe();
@@ -127,7 +127,7 @@ describe('store/registry', () => {
       const services = makeServices();
       registerStore('s', services);
 
-      const onConnect = jest.fn();
+      const onConnect = vi.fn();
       const unsubscribe = onStoreReady('s', onConnect);
       unsubscribe();
 
@@ -136,15 +136,15 @@ describe('store/registry', () => {
     });
 
     it('is idempotent', () => {
-      const onConnect = jest.fn();
+      const onConnect = vi.fn();
       const unsubscribe = onStoreReady('s', onConnect);
       unsubscribe();
       expect(() => unsubscribe()).not.toThrow();
     });
 
     it('leaves other subscribers in the same scope intact', () => {
-      const a = jest.fn();
-      const b = jest.fn();
+      const a = vi.fn();
+      const b = vi.fn();
       const unsubA = onStoreReady('s', a);
       onStoreReady('s', b);
 
@@ -158,13 +158,13 @@ describe('store/registry', () => {
 
   describe('onStoreReady — timeout', () => {
     it('drops the subscription and logs a warn after the timeout', () => {
-      jest.useFakeTimers();
-      const warn = jest.spyOn(console, 'warn').mockImplementation();
+      vi.useFakeTimers();
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-      const onConnect = jest.fn();
+      const onConnect = vi.fn();
       onStoreReady('s', onConnect, { timeout: 1000 });
 
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
       expect(onConnect).not.toHaveBeenCalled();
       expect(warn).toHaveBeenCalled();
 
@@ -174,64 +174,64 @@ describe('store/registry', () => {
     });
 
     it('does not time out when timeout is 0', () => {
-      jest.useFakeTimers();
-      const onConnect = jest.fn();
+      vi.useFakeTimers();
+      const onConnect = vi.fn();
       onStoreReady('s', onConnect, { timeout: 0 });
 
-      jest.advanceTimersByTime(10_000);
+      vi.advanceTimersByTime(10_000);
 
       registerStore('s', makeServices());
       expect(onConnect).toHaveBeenCalledTimes(1);
     });
 
     it('unsubscribe clears the pending timeout', () => {
-      jest.useFakeTimers();
-      const warn = jest.spyOn(console, 'warn').mockImplementation();
+      vi.useFakeTimers();
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-      const onConnect = jest.fn();
+      const onConnect = vi.fn();
       const unsubscribe = onStoreReady('s', onConnect, { timeout: 1000 });
       unsubscribe();
 
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
       expect(warn).not.toHaveBeenCalled();
       expect(onConnect).not.toHaveBeenCalled();
     });
 
     it('invokes onTimeout when the timeout fires', () => {
-      jest.useFakeTimers();
-      jest.spyOn(console, 'warn').mockImplementation();
+      vi.useFakeTimers();
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-      const onConnect = jest.fn();
-      const onTimeout = jest.fn();
+      const onConnect = vi.fn();
+      const onTimeout = vi.fn();
       onStoreReady('s', onConnect, { timeout: 1000, onTimeout });
 
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
       expect(onTimeout).toHaveBeenCalledTimes(1);
       expect(onConnect).not.toHaveBeenCalled();
     });
 
     it('does not invoke onTimeout when the store registers before the timeout', () => {
-      jest.useFakeTimers();
-      const onConnect = jest.fn();
-      const onTimeout = jest.fn();
+      vi.useFakeTimers();
+      const onConnect = vi.fn();
+      const onTimeout = vi.fn();
       onStoreReady('s', onConnect, { timeout: 1000, onTimeout });
 
       registerStore('s', makeServices());
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
 
       expect(onConnect).toHaveBeenCalledTimes(1);
       expect(onTimeout).not.toHaveBeenCalled();
     });
 
     it('does not invoke onTimeout when the subscriber unsubscribes first', () => {
-      jest.useFakeTimers();
-      jest.spyOn(console, 'warn').mockImplementation();
+      vi.useFakeTimers();
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-      const onTimeout = jest.fn();
-      const unsubscribe = onStoreReady('s', jest.fn(), { timeout: 1000, onTimeout });
+      const onTimeout = vi.fn();
+      const unsubscribe = onStoreReady('s', vi.fn(), { timeout: 1000, onTimeout });
       unsubscribe();
 
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
       expect(onTimeout).not.toHaveBeenCalled();
     });
   });
@@ -242,7 +242,7 @@ describe('store/registry', () => {
       unregisterStore('s');
       expect(hasStore('s')).toBe(false);
 
-      const onConnect = jest.fn();
+      const onConnect = vi.fn();
       onStoreReady('s', onConnect);
 
       const replacement = makeServices('second');
@@ -252,7 +252,7 @@ describe('store/registry', () => {
     });
 
     it('does not notify subscribers that registered before the original unregister', () => {
-      const onConnect = jest.fn();
+      const onConnect = vi.fn();
       onStoreReady('s', onConnect);
 
       const first = makeServices('first');
@@ -271,11 +271,11 @@ describe('store/registry', () => {
 
   describe('subscriber exceptions', () => {
     it('does not orphan sibling subscribers when one throws', () => {
-      const error = jest.spyOn(console, 'error').mockImplementation();
-      const thrower = jest.fn(() => {
+      const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const thrower = vi.fn(() => {
         throw new Error('boom');
       });
-      const survivor = jest.fn();
+      const survivor = vi.fn();
 
       onStoreReady('s', thrower);
       onStoreReady('s', survivor);
@@ -288,7 +288,7 @@ describe('store/registry', () => {
     });
 
     it('does not propagate out of registerStore', () => {
-      jest.spyOn(console, 'error').mockImplementation();
+      vi.spyOn(console, 'error').mockImplementation(() => {});
       onStoreReady('s', () => {
         throw new Error('boom');
       });
@@ -300,28 +300,28 @@ describe('store/registry', () => {
   describe('connectConsumer', () => {
     it('sets data-changebot-state to waiting-for-provider initially', () => {
       const el = document.createElement('div');
-      connectConsumer(el, 'default', jest.fn());
+      connectConsumer(el, 'default', vi.fn());
       expect(el.getAttribute('data-changebot-state')).toBe('waiting-for-provider');
     });
 
     it('sets data-changebot-state to connected when store registers', () => {
       const el = document.createElement('div');
-      connectConsumer(el, 'default', jest.fn());
+      connectConsumer(el, 'default', vi.fn());
       registerStore('default', makeServices());
       expect(el.getAttribute('data-changebot-state')).toBe('connected');
     });
 
     it('sets data-changebot-state to provider-missing on timeout', () => {
-      jest.useFakeTimers();
-      jest.spyOn(console, 'warn').mockImplementation();
+      vi.useFakeTimers();
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
       const el = document.createElement('div');
-      connectConsumer(el, 'default', jest.fn());
-      jest.advanceTimersByTime(5000);
+      connectConsumer(el, 'default', vi.fn());
+      vi.advanceTimersByTime(5000);
       expect(el.getAttribute('data-changebot-state')).toBe('provider-missing');
     });
 
     it('includes element tag name in error log when onConnected throws', () => {
-      const errorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       const el = document.createElement('changebot-badge');
       connectConsumer(el, 'default', () => {
         throw new Error('boom');
@@ -336,7 +336,7 @@ describe('store/registry', () => {
 
   describe('clearRegistry', () => {
     it('drops registered stores and pending listeners', async () => {
-      const onConnect = jest.fn();
+      const onConnect = vi.fn();
       registerStore('a', makeServices('a'));
       onStoreReady('b', onConnect);
 

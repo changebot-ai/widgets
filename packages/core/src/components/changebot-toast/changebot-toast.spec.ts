@@ -1,5 +1,5 @@
-import { newSpecPage } from '@stencil/core/testing';
-import { ChangebotToast } from './changebot-toast';
+import { render } from '@stencil/vitest';
+import './changebot-toast';
 import { Services } from '../../types';
 import { clearRegistry, registerStore } from '../../store/registry';
 
@@ -15,10 +15,7 @@ describe('changebot-toast', () => {
   });
 
   it('renders nothing when no update is visible', async () => {
-    const { root } = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast></changebot-toast>',
-    });
+    const { root } = await render('<changebot-toast></changebot-toast>');
 
     expect(root.shadowRoot.children.length).toBe(0);
   });
@@ -36,12 +33,9 @@ describe('changebot-toast', () => {
       tags: []
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast></changebot-toast>',
-    });
+    const page = await render('<changebot-toast></changebot-toast>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.currentUpdate = mockUpdate;
     component.isVisible = true;
     await page.waitForChanges();
@@ -69,12 +63,9 @@ describe('changebot-toast', () => {
       tags: []
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast></changebot-toast>',
-    });
+    const page = await render('<changebot-toast></changebot-toast>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.currentUpdate = mockUpdate;
     component.isVisible = true;
     await page.waitForChanges();
@@ -98,12 +89,9 @@ describe('changebot-toast', () => {
       tags: []
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast position="top-left"></changebot-toast>',
-    });
+    const page = await render('<changebot-toast position="top-left"></changebot-toast>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.currentUpdate = mockUpdate;
     component.isVisible = true;
     await page.waitForChanges();
@@ -125,12 +113,9 @@ describe('changebot-toast', () => {
       tags: []
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast position="center"></changebot-toast>',
-    });
+    const page = await render('<changebot-toast position="center"></changebot-toast>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.currentUpdate = mockUpdate;
     component.isVisible = true;
     await page.waitForChanges();
@@ -152,12 +137,9 @@ describe('changebot-toast', () => {
       tags: []
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast></changebot-toast>',
-    });
+    const page = await render('<changebot-toast></changebot-toast>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.currentUpdate = mockUpdate;
     component.isVisible = true;
     await page.waitForChanges();
@@ -167,10 +149,7 @@ describe('changebot-toast', () => {
   });
 
   it('applies custom scope attribute', async () => {
-    const { root } = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast scope="admin"></changebot-toast>',
-    });
+    const { root } = await render('<changebot-toast scope="admin"></changebot-toast>');
 
     expect(root.getAttribute('data-scope')).toBe('admin');
   });
@@ -188,12 +167,9 @@ describe('changebot-toast', () => {
       tags: []
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast theme="catppuccin-mocha"></changebot-toast>',
-    });
+    const page = await render('<changebot-toast theme="catppuccin-mocha"></changebot-toast>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.currentUpdate = mockUpdate;
     component.isVisible = true;
     await page.waitForChanges();
@@ -215,12 +191,9 @@ describe('changebot-toast', () => {
       tags: []
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast></changebot-toast>',
-    });
+    const page = await render('<changebot-toast></changebot-toast>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.currentUpdate = mockUpdate;
     component.isVisible = true;
     await page.waitForChanges();
@@ -245,12 +218,9 @@ describe('changebot-toast', () => {
       tags: []
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast></changebot-toast>',
-    });
+    const page = await render('<changebot-toast></changebot-toast>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.currentUpdate = mockUpdate;
     component.isVisible = true;
     await page.waitForChanges();
@@ -276,12 +246,9 @@ describe('changebot-toast', () => {
       tags: []
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast></changebot-toast>',
-    });
+    const page = await render('<changebot-toast></changebot-toast>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.currentUpdate = mockUpdate;
     component.isVisible = true;
     await page.waitForChanges();
@@ -307,12 +274,9 @@ describe('changebot-toast', () => {
       tags: []
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast></changebot-toast>',
-    });
+    const page = await render('<changebot-toast></changebot-toast>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.currentUpdate = mockUpdate;
     component.isVisible = true;
     await page.waitForChanges();
@@ -338,12 +302,9 @@ describe('changebot-toast', () => {
       tags: []
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast></changebot-toast>',
-    });
+    const page = await render('<changebot-toast></changebot-toast>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.currentUpdate = mockUpdate;
     component.isVisible = true;
     await page.waitForChanges();
@@ -353,16 +314,13 @@ describe('changebot-toast', () => {
   });
 
   it('loads without provider (services remain undefined)', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast></changebot-toast>',
-    });
+    const page = await render('<changebot-toast></changebot-toast>');
 
     // Verify component loaded successfully
-    expect(page.rootInstance).toBeDefined();
+    expect(page.instance).toBeDefined();
 
     // Services should be undefined since no provider registered a store
-    expect(page.rootInstance.services).toBeUndefined();
+    expect(page.instance.services).toBeUndefined();
   });
 
   it('subscribes to store updates when context is received', async () => {
@@ -382,15 +340,12 @@ describe('changebot-toast', () => {
           }
         ]
       },
-      onChange: jest.fn()
+      onChange: vi.fn()
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast></changebot-toast>',
-    });
+    const page = await render('<changebot-toast></changebot-toast>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
 
     // Simulate receiving context
     component.services = { store: mockStore };
@@ -400,18 +355,15 @@ describe('changebot-toast', () => {
   });
 
   it('cleans up on disconnect', async () => {
-    const unsubscribe = jest.fn();
+    const unsubscribe = vi.fn();
     const mockStore = {
       state: { updates: [] },
-      onChange: jest.fn().mockReturnValue(unsubscribe)
+      onChange: vi.fn().mockReturnValue(unsubscribe)
     };
 
-    const page = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast></changebot-toast>',
-    });
+    const page = await render('<changebot-toast></changebot-toast>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     component.services = { store: mockStore };
     component.subscribeToStore();
 
@@ -422,17 +374,14 @@ describe('changebot-toast', () => {
   });
 
   it('cancels its pending registry subscription on disconnect', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast></changebot-toast>',
-    });
+    const page = await render('<changebot-toast></changebot-toast>');
 
-    const component = page.rootInstance;
+    const component = page.instance;
     expect(component.services).toBeUndefined();
 
     component.disconnectedCallback();
 
-    const onChange = jest.fn().mockReturnValue(jest.fn());
+    const onChange = vi.fn().mockReturnValue(vi.fn());
     const services = {
       store: { state: { updates: [] }, onChange },
     } as unknown as Services;
@@ -443,20 +392,18 @@ describe('changebot-toast', () => {
   });
 
   it('exposes connection state via data-changebot-state', async () => {
-    const page = await newSpecPage({
-      components: [ChangebotToast],
-      html: '<changebot-toast></changebot-toast>',
-    });
+    const page = await render('<changebot-toast></changebot-toast>');
 
     const host = page.root;
     expect(host.getAttribute('data-changebot-state')).toBe('waiting-for-provider');
 
-    const onChange = jest.fn().mockReturnValue(jest.fn());
+    const onChange = vi.fn().mockReturnValue(vi.fn());
     const services = {
       store: { state: { updates: [] }, onChange },
     } as unknown as Services;
     registerStore('default', services);
 
+    await page.waitForChanges();
     expect(host.getAttribute('data-changebot-state')).toBe('connected');
   });
 
@@ -474,20 +421,17 @@ describe('changebot-toast', () => {
     };
 
     const makeFakeConfetti = () => {
-      const fire = jest.fn().mockReturnValue(Promise.resolve());
-      const fn: any = jest.fn();
-      fn.create = jest.fn().mockReturnValue(fire);
+      const fire = vi.fn().mockReturnValue(Promise.resolve());
+      const fn: any = vi.fn();
+      fn.create = vi.fn().mockReturnValue(fire);
       return { fn, fire };
     };
 
     it('fires confetti when becoming visible with confetti=true and position=center', async () => {
       const { fn, fire } = makeFakeConfetti();
-      const page = await newSpecPage({
-        components: [ChangebotToast],
-        html: '<changebot-toast position="center" confetti="true"></changebot-toast>',
-      });
+      const page = await render('<changebot-toast position="center" confetti="true"></changebot-toast>');
 
-      const component = page.rootInstance;
+      const component = page.instance;
       (component as any).confettiFn = fn;
       component.currentUpdate = confettiUpdate;
       component.isVisible = true;
@@ -499,12 +443,9 @@ describe('changebot-toast', () => {
 
     it('fires confetti for non-center positions', async () => {
       const { fn, fire } = makeFakeConfetti();
-      const page = await newSpecPage({
-        components: [ChangebotToast],
-        html: '<changebot-toast position="bottom-right" confetti="true"></changebot-toast>',
-      });
+      const page = await render('<changebot-toast position="bottom-right" confetti="true"></changebot-toast>');
 
-      const component = page.rootInstance;
+      const component = page.instance;
       (component as any).confettiFn = fn;
       component.currentUpdate = confettiUpdate;
       component.isVisible = true;
@@ -516,12 +457,9 @@ describe('changebot-toast', () => {
 
     it('does not fire confetti when confetti prop is false', async () => {
       const { fn, fire } = makeFakeConfetti();
-      const page = await newSpecPage({
-        components: [ChangebotToast],
-        html: '<changebot-toast position="center"></changebot-toast>',
-      });
+      const page = await render('<changebot-toast position="center"></changebot-toast>');
 
-      const component = page.rootInstance;
+      const component = page.instance;
       (component as any).confettiFn = fn;
       component.currentUpdate = confettiUpdate;
       component.isVisible = true;
@@ -532,12 +470,9 @@ describe('changebot-toast', () => {
     });
 
     it('removes confetti canvas on dismiss', async () => {
-      const page = await newSpecPage({
-        components: [ChangebotToast],
-        html: '<changebot-toast position="center" confetti="true"></changebot-toast>',
-      });
+      const page = await render('<changebot-toast position="center" confetti="true"></changebot-toast>');
 
-      const component = page.rootInstance;
+      const component = page.instance;
       const fakeCanvas = document.createElement('canvas');
       document.body.appendChild(fakeCanvas);
       (component as any).confettiCanvas = fakeCanvas;

@@ -26,8 +26,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Install Puppeteer browsers
-        run: pnpm --filter @changebot/core exec puppeteer browsers install chrome-headless-shell
+      - name: Install Playwright browsers
+        run: pnpm --filter @changebot/core exec playwright install --with-deps chromium
 
       - name: Run tests
         run: pnpm test

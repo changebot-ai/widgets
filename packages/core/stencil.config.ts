@@ -43,8 +43,10 @@ export const config: Config = {
       ],
     },
   ],
-  testing: {
-    browserHeadless: 'shell',
-    setupFilesAfterEnv: ['./src/test-setup.js'],
+  // Playwright builds each e2e page against this address. Chromium will not
+  // fetch subresources from 0.0.0.0, which is the default, so the component
+  // bundle would never load.
+  devServer: {
+    address: 'localhost',
   },
 };

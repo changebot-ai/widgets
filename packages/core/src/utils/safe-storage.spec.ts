@@ -1,3 +1,4 @@
+import type { MockInstance } from 'vitest';
 import { safeStorage, resetStorageCheck } from './safe-storage';
 
 /**
@@ -21,11 +22,11 @@ function installLocalStorage(overrides: Partial<Storage> = {}): Map<string, stri
 }
 
 describe('safeStorage', () => {
-  let warnSpy: jest.SpyInstance;
+  let warnSpy: MockInstance;
 
   beforeEach(() => {
     resetStorageCheck();
-    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   afterEach(() => {

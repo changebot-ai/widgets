@@ -1,4 +1,5 @@
-import { newE2EPage, E2EPage } from '@stencil/core/testing';
+import { expect } from '@playwright/test';
+import { test, type E2EPage } from '@stencil/playwright';
 import { waitForConnected, waitForPanelOpen, waitForPanelClosed } from '../../test-utils/e2e-helpers';
 
 const emptyMockData = JSON.stringify({ publications: [], widget: { name: 'Test' } });
@@ -11,57 +12,51 @@ function shadowFocusClasses(page: E2EPage): Promise<string | null> {
   });
 }
 
-describe('changebot-panel e2e', () => {
-  it('renders', async () => {
-    const page = await newE2EPage();
+test.describe('changebot-panel e2e', () => {
+  test('renders', async ({ page }) => {
     await page.setContent(`<changebot-panel></changebot-panel><changebot-provider mock-data='${emptyMockData}'></changebot-provider>`);
 
-    const element = await page.find('changebot-panel');
-    expect(element).toHaveClass('hydrated');
+    const element = page.locator('changebot-panel');
+    await expect(element).toContainClass('hydrated');
   });
 
-  it('renders with drawer-right class by default', async () => {
-    const page = await newE2EPage();
+  test('renders with drawer-right class by default', async ({ page }) => {
     await page.setContent(`<changebot-panel></changebot-panel><changebot-provider mock-data='${emptyMockData}'></changebot-provider>`);
 
-    const drawer = await page.find('changebot-panel >>> .panel');
-    const className = await drawer.getProperty('className');
+    const drawer = page.locator('changebot-panel .panel');
+    const className = await drawer.evaluate((el: any) => el.className);
 
     expect(className).toContain('panel--right');
     expect(className).toContain('panel--closed');
   });
 
-  it('renders with drawer-left class when specified', async () => {
-    const page = await newE2EPage();
+  test('renders with drawer-left class when specified', async ({ page }) => {
     await page.setContent(`<changebot-panel mode="drawer-left"></changebot-panel><changebot-provider mock-data='${emptyMockData}'></changebot-provider>`);
 
-    const drawer = await page.find('changebot-panel >>> .panel');
-    const className = await drawer.getProperty('className');
+    const drawer = page.locator('changebot-panel .panel');
+    const className = await drawer.evaluate((el: any) => el.className);
 
     expect(className).toContain('panel--left');
   });
 
-  it('renders with modal class when specified', async () => {
-    const page = await newE2EPage();
+  test('renders with modal class when specified', async ({ page }) => {
     await page.setContent(`<changebot-panel mode="modal"></changebot-panel><changebot-provider mock-data='${emptyMockData}'></changebot-provider>`);
 
-    const drawer = await page.find('changebot-panel >>> .panel');
-    const className = await drawer.getProperty('className');
+    const drawer = page.locator('changebot-panel .panel');
+    const className = await drawer.evaluate((el: any) => el.className);
 
     expect(className).toContain('panel--modal');
   });
 
-  it('shows close button', async () => {
-    const page = await newE2EPage();
+  test('shows close button', async ({ page }) => {
     await page.setContent(`<changebot-panel></changebot-panel><changebot-provider mock-data='${emptyMockData}'></changebot-provider>`);
 
-    const closeButton = await page.find('changebot-panel >>> .close-button');
-    expect(closeButton).not.toBeNull();
+    const closeButton = page.locator('changebot-panel .close-button');
+    await expect(closeButton).toHaveCount(1);
   });
 
-  describe('focus behavior', () => {
-    it('moves focus into the panel when opened', async () => {
-      const page = await newE2EPage();
+  test.describe('focus behavior', () => {
+    test('moves focus into the panel when opened', async ({ page }) => {
       const scope = 'panel-focus-open';
 
       await page.setContent(`
@@ -83,8 +78,7 @@ describe('changebot-panel e2e', () => {
       expect(await shadowFocusClasses(page)).toContain('close-button');
     });
 
-    it('traps Tab and Shift+Tab inside a modal panel', async () => {
-      const page = await newE2EPage();
+    test('traps Tab and Shift+Tab inside a modal panel', async ({ page }) => {
       const scope = 'panel-focus-trap';
 
       // With no updates, the focusable elements are exactly the close button
@@ -122,9 +116,8 @@ describe('changebot-panel e2e', () => {
     });
   });
 
-  describe('trigger prop', () => {
-    it('opens the panel when a trigger element is clicked', async () => {
-      const page = await newE2EPage();
+  test.describe('trigger prop', () => {
+    test('opens the panel when a trigger element is clicked', async ({ page }) => {
       const scope = 'panel-trigger';
 
       await page.setContent(`
@@ -139,8 +132,7 @@ describe('changebot-panel e2e', () => {
       await waitForPanelOpen(page);
     });
 
-    it('works for trigger elements added after mount', async () => {
-      const page = await newE2EPage();
+    test('works for trigger elements added after mount', async ({ page }) => {
       const scope = 'panel-trigger-dynamic';
 
       await page.setContent(`
@@ -162,8 +154,7 @@ describe('changebot-panel e2e', () => {
       await waitForPanelOpen(page);
     });
 
-    it('ignores clicks outside the trigger selector', async () => {
-      const page = await newE2EPage();
+    test('ignores clicks outside the trigger selector', async ({ page }) => {
       const scope = 'panel-trigger-miss';
 
       await page.setContent(`

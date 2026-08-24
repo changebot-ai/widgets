@@ -24,7 +24,7 @@ const silentLog = {
 
 describe('checkForHighlightedUpdate', () => {
   function callbacks() {
-    return { onShow: jest.fn(), onHide: jest.fn() };
+    return { onShow: vi.fn(), onHide: vi.fn() };
   }
 
   it('calls onShow with a new matching update', () => {
@@ -62,16 +62,16 @@ describe('checkForHighlightedUpdate', () => {
 describe('markUpdateAsViewed', () => {
   function actionsStub(): StoreActions {
     return {
-      loadUpdates: jest.fn(),
-      loadMockUpdates: jest.fn(),
-      markViewed: jest.fn(),
-      markAllViewed: jest.fn(),
-      markBannerViewed: jest.fn(),
-      markToastViewed: jest.fn(),
-      openDisplay: jest.fn(),
-      closeDisplay: jest.fn(),
-      toggleDisplay: jest.fn(),
-      calculateNewCount: jest.fn(),
+      loadUpdates: vi.fn(),
+      loadMockUpdates: vi.fn(),
+      markViewed: vi.fn(),
+      markAllViewed: vi.fn(),
+      markBannerViewed: vi.fn(),
+      markToastViewed: vi.fn(),
+      openDisplay: vi.fn(),
+      closeDisplay: vi.fn(),
+      toggleDisplay: vi.fn(),
+      calculateNewCount: vi.fn(),
     };
   }
 
@@ -86,7 +86,7 @@ describe('markUpdateAsViewed', () => {
   });
 
   it('refuses an update with an invalid published_at', () => {
-    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
       const actions = actionsStub();
       const u = update({ published_at: 'not-a-date' });
