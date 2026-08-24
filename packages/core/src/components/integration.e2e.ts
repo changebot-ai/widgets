@@ -1,5 +1,5 @@
 import { newE2EPage } from '@stencil/core/testing';
-import { injectFetchMock, waitForConnected, waitForPanelOpen, waitForPanelClosed, waitForShadow } from '../test-utils/e2e-helpers';
+import { injectFetchMock, seedLocalStorage, waitForConnected, waitForPanelOpen, waitForPanelClosed, waitForShadow } from '../test-utils/e2e-helpers';
 
 describe('Integration Tests - Full System', () => {
   describe('Provider-Badge-Drawer Integration', () => {
@@ -587,6 +587,102 @@ describe('Integration Tests - Full System', () => {
       await waitForConnected(page, 'changebot-badge');
 
       // Badge should still be hidden (no new updates since last view)
+      await waitForShadow(page, 'changebot-badge', '.badge.badge--hidden');
+
+      await page.close();
+    });
+  });
+
+  describe('Anonymous User Journey (no userId)', () => {
+    const SCOPE = 'anon-journey';
+    const STORAGE_KEY = `changebot:lastViewed:${SCOPE}`;
+
+    function mockDataWith(publications: any[]): string {
+      return JSON.stringify({
+        widget: { title: 'Updates', slug: 'anon-test' },
+        publications,
+      });
+    }
+
+    const oldPublication = {
+      id: 1,
+      title: 'Old Update',
+      content: '<p>Existed before the first visit</p>',
+      display_date: '2025-01-01',
+      published_at: '2025-01-01T00:00:00Z',
+      tags: [],
+    };
+
+    it('initializes lastViewed on first visit, counts a newer publication on the next, and clears after opening the panel', async () => {
+      // ===== Visit 1: first visit initializes lastViewed and hides the badge =====
+      let page = await newE2EPage();
+
+      await page.setContent(`
+        <changebot-provider scope="${SCOPE}" mock-data='${mockDataWith([oldPublication])}' />
+        <changebot-badge scope="${SCOPE}" />
+        <changebot-panel scope="${SCOPE}" />
+      `);
+      await page.waitForChanges();
+      await waitForConnected(page, 'changebot-badge');
+      await waitForShadow(page, 'changebot-badge', '.badge.badge--hidden');
+
+      const stored1 = await page.evaluate((key: string) => localStorage.getItem(key), STORAGE_KEY);
+      expect(stored1).not.toBeNull();
+      const firstVisitTimestamp = parseInt(stored1, 10);
+      expect(firstVisitTimestamp).toBeGreaterThan(new Date(oldPublication.published_at).getTime());
+
+      await page.close();
+
+      // ===== Visit 2: a publication newer than the first visit shows a count =====
+      const newPublication = {
+        id: 2,
+        title: 'New Update',
+        content: '<p>Published after the first visit</p>',
+        display_date: '2025-06-01',
+        // 1ms after the first visit: newer than that visit, but already in the
+        // past by the time the test clicks (which marks "now" as viewed)
+        published_at: new Date(firstVisitTimestamp + 1).toISOString(),
+        tags: [],
+      };
+
+      page = await newE2EPage();
+      await seedLocalStorage(page, { [STORAGE_KEY]: String(firstVisitTimestamp) });
+
+      await page.setContent(`
+        <changebot-provider scope="${SCOPE}" mock-data='${mockDataWith([newPublication, oldPublication])}' />
+        <changebot-badge scope="${SCOPE}" />
+        <changebot-panel scope="${SCOPE}" />
+      `);
+      await page.waitForChanges();
+      await waitForConnected(page, 'changebot-badge');
+      await waitForShadow(page, 'changebot-badge', '.badge:not(.badge--hidden)');
+
+      const count = await page.find('changebot-badge >>> .badge__count');
+      expect(await count.textContent).toBe('1');
+
+      // Opening the panel clears the count and persists the new timestamp
+      const badgeButton = await page.find('changebot-badge >>> .badge');
+      await badgeButton.click();
+      await waitForPanelOpen(page);
+      await waitForShadow(page, 'changebot-badge', '.badge.badge--hidden');
+
+      const stored2 = await page.evaluate((key: string) => localStorage.getItem(key), STORAGE_KEY);
+      const secondVisitTimestamp = parseInt(stored2, 10);
+      expect(secondVisitTimestamp).toBeGreaterThan(firstVisitTimestamp);
+
+      await page.close();
+
+      // ===== Visit 3: nothing new — the badge stays hidden =====
+      page = await newE2EPage();
+      await seedLocalStorage(page, { [STORAGE_KEY]: String(secondVisitTimestamp) });
+
+      await page.setContent(`
+        <changebot-provider scope="${SCOPE}" mock-data='${mockDataWith([newPublication, oldPublication])}' />
+        <changebot-badge scope="${SCOPE}" />
+        <changebot-panel scope="${SCOPE}" />
+      `);
+      await page.waitForChanges();
+      await waitForConnected(page, 'changebot-badge');
       await waitForShadow(page, 'changebot-badge', '.badge.badge--hidden');
 
       await page.close();

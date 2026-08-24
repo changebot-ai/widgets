@@ -1,9 +1,10 @@
 import { newE2EPage } from '@stencil/core/testing';
+import { seedLocalStorage, waitForConnected, waitForShadow } from '../../test-utils/e2e-helpers';
 
 const mockData = JSON.stringify({
   publications: [
-    { id: '1', title: 'New Feature', body: 'Description', published_at: new Date().toISOString(), tags: [] },
-    { id: '2', title: 'Bug Fix', body: 'Description', published_at: new Date().toISOString(), tags: [] },
+    { id: 1, title: 'New Feature', content: '<p>Description</p>', display_date: '2025-01-01', published_at: '2025-01-01T00:00:00Z', tags: [] },
+    { id: 2, title: 'Bug Fix', content: '<p>Description</p>', display_date: '2025-01-02', published_at: '2025-01-02T00:00:00Z', tags: [] },
   ],
   widget: { name: 'Test Widget' },
 });
@@ -54,41 +55,43 @@ describe('changebot-badge e2e', () => {
     expect(await component.getProperty('indicator')).toBe('dot');
   });
 
-  it.skip('displays correct count after badge re-renders', async () => {
+  it('displays correct count after badge re-renders', async () => {
     const page = await newE2EPage();
+    const scope = 'badge-remount';
 
-    // Set up provider with mock data and a badge
+    // A lastViewed older than both publications, so the count is 2
+    await seedLocalStorage(page, { [`changebot:lastViewed:${scope}`]: String(new Date('2024-01-01T00:00:00Z').getTime()) });
+
     await page.setContent(`
       <div id="badge-container">
-        <changebot-badge></changebot-badge>
+        <changebot-badge scope="${scope}"></changebot-badge>
       </div>
-      <changebot-provider mock-data='${mockData}'></changebot-provider>
+      <changebot-provider scope="${scope}" mock-data='${mockData}'></changebot-provider>
     `);
 
     await page.waitForChanges();
-    await new Promise(r => setTimeout(r, 50)); // Let badge start waiting for store
 
-    // Simulate re-render: remove badge from DOM (before it connects to provider)
+    // Simulate a framework re-render: remove the badge from the DOM...
     await page.evaluate(() => {
       const container = document.getElementById('badge-container');
       container.innerHTML = '';
     });
     await page.waitForChanges();
 
-    // Re-add badge to DOM (simulating framework re-render)
-    await page.evaluate(() => {
+    // ...and add a fresh one back
+    await page.evaluate((s: string) => {
       const container = document.getElementById('badge-container');
       const newBadge = document.createElement('changebot-badge');
+      newBadge.setAttribute('scope', s);
       container.appendChild(newBadge);
-    });
-    await page.waitForChanges();
-    await new Promise(r => setTimeout(r, 300));
+    }, scope);
     await page.waitForChanges();
 
-    // Verify badge shows correct count after re-render
-    const badge = await page.find('changebot-badge >>> .badge');
+    // The new badge connects to the provider and shows the count
+    await waitForConnected(page, 'changebot-badge');
+    await waitForShadow(page, 'changebot-badge', '.badge:not(.badge--hidden)');
+
     const count = await page.find('changebot-badge >>> .badge__count');
     expect(await count.innerText).toBe('2');
-    expect(badge).not.toHaveClass('badge--hidden');
   });
 });
