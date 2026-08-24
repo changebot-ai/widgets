@@ -7,6 +7,9 @@
     "build": "pnpm --filter @changebot/core run build && pnpm --filter @changebot/widgets-react run build && pnpm --filter @changebot/widgets-vue run build && pnpm --filter @changebot/mock-server run build",
     "start": "pnpm --filter @changebot/core run start",
     "test": "pnpm --filter @changebot/core run test",
+    "test.spec": "pnpm --filter @changebot/core run test.spec",
+    "test.e2e": "pnpm --filter @changebot/core run test.e2e",
+    "test.watch": "pnpm --filter @changebot/core run test.watch",
     "test.smoke": "pnpm --filter @changebot/core run test.smoke",
     "mock-server": "pnpm --filter @changebot/mock-server run start",
     "mock-server:dev": "pnpm --filter @changebot/mock-server run dev"
