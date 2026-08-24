@@ -27,3 +27,9 @@ jobs:
 
       - name: Run tests
         run: pnpm test
+
+      - name: Build packages
+        run: pnpm run build
+
+      - name: Run built-output smoke test
+        run: pnpm run test.smoke
